@@ -1,0 +1,137 @@
+/* Hirntraining – Offline-Speicher (Service Worker). Automatisch erzeugt von tools/offline_liste.py – nicht von Hand ändern.
+ * Wirkt nur in der Online-Version (https, z. B. GitHub Pages): Nach dem ersten Öffnen läuft das Programm
+ * auch ohne Internet. Die Patientendaten liegen davon unabhängig im Speicher des jeweiligen Geräts. */
+var VERSION = 'ht-13ee720154';
+var DATEIEN = [
+ "./",
+ "index.html",
+ "manifest.webmanifest",
+ "assets/app/apple-touch-icon.png",
+ "assets/app/favicon-64.png",
+ "assets/app/icon-192.png",
+ "assets/app/icon-512.png",
+ "assets/app/icon-maskable-512.png",
+ "assets/app/icon.svg",
+ "assets/icons.js",
+ "core/adaptive.js",
+ "core/admin.js",
+ "core/app.js",
+ "core/arbeitsplatz.js",
+ "core/audio.js",
+ "core/auth.js",
+ "core/charts.js",
+ "core/exploration.js",
+ "core/i18n.js",
+ "core/library.js",
+ "core/moduleApi.js",
+ "core/patients.js",
+ "core/plans.js",
+ "core/pult.js",
+ "core/reports.js",
+ "core/results.js",
+ "core/session.js",
+ "core/storage.js",
+ "core/testdata.js",
+ "core/ui.js",
+ "core/util.js",
+ "core/vorgaben.js",
+ "core/ziele.js",
+ "css/base.css",
+ "css/components.css",
+ "css/layout.css",
+ "css/print.css",
+ "css/training.css",
+ "data/alltag.js",
+ "data/bilder.js",
+ "data/formen.js",
+ "data/modulinfo.js",
+ "data/sprachaudio.js",
+ "data/texte.js",
+ "data/woerter.js",
+ "modules/alltagsgedaechtnis/module.js",
+ "modules/arbeitsgedaechtnis/module.js",
+ "modules/bilder-wiedererkennen/module.js",
+ "modules/daueraufmerksamkeit/module.js",
+ "modules/figur-grund/module.js",
+ "modules/formen-unterscheiden/module.js",
+ "modules/gesichtsfeld/module.js",
+ "modules/geteilte-aufmerksamkeit/module.js",
+ "modules/handlungsplanung/module.js",
+ "modules/kategorisieren/module.js",
+ "modules/labyrinth/module.js",
+ "modules/liste.js",
+ "modules/memory/module.js",
+ "modules/muster-nachbauen/module.js",
+ "modules/neglect-training/module.js",
+ "modules/reaktion/module.js",
+ "modules/rechnen-alltag/module.js",
+ "modules/regeln-wechseln/module.js",
+ "modules/reihen-fortsetzen/module.js",
+ "modules/richtungen/module.js",
+ "modules/rotation-2d/module.js",
+ "modules/rotation-3d/module.js",
+ "modules/sakkaden/module.js",
+ "modules/selektive-aufmerksamkeit/module.js",
+ "modules/spur-nachfahren/module.js",
+ "modules/tagesplanung/module.js",
+ "modules/textverstaendnis/module.js",
+ "modules/turm/module.js",
+ "modules/uhrzeit/module.js",
+ "modules/verfolgen/module.js",
+ "modules/vigilanz/module.js",
+ "modules/visuelle-exploration/module.js",
+ "modules/wahlreaktion/module.js",
+ "modules/wege-merken/module.js",
+ "modules/wortfindung/module.js",
+ "modules/wortlisten/module.js",
+ "modules/wortsuche/module.js",
+ "modules/zahlen-mengen/module.js",
+ "modules/zahlenspanne/module.js",
+ "modules/zielklicken/module.js",
+ "audio/anleitung-kategorisieren.mp3",
+ "audio/anleitung-reaktion.mp3",
+ "audio/anleitung-rechnen-alltag.mp3",
+ "audio/anleitung-zielklicken.mp3",
+ "audio/befinden-anstrengung.mp3",
+ "audio/befinden-jetzt.mp3",
+ "audio/befinden-stimmung.mp3",
+ "audio/befinden-wach.mp3",
+ "audio/lob-1.mp3",
+ "audio/lob-2.mp3",
+ "audio/lob-3.mp3",
+ "audio/lob-4.mp3",
+ "audio/nachricht.mp3",
+ "audio/pause.mp3",
+ "audio/sitzung-fertig.mp3",
+ "audio/uebung-fertig.mp3",
+ "audio/ziffer-0.mp3",
+ "audio/ziffer-1.mp3",
+ "audio/ziffer-2.mp3",
+ "audio/ziffer-3.mp3",
+ "audio/ziffer-4.mp3",
+ "audio/ziffer-5.mp3",
+ "audio/ziffer-6.mp3",
+ "audio/ziffer-7.mp3",
+ "audio/ziffer-8.mp3",
+ "audio/ziffer-9.mp3"
+];
+self.addEventListener('install', function (e) {
+  e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(DATEIEN); }).then(function () { return self.skipWaiting(); }));
+});
+self.addEventListener('activate', function (e) {
+  e.waitUntil(caches.keys().then(function (alle) {
+    return Promise.all(alle.filter(function (k) { return k !== VERSION; }).map(function (k) { return caches.delete(k); }));
+  }).then(function () { return self.clients.claim(); }));
+});
+self.addEventListener('fetch', function (e) {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(function (treffer) {
+    return treffer || fetch(e.request).then(function (antwort) {
+      if (antwort && antwort.ok && new URL(e.request.url).origin === self.location.origin) {
+        var kopie = antwort.clone();
+        caches.open(VERSION).then(function (c) { c.put(e.request, kopie); });
+      }
+      return antwort;
+    }).catch(function () { return caches.match('./index.html'); });
+  }));
+});

@@ -1,0 +1,50 @@
+/* Hirntraining – Berichte (Bildschirmvorschau + Druck auf A4) */
+
+.bericht-layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); grid-gap: 1.4rem; gap: 1.4rem; align-items: start; }
+.bericht-optionen { position: -webkit-sticky; position: sticky; top: 1rem; }
+.bericht-optionen .feld { margin-bottom: .9rem; }
+.bericht-papier {
+  background: #fff; color: #1E2A33; width: 210mm; max-width: 100%; min-height: 297mm; margin: 0 auto;
+  padding: 16mm 16mm 18mm; box-shadow: var(--schatten-3); border-radius: 6px; font-size: 10.5pt; line-height: 1.45;
+}
+.bericht-kopf { display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 3px solid #1BA8B5; padding-bottom: 5mm; margin-bottom: 6mm; }
+.bericht-kopf img { max-height: 22mm; max-width: 60mm; object-fit: contain; }
+.bericht-kopf h1 { font-size: 18pt; color: #1E2A33; }
+.bericht-kopf .bk-praxis { text-align: right; font-size: 9.5pt; color: #51606b; }
+.bericht-kopf .bk-praxis strong { display: block; font-size: 12pt; color: #1E2A33; }
+.bericht-papier h2 { font-size: 12.5pt; color: #13808b; margin: 6mm 0 2.5mm; padding-bottom: 1mm; border-bottom: 1px solid #e1e8ed; }
+.bericht-papier h3 { font-size: 11pt; margin: 4mm 0 1.5mm; }
+.bericht-daten { display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 1.5mm 8mm; gap: 1.5mm 8mm; }
+.bericht-daten div { display: flex; }
+.bericht-daten span { color: #51606b; min-width: 34mm; }
+.bericht-tabelle { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 2mm 0; }
+.bericht-tabelle th { background: #f0f5f7; text-align: left; padding: 1.6mm 2mm; font-size: 8.5pt; text-transform: uppercase; letter-spacing: .04em; color: #51606b; }
+.bericht-tabelle td { padding: 1.6mm 2mm; border-bottom: 1px solid #e8eef1; }
+.bericht-tabelle .r { text-align: right; font-variant-numeric: tabular-nums; }
+.bericht-modul { page-break-inside: avoid; break-inside: avoid; margin-bottom: 4mm; }
+.bericht-diagramme { display: grid; grid-template-columns: 1fr 1fr; grid-gap: 4mm; gap: 4mm; }
+.bericht-diagramme img { width: 100%; border: 1px solid #e8eef1; border-radius: 3mm; }
+.bericht-kommentar { white-space: pre-wrap; border: 1px solid #e1e8ed; border-radius: 3mm; padding: 3mm 4mm; min-height: 20mm; background: #fafcfd; }
+.bericht-fuss { margin-top: 10mm; display: flex; justify-content: space-between; font-size: 9pt; color: #51606b; }
+.bericht-fuss .unterschrift { border-top: 1px solid #1E2A33; width: 70mm; padding-top: 1.5mm; text-align: center; margin-top: 14mm; }
+
+@media print {
+  @page { size: A4; margin: 0; }
+  html, body { height: auto; overflow: visible !important; background: #fff !important; }
+  body * { visibility: hidden; }
+  .bericht-papier, .bericht-papier * { visibility: visible; }
+  .bericht-papier { position: absolute; left: 0; top: 0; box-shadow: none; border-radius: 0; width: 210mm; margin: 0; }
+  .seitenleiste, .bericht-optionen, .seiten-kopf, #toasts { display: none !important; }
+  .hauptbereich, .shell, .inhalt { overflow: visible !important; height: auto !important; display: block !important; padding: 0 !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+/* Levelverlauf für Patienten */
+.lv-druck { position: fixed; left: -10000px; top: 0; }
+.lv-grafik { display: flex; align-items: flex-end; height: 120mm; border-bottom: 2px solid #1E2A33; margin-top: 8mm; padding: 0 2mm; }
+.lv-saeule { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; margin: 0 1mm; }
+.lv-balken { width: 70%; background: linear-gradient(180deg, #2EAD6B, #1BA8B5); border-radius: 3mm 3mm 0 0; }
+.lv-smileys { font-size: 18pt; color: #E0A21B; writing-mode: vertical-rl; letter-spacing: 2mm; }
+.lv-saeule span { font-size: 8pt; color: #51606b; margin-top: 1.5mm; position: relative; top: 6mm; }
+@media print { .lv-druck { position: absolute; left: 0; } .lv-druck .bericht-papier, .lv-druck .bericht-papier * { visibility: visible; } body:has(.lv-druck) .bericht-papier:not(.lv-papier) { display: none; } }
+.bericht-text { margin: 4mm 0; line-height: 1.55; }
+code { background: var(--grund-2); padding: 0 .3rem; border-radius: 5px; font-size: .85em; }

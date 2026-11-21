@@ -1,0 +1,407 @@
+[
+ {
+  "id": "befinden-stimmung",
+  "text": "Wie fühlen Sie sich heute?",
+  "prio": 1,
+  "ausloeser": "Wie fühlen Sie sich heute?"
+ },
+ {
+  "id": "befinden-wach",
+  "text": "Wie wach fühlen Sie sich?",
+  "prio": 1,
+  "ausloeser": "Wie wach fühlen Sie sich?"
+ },
+ {
+  "id": "befinden-anstrengung",
+  "text": "Wie anstrengend war das Training?",
+  "prio": 1,
+  "ausloeser": "Wie anstrengend war das Training?"
+ },
+ {
+  "id": "befinden-jetzt",
+  "text": "Wie fühlen Sie sich jetzt?",
+  "prio": 1,
+  "ausloeser": "Wie fühlen Sie sich jetzt?"
+ },
+ {
+  "id": "pause",
+  "text": "Zeit für eine kurze Pause!",
+  "prio": 1,
+  "ausloeser": "Zeit für eine kurze Pause!"
+ },
+ {
+  "id": "uebung-fertig",
+  "text": "Prima! Die Übung ist geschafft. Jetzt beginnt das Training.",
+  "prio": 1,
+  "ausloeser": "Prima! Die Übung ist geschafft. Jetzt beginnt das Training."
+ },
+ {
+  "id": "lob-1",
+  "text": "Hervorragend!",
+  "prio": 1,
+  "ausloeser": "Hervorragend!"
+ },
+ {
+  "id": "lob-2",
+  "text": "Gut gemacht!",
+  "prio": 1,
+  "ausloeser": "Gut gemacht!"
+ },
+ {
+  "id": "lob-3",
+  "text": "Weiter so!",
+  "prio": 1,
+  "ausloeser": "Weiter so!"
+ },
+ {
+  "id": "lob-4",
+  "text": "Dranbleiben – das wird!",
+  "prio": 1,
+  "ausloeser": "Dranbleiben – das wird!"
+ },
+ {
+  "id": "sitzung-fertig",
+  "text": "Super – Sitzung geschafft!",
+  "prio": 1,
+  "ausloeser": "Super – Sitzung geschafft!"
+ },
+ {
+  "id": "nachricht",
+  "text": "Möchten Sie Ihrer Therapeutin oder Ihrem Therapeuten etwas mitteilen?",
+  "prio": 2,
+  "ausloeser": "Möchten Sie Ihrer Therapeutin oder Ihrem Therapeuten etwas mitteilen?"
+ },
+ {
+  "id": "ziffer-0",
+  "text": "Null",
+  "prio": 2,
+  "ausloeser": "0"
+ },
+ {
+  "id": "ziffer-1",
+  "text": "Eins",
+  "prio": 2,
+  "ausloeser": "1"
+ },
+ {
+  "id": "ziffer-2",
+  "text": "Zwei",
+  "prio": 2,
+  "ausloeser": "2"
+ },
+ {
+  "id": "ziffer-3",
+  "text": "Drei",
+  "prio": 2,
+  "ausloeser": "3"
+ },
+ {
+  "id": "ziffer-4",
+  "text": "Vier",
+  "prio": 2,
+  "ausloeser": "4"
+ },
+ {
+  "id": "ziffer-5",
+  "text": "Fünf",
+  "prio": 2,
+  "ausloeser": "5"
+ },
+ {
+  "id": "ziffer-6",
+  "text": "Sechs",
+  "prio": 2,
+  "ausloeser": "6"
+ },
+ {
+  "id": "ziffer-7",
+  "text": "Sieben",
+  "prio": 2,
+  "ausloeser": "7"
+ },
+ {
+  "id": "ziffer-8",
+  "text": "Acht",
+  "prio": 2,
+  "ausloeser": "8"
+ },
+ {
+  "id": "ziffer-9",
+  "text": "Neun",
+  "prio": 2,
+  "ausloeser": "9"
+ },
+ {
+  "id": "anleitung-reaktion",
+  "text": "Schauen Sie auf den grauen Kreis. Sobald er GRÜN wird, drücken Sie so schnell wie möglich die Leertaste oder tippen auf den Kreis. Wird er ROT, nicht reagieren!",
+  "prio": 3,
+  "ausloeser": "Schauen Sie auf den grauen Kreis. Sobald er GRÜN wird, drücken Sie so schnell wie möglich die Leertaste oder tippen auf den Kreis. Wird er ROT, nicht reagieren!",
+  "modul": "Reaktion"
+ },
+ {
+  "id": "anleitung-daueraufmerksamkeit",
+  "text": "Oben sehen Sie Ihr Zielsymbol. In der Mitte erscheinen nacheinander verschiedene Symbole. Drücken Sie nur dann die Leertaste oder tippen auf das Symbol, wenn Ihr Zielsymbol erscheint.",
+  "prio": 4,
+  "ausloeser": "Oben sehen Sie Ihr Zielsymbol. In der Mitte erscheinen nacheinander verschiedene Symbole. Drücken Sie nur dann die Leertaste oder tippen auf das Symbol, wenn Ihr Zielsymbol erscheint.",
+  "modul": "Daueraufmerksamkeit"
+ },
+ {
+  "id": "anleitung-selektive-aufmerksamkeit",
+  "text": "Oben sehen Sie das gesuchte Symbol. Klicken oder tippen Sie im Feld darunter auf ALLE gleichen Symbole. Wenn Sie alle gefunden haben, tippen Sie auf „Fertig“.",
+  "prio": 5,
+  "ausloeser": "Oben sehen Sie das gesuchte Symbol. Klicken oder tippen Sie im Feld darunter auf ALLE gleichen Symbole. Wenn Sie alle gefunden haben, tippen Sie auf „Fertig“.",
+  "modul": "Selektive Aufmerksamkeit"
+ },
+ {
+  "id": "anleitung-arbeitsgedaechtnis",
+  "text": "Merken Sie sich, in welcher Reihenfolge die Felder aufleuchten. Tippen Sie danach die Felder in derselben Reihenfolge an. Wenn „rückwärts“ angezeigt wird, beginnen Sie mit dem zuletzt leuchtenden Feld.",
+  "prio": 6,
+  "ausloeser": "Merken Sie sich, in welcher Reihenfolge die Felder aufleuchten. Tippen Sie danach die Felder in derselben Reihenfolge an. Wenn „rückwärts“ angezeigt wird, beginnen Sie mit dem zuletzt leuchtenden Feld.",
+  "modul": "Arbeitsgedächtnis Folgen"
+ },
+ {
+  "id": "anleitung-memory",
+  "text": "Decken Sie immer zwei Karten auf. Zeigen beide das gleiche Bild, bleiben sie offen liegen. Merken Sie sich, wo welche Bilder liegen, und finden Sie alle Paare.",
+  "prio": 7,
+  "ausloeser": "Decken Sie immer zwei Karten auf. Zeigen beide das gleiche Bild, bleiben sie offen liegen. Merken Sie sich, wo welche Bilder liegen, und finden Sie alle Paare.",
+  "modul": "Memory (Paare)"
+ },
+ {
+  "id": "anleitung-visuelle-exploration",
+  "text": "Oben sehen Sie, was Sie suchen. Suchen Sie den ganzen Bildschirm in Ruhe ab – am besten Zeile für Zeile von links nach rechts – und tippen Sie jedes gesuchte Objekt an. Danach auf „Fertig“.",
+  "prio": 8,
+  "ausloeser": "Oben sehen Sie, was Sie suchen. Suchen Sie den ganzen Bildschirm in Ruhe ab – am besten Zeile für Zeile von links nach rechts – und tippen Sie jedes gesuchte Objekt an. Danach auf „Fertig“.",
+  "modul": "Visuelle Exploration"
+ },
+ {
+  "id": "anleitung-neglect-training",
+  "text": "Schauen Sie zuerst zur roten Linie am Rand. Beginnen Sie dort und suchen Sie dann Zeile für Zeile den ganzen Bildschirm nach den gesuchten Objekten ab. Tippen Sie jedes an.",
+  "prio": 9,
+  "ausloeser": "Schauen Sie zuerst zur roten Linie am Rand. Beginnen Sie dort und suchen Sie dann Zeile für Zeile den ganzen Bildschirm nach den gesuchten Objekten ab. Tippen Sie jedes an.",
+  "modul": "Neglect-Training"
+ },
+ {
+  "id": "anleitung-geteilte-aufmerksamkeit",
+  "text": "Behalten Sie beides im Blick: Erreicht ein Zeiger den ROTEN Bereich, drücken Sie F oder tippen links auf „Anzeige“. Hören Sie einen HOHEN Ton, drücken Sie J oder tippen rechts auf „Ton“.",
+  "prio": 10,
+  "ausloeser": "Behalten Sie beides im Blick: Erreicht ein Zeiger den ROTEN Bereich, drücken Sie F oder tippen links auf „Anzeige“. Hören Sie einen HOHEN Ton, drücken Sie J oder tippen rechts auf „Ton“.",
+  "modul": "Geteilte Aufmerksamkeit"
+ },
+ {
+  "id": "anleitung-wahlreaktion",
+  "text": "In der Mitte erscheint ein Symbol. Drücken Sie so schnell wie möglich die passende Pfeiltaste oder tippen Sie unten auf das gleiche Symbol.",
+  "prio": 11,
+  "ausloeser": "In der Mitte erscheint ein Symbol. Drücken Sie so schnell wie möglich die passende Pfeiltaste oder tippen Sie unten auf das gleiche Symbol.",
+  "modul": "Wahlreaktion"
+ },
+ {
+  "id": "anleitung-bilder-wiedererkennen",
+  "text": "Schauen Sie sich die Bilder genau an und merken Sie sie sich. Danach sehen Sie wieder Bilder: Tippen Sie auf „Bekannt“ (Taste J), wenn Sie es vorher gesehen haben, sonst auf „Neu“ (Taste N).",
+  "prio": 12,
+  "ausloeser": "Schauen Sie sich die Bilder genau an und merken Sie sie sich. Danach sehen Sie wieder Bilder: Tippen Sie auf „Bekannt“ (Taste J), wenn Sie es vorher gesehen haben, sonst auf „Neu“ (Taste N).",
+  "modul": "Bilder wiedererkennen"
+ },
+ {
+  "id": "anleitung-wortlisten",
+  "text": "Lesen Sie die Wörter und merken Sie sie sich. Danach erscheinen Wörter einzeln: Tippen Sie auf „Bekannt“ (J), wenn das Wort in der Liste war, sonst auf „Neu“ (N).",
+  "prio": 13,
+  "ausloeser": "Lesen Sie die Wörter und merken Sie sie sich. Danach erscheinen Wörter einzeln: Tippen Sie auf „Bekannt“ (J), wenn das Wort in der Liste war, sonst auf „Neu“ (N).",
+  "modul": "Wortlisten"
+ },
+ {
+  "id": "anleitung-alltagsgedaechtnis",
+  "text": "Merken Sie sich die gezeigten Informationen gut. Danach werden Sie danach gefragt – wählen Sie die richtigen Antworten aus.",
+  "prio": 14,
+  "ausloeser": "Merken Sie sich die gezeigten Informationen gut. Danach werden Sie danach gefragt – wählen Sie die richtigen Antworten aus.",
+  "modul": "Alltagsgedächtnis"
+ },
+ {
+  "id": "anleitung-reihen-fortsetzen",
+  "text": "Schauen Sie sich die Reihe an: Nach welcher Regel geht sie weiter? Tippen Sie unten auf das Element, das als Nächstes kommt (oder Ziffer 1–4).",
+  "prio": 15,
+  "ausloeser": "Schauen Sie sich die Reihe an: Nach welcher Regel geht sie weiter? Tippen Sie unten auf das Element, das als Nächstes kommt (oder Ziffer 1–4).",
+  "modul": "Reihen fortsetzen"
+ },
+ {
+  "id": "anleitung-handlungsplanung",
+  "text": "Oben steht, was erledigt werden soll. Tippen Sie die Schritte in der richtigen Reihenfolge an – was zuerst kommt, zuerst. Schritte, die nicht dazugehören, lassen Sie einfach weg.",
+  "prio": 16,
+  "ausloeser": "Oben steht, was erledigt werden soll. Tippen Sie die Schritte in der richtigen Reihenfolge an – was zuerst kommt, zuerst. Schritte, die nicht dazugehören, lassen Sie einfach weg.",
+  "modul": "Handlungsplanung"
+ },
+ {
+  "id": "anleitung-rechnen-alltag",
+  "text": "Lesen Sie die Aufgabe und rechnen Sie in Ruhe. Tippen Sie dann auf das richtige Ergebnis (oder Ziffer 1–4).",
+  "prio": 17,
+  "ausloeser": "Lesen Sie die Aufgabe und rechnen Sie in Ruhe. Tippen Sie dann auf das richtige Ergebnis (oder Ziffer 1–4).",
+  "modul": "Rechnen im Alltag"
+ },
+ {
+  "id": "anleitung-uhrzeit",
+  "text": "Schauen Sie genau auf die Zeiger: Der kurze zeigt die Stunde, der lange (türkis) die Minuten. Tippen Sie auf die richtige Antwort.",
+  "prio": 18,
+  "ausloeser": "Schauen Sie genau auf die Zeiger: Der kurze zeigt die Stunde, der lange (türkis) die Minuten. Tippen Sie auf die richtige Antwort.",
+  "modul": "Uhrzeit"
+ },
+ {
+  "id": "anleitung-zielklicken",
+  "text": "Tippen oder klicken Sie die farbigen Ziele an, bevor sie verschwinden. Treffen Sie möglichst genau in die Mitte.",
+  "prio": 19,
+  "ausloeser": "Tippen oder klicken Sie die farbigen Ziele an, bevor sie verschwinden. Treffen Sie möglichst genau in die Mitte.",
+  "modul": "Zielklicken"
+ },
+ {
+  "id": "anleitung-vigilanz",
+  "text": "Pakete fahren auf dem Band vorbei. Die meisten sind gleich. Drücken Sie die Leertaste oder tippen Sie auf das Paket, sobald ein Paket anders aussieht.",
+  "prio": 20,
+  "ausloeser": "Pakete fahren auf dem Band vorbei. Die meisten sind gleich. Drücken Sie die Leertaste oder tippen Sie auf das Paket, sobald ein Paket anders aussieht.",
+  "modul": "Vigilanz"
+ },
+ {
+  "id": "anleitung-zahlenspanne",
+  "text": "Merken Sie sich die Ziffern, die nacheinander erscheinen. Geben Sie sie danach über den Ziffernblock oder die Tastatur ein und bestätigen Sie mit OK. Bei „rückwärts“ beginnen Sie mit der letzten Ziffer.",
+  "prio": 21,
+  "ausloeser": "Merken Sie sich die Ziffern, die nacheinander erscheinen. Geben Sie sie danach über den Ziffernblock oder die Tastatur ein und bestätigen Sie mit OK. Bei „rückwärts“ beginnen Sie mit der letzten Ziffer.",
+  "modul": "Zahlenspanne"
+ },
+ {
+  "id": "anleitung-wege-merken",
+  "text": "Beobachten Sie genau, welchen Weg der Punkt vom Haus zur Fahne nimmt. Gehen Sie danach denselben Weg: Tippen Sie nacheinander auf die Kreuzungen oder nutzen Sie die Pfeiltasten.",
+  "prio": 22,
+  "ausloeser": "Beobachten Sie genau, welchen Weg der Punkt vom Haus zur Fahne nimmt. Gehen Sie danach denselben Weg: Tippen Sie nacheinander auf die Kreuzungen oder nutzen Sie die Pfeiltasten.",
+  "modul": "Wege merken"
+ },
+ {
+  "id": "anleitung-gesichtsfeld",
+  "text": "Schauen Sie immer auf das Kreuz in der Mitte. Leuchtet am Rand ein Punkt auf, drücken Sie die Pfeiltaste dieser Seite (← oder →) oder tippen Sie auf diese Bildschirmhälfte. Wird das Kreuz ROT, drücken Sie die Leertaste.",
+  "prio": 23,
+  "ausloeser": "Schauen Sie immer auf das Kreuz in der Mitte. Leuchtet am Rand ein Punkt auf, drücken Sie die Pfeiltaste dieser Seite (← oder →) oder tippen Sie auf diese Bildschirmhälfte. Wird das Kreuz ROT, drücken Sie die Leertaste.",
+  "modul": "Gesichtsfeldtraining"
+ },
+ {
+  "id": "anleitung-sakkaden",
+  "text": "Folgen Sie dem springenden Punkt mit den Augen. Tippen Sie ihn schnell an. In schwereren Stufen erscheint dort kurz ein Pfeil – geben Sie seine Richtung mit den Pfeiltasten an.",
+  "prio": 24,
+  "ausloeser": "Folgen Sie dem springenden Punkt mit den Augen. Tippen Sie ihn schnell an. In schwereren Stufen erscheint dort kurz ein Pfeil – geben Sie seine Richtung mit den Pfeiltasten an.",
+  "modul": "Sakkadentraining"
+ },
+ {
+  "id": "anleitung-formen-unterscheiden",
+  "text": "Vergleichen Sie die Figuren genau. Tippen Sie auf die Figur, die anders ist – oder auf die Figur, die genau wie die Vorlage oben aussieht. Mit Pfeiltasten und Leertaste oder den Ziffern geht es auch.",
+  "prio": 25,
+  "ausloeser": "Vergleichen Sie die Figuren genau. Tippen Sie auf die Figur, die anders ist – oder auf die Figur, die genau wie die Vorlage oben aussieht. Mit Pfeiltasten und Leertaste oder den Ziffern geht es auch.",
+  "modul": "Formen unterscheiden"
+ },
+ {
+  "id": "anleitung-figur-grund",
+  "text": "Im großen Bild liegen mehrere Formen übereinander. Schauen Sie genau hin und tippen Sie unten auf die Form, die im Bild versteckt ist (oder – wenn gefragt – auf die Form, die NICHT im Bild ist).",
+  "prio": 26,
+  "ausloeser": "Im großen Bild liegen mehrere Formen übereinander. Schauen Sie genau hin und tippen Sie unten auf die Form, die im Bild versteckt ist (oder – wenn gefragt – auf die Form, die NICHT im Bild ist).",
+  "modul": "Figur-Grund"
+ },
+ {
+  "id": "anleitung-richtungen",
+  "text": "Bei Pfeilen: Geben Sie an, wohin der Pfeil zeigt. Bei Figuren: Welche Hand hebt die Person – ihre LINKE oder ihre RECHTE? Denken Sie sich in die Person hinein. Antworten Sie mit den Pfeiltasten oder den Knöpfen.",
+  "prio": 27,
+  "ausloeser": "Bei Pfeilen: Geben Sie an, wohin der Pfeil zeigt. Bei Figuren: Welche Hand hebt die Person – ihre LINKE oder ihre RECHTE? Denken Sie sich in die Person hinein. Antworten Sie mit den Pfeiltasten oder den Knöpfen.",
+  "modul": "Richtungen"
+ },
+ {
+  "id": "anleitung-rotation-2d",
+  "text": "Ist die rechte Figur dieselbe wie die linke, nur gedreht? Dann „Gleich“ (Taste J). Ist sie gespiegelt (wie im Spiegel), dann „Gespiegelt“ (Taste N).",
+  "prio": 28,
+  "ausloeser": "Ist die rechte Figur dieselbe wie die linke, nur gedreht? Dann „Gleich“ (Taste J). Ist sie gespiegelt (wie im Spiegel), dann „Gespiegelt“ (Taste N).",
+  "modul": "Mentale Rotation 2D"
+ },
+ {
+  "id": "anleitung-rotation-3d",
+  "text": "Stellen Sie sich vor, Sie drehen den linken Körper. Kann er genauso aussehen wie der rechte? Dann „Gleich“ (Taste J). Ist der rechte ein Spiegelbild, dann „Gespiegelt“ (Taste N).",
+  "prio": 29,
+  "ausloeser": "Stellen Sie sich vor, Sie drehen den linken Körper. Kann er genauso aussehen wie der rechte? Dann „Gleich“ (Taste J). Ist der rechte ein Spiegelbild, dann „Gespiegelt“ (Taste N).",
+  "modul": "Mentale Rotation 3D"
+ },
+ {
+  "id": "anleitung-muster-nachbauen",
+  "text": "Bauen Sie das Muster der Vorlage im rechten Raster nach. Wählen Sie unten eine Farbe und tippen Sie die Felder an. Nochmal tippen löscht ein Feld. Wenn alles stimmt, tippen Sie auf „Fertig“.",
+  "prio": 30,
+  "ausloeser": "Bauen Sie das Muster der Vorlage im rechten Raster nach. Wählen Sie unten eine Farbe und tippen Sie die Felder an. Nochmal tippen löscht ein Feld. Wenn alles stimmt, tippen Sie auf „Fertig“.",
+  "modul": "Muster nachbauen"
+ },
+ {
+  "id": "anleitung-regeln-wechseln",
+  "text": "Legen Sie die Karte unten auf einen der vier Stapel oben. Ob es richtig war, sehen Sie an der Rückmeldung. Finden Sie heraus, nach welcher Regel sortiert wird – die Regel kann sich ändern!",
+  "prio": 31,
+  "ausloeser": "Legen Sie die Karte unten auf einen der vier Stapel oben. Ob es richtig war, sehen Sie an der Rückmeldung. Finden Sie heraus, nach welcher Regel sortiert wird – die Regel kann sich ändern!",
+  "modul": "Regeln erkennen und wechseln"
+ },
+ {
+  "id": "anleitung-turm",
+  "text": "Bringen Sie die Scheiben in die Anordnung der Vorlage oben. Tippen Sie zuerst auf den Stab, von dem Sie die oberste Scheibe nehmen, dann auf den Ziel-Stab. Größere Scheiben dürfen nicht auf kleinere. Versuchen Sie, mit wenig Zügen auszukommen.",
+  "prio": 32,
+  "ausloeser": "Bringen Sie die Scheiben in die Anordnung der Vorlage oben. Tippen Sie zuerst auf den Stab, von dem Sie die oberste Scheibe nehmen, dann auf den Ziel-Stab. Größere Scheiben dürfen nicht auf kleinere. Versuchen Sie, mit wenig Zügen auszukommen.",
+  "modul": "Turm-Aufgabe"
+ },
+ {
+  "id": "anleitung-tagesplanung",
+  "text": "Tippen Sie links auf eine Erledigung und dann rechts auf eine freie Uhrzeit. Beachten Sie die Bedingung jeder Erledigung. Wenn alles eingetragen ist, tippen Sie auf „Fertig“.",
+  "prio": 33,
+  "ausloeser": "Tippen Sie links auf eine Erledigung und dann rechts auf eine freie Uhrzeit. Beachten Sie die Bedingung jeder Erledigung. Wenn alles eingetragen ist, tippen Sie auf „Fertig“.",
+  "modul": "Tagesplanung"
+ },
+ {
+  "id": "anleitung-kategorisieren",
+  "text": "In der Mitte erscheint ein Bild oder Wort. Tippen Sie auf den Oberbegriff, zu dem es gehört (oder Ziffer 1–4).",
+  "prio": 34,
+  "ausloeser": "In der Mitte erscheint ein Bild oder Wort. Tippen Sie auf den Oberbegriff, zu dem es gehört (oder Ziffer 1–4).",
+  "modul": "Kategorisieren"
+ },
+ {
+  "id": "anleitung-zahlen-mengen",
+  "text": "Entscheiden Sie zügig: Wo sind mehr Punkte? Welche Zahl ist größer? Was ist das Ergebnis? Tippen Sie auf die richtige Antwort oder nutzen Sie die Pfeiltasten.",
+  "prio": 35,
+  "ausloeser": "Entscheiden Sie zügig: Wo sind mehr Punkte? Welche Zahl ist größer? Was ist das Ergebnis? Tippen Sie auf die richtige Antwort oder nutzen Sie die Pfeiltasten.",
+  "modul": "Zahlen und Mengen"
+ },
+ {
+  "id": "anleitung-wortfindung",
+  "text": "Wie heißt der abgebildete Gegenstand? Tippen Sie auf das richtige Wort – oder setzen Sie das Wort aus den Buchstaben zusammen (auch per Tastatur). Mit „Hilfe“ sehen Sie den ersten Buchstaben.",
+  "prio": 36,
+  "ausloeser": "Wie heißt der abgebildete Gegenstand? Tippen Sie auf das richtige Wort – oder setzen Sie das Wort aus den Buchstaben zusammen (auch per Tastatur). Mit „Hilfe“ sehen Sie den ersten Buchstaben.",
+  "modul": "Wortfindung und Benennen"
+ },
+ {
+  "id": "anleitung-wortsuche",
+  "text": "Finden Sie die Wörter aus der Liste im Gitter. Tippen Sie den ersten und dann den letzten Buchstaben eines Wortes an. Gefundene Wörter werden markiert.",
+  "prio": 37,
+  "ausloeser": "Finden Sie die Wörter aus der Liste im Gitter. Tippen Sie den ersten und dann den letzten Buchstaben eines Wortes an. Gefundene Wörter werden markiert.",
+  "modul": "Buchstaben- und Wortsuche"
+ },
+ {
+  "id": "anleitung-textverstaendnis",
+  "text": "Lesen Sie den Text in Ruhe durch. Tippen Sie auf „Gelesen“, wenn Sie fertig sind. Beantworten Sie danach die Fragen zum Text.",
+  "prio": 38,
+  "ausloeser": "Lesen Sie den Text in Ruhe durch. Tippen Sie auf „Gelesen“, wenn Sie fertig sind. Beantworten Sie danach die Fragen zum Text.",
+  "modul": "Lesen und Textverständnis"
+ },
+ {
+  "id": "anleitung-spur-nachfahren",
+  "text": "Setzen Sie Maus oder Finger auf den grünen Startpunkt und fahren Sie die Spur bis zur Zielfahne nach, ohne die Spur zu verlassen. Mit den Pfeiltasten geht es auch.",
+  "prio": 39,
+  "ausloeser": "Setzen Sie Maus oder Finger auf den grünen Startpunkt und fahren Sie die Spur bis zur Zielfahne nach, ohne die Spur zu verlassen. Mit den Pfeiltasten geht es auch.",
+  "modul": "Spur nachfahren"
+ },
+ {
+  "id": "anleitung-labyrinth",
+  "text": "Führen Sie den türkisen Punkt zum Ziel unten rechts. Nutzen Sie die Pfeiltasten oder ziehen Sie den Punkt mit Maus oder Finger durch die Gänge.",
+  "prio": 40,
+  "ausloeser": "Führen Sie den türkisen Punkt zum Ziel unten rechts. Nutzen Sie die Pfeiltasten oder ziehen Sie den Punkt mit Maus oder Finger durch die Gänge.",
+  "modul": "Labyrinth"
+ },
+ {
+  "id": "anleitung-verfolgen",
+  "text": "Bleiben Sie mit der Maus oder dem Finger auf dem Ball und folgen Sie ihm. Der Ball leuchtet grün, solange Sie ihn treffen. Mit den Pfeiltasten können Sie den Zeiger ebenfalls steuern.",
+  "prio": 41,
+  "ausloeser": "Bleiben Sie mit der Maus oder dem Finger auf dem Ball und folgen Sie ihm. Der Ball leuchtet grün, solange Sie ihn treffen. Mit den Pfeiltasten können Sie den Zeiger ebenfalls steuern.",
+  "modul": "Verfolgen"
+ }
+]

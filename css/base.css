@@ -1,0 +1,100 @@
+/* Hirntraining – Grundlagen: Variablen, Reset, Typografie
+ * Hinweis: Für Safari 13 kein "gap" bei Flexbox (nur bei Grid), Abstände über Margins. */
+:root {
+  --akzent: #1BA8B5;
+  --akzent-dunkel: #13808b;
+  --akzent-hell: #e3f5f7;
+  --akzent-2: #3D7BE0;
+  --verlauf: linear-gradient(135deg, #1BA8B5 0%, #2c8fd6 100%);
+  --erfolg: #2EAD6B;
+  --erfolg-hell: #e2f5ea;
+  --fehler: #E25C5C;
+  --fehler-hell: #fce9e9;
+  --warnung: #E0A21B;
+  --warnung-hell: #fdf3dc;
+  --text: #1E2A33;
+  --text-2: #51606b;
+  --text-3: #8a97a1;
+  --grund: #F5F8FA;
+  --grund-2: #edf2f5;
+  --karte: #ffffff;
+  --linie: #e1e8ed;
+  --linie-2: #cfd9e0;
+  --schatten-1: 0 1px 2px rgba(20, 40, 60, .06), 0 1px 3px rgba(20, 40, 60, .05);
+  --schatten-2: 0 4px 14px rgba(20, 40, 60, .08), 0 1px 3px rgba(20, 40, 60, .05);
+  --schatten-3: 0 18px 50px rgba(20, 40, 60, .18), 0 4px 12px rgba(20, 40, 60, .08);
+  --radius: 12px;
+  --radius-gross: 18px;
+  --radius-klein: 8px;
+  --schnell: 160ms;
+  --mittel: 240ms;
+  --kurve: cubic-bezier(.2, .7, .2, 1);
+  --schrift: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --training-grund: #f3f6f8;
+  --skala: 1;
+}
+
+/* Farbschemata */
+[data-schema="ozean"] { --akzent: #2F6FDE; --akzent-dunkel: #2153ad; --akzent-hell: #e6eefc; --verlauf: linear-gradient(135deg, #2F6FDE 0%, #5a4fd6 100%); }
+[data-schema="salbei"] { --akzent: #2E9C77; --akzent-dunkel: #217659; --akzent-hell: #e2f4ed; --verlauf: linear-gradient(135deg, #2E9C77 0%, #1f8fa0 100%); }
+[data-schema="lavendel"] { --akzent: #7A62D6; --akzent-dunkel: #5b46ad; --akzent-hell: #eeeafb; --verlauf: linear-gradient(135deg, #7A62D6 0%, #c05ab5 100%); }
+[data-schema="koralle"] { --akzent: #E0675A; --akzent-dunkel: #b54a3f; --akzent-hell: #fceceb; --verlauf: linear-gradient(135deg, #E0675A 0%, #e6a03c 100%); }
+[data-schema="abend"] {
+  --akzent: #3cc3cf; --akzent-dunkel: #2aa3ae; --akzent-hell: #17353b; --verlauf: linear-gradient(135deg, #1f9aa6 0%, #2a6fb8 100%);
+  --text: #e7eef2; --text-2: #a9b7c0; --text-3: #7a8a95; --grund: #12191e; --grund-2: #19232a; --karte: #1c262d;
+  --linie: #2b3841; --linie-2: #3a4955; --erfolg-hell: #173527; --fehler-hell: #3a1f21; --warnung-hell: #3a301a;
+  --schatten-1: 0 1px 2px rgba(0, 0, 0, .3); --schatten-2: 0 4px 14px rgba(0, 0, 0, .35); --schatten-3: 0 18px 50px rgba(0, 0, 0, .55);
+  --training-grund: #161f25;
+}
+
+/* Hoher Kontrast: schwarz / weiß / gelb */
+[data-kontrast="an"] {
+  --akzent: #ffd400; --akzent-dunkel: #ffe866; --akzent-hell: #222; --verlauf: #000; --akzent-2: #ffd400;
+  --text: #ffffff; --text-2: #ffffff; --text-3: #e0e0e0; --grund: #000; --grund-2: #000; --karte: #000;
+  --linie: #ffffff; --linie-2: #ffffff; --erfolg: #39ff7a; --fehler: #ff5c5c; --erfolg-hell: #000; --fehler-hell: #000; --warnung-hell: #000;
+  --schatten-1: none; --schatten-2: none; --schatten-3: none; --training-grund: #000;
+}
+[data-kontrast="an"] .karte, [data-kontrast="an"] .dialog, [data-kontrast="an"] .seitenleiste { border: 2px solid #fff !important; }
+[data-kontrast="an"] .knopf.primaer { color: #000 !important; }
+
+* { box-sizing: border-box; }
+html { font-size: calc(112.5% * var(--skala)); -webkit-text-size-adjust: 100%; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: var(--schrift);
+  color: var(--text);
+  background: var(--grund);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+h1, h2, h3, h4 { margin: 0; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
+h1 { font-size: 1.75rem; letter-spacing: -0.02em; }
+h2 { font-size: 1.15rem; }
+h3 { font-size: 1rem; }
+p { margin: 0 0 .6em; }
+a { color: var(--akzent-dunkel); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+img { max-width: 100%; }
+::selection { background: var(--akzent-hell); }
+:focus { outline: none; }
+:focus-visible { outline: 3px solid var(--akzent); outline-offset: 2px; }
+.ic { width: 1.2em; height: 1.2em; flex: none; vertical-align: middle; }
+.versteckt { display: none !important; }
+.gedimmt { color: var(--text-3); }
+.klein { font-size: .85rem; }
+.fett { font-weight: 700; }
+.rechts { text-align: right; }
+.mitte { text-align: center; }
+.zahl { font-variant-numeric: tabular-nums; }
+
+/* Scrollbalken dezent */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-thumb { background: var(--linie-2); border-radius: 8px; border: 3px solid var(--grund); }
+::-webkit-scrollbar-track { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+}
