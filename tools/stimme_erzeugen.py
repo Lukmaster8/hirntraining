@@ -106,16 +106,55 @@ def wortzeiten(datei, text):
         silben = max(1, len(re.findall(r'[aeiouyäöü]+', sauber.lower())))
         return silben * 1.0 + len(sauber) * 0.08
     gew = [gewicht(w) for w in woerter]
-    gesamt = float(sum(gew))
     zeiten_aktiv = [k for k, a in enumerate(aktiv) if a]
     if not zeiten_aktiv:
         return None
-    starts, kum = [], 0.0
-    for g in gew:
-        idx = int(round(kum / gesamt * (len(zeiten_aktiv) - 1)))
-        starts.append(round(zeiten_aktiv[idx] * 0.02, 2))
-        kum += g
-    return starts
+
+    def verteilen(ws, rahmen):
+        """Wörter (Gewichte ws) auf die aktiven Rahmen eines Abschnitts verteilen."""
+        g = float(sum(ws)) or 1.0
+        out, kum = [], 0.0
+        for x in ws:
+            out.append(round(rahmen[int(round(kum / g * (len(rahmen) - 1)))] * 0.02, 2))
+            kum += x
+        return out
+
+    # Sprechabschnitte (getrennt durch Pausen >= 160 ms) den Satzteilen (bis , . ! ? : ;) zuordnen
+    abschnitte, akt, luecke = [], [], 0
+    for k, a in enumerate(aktiv):
+        if a:
+            if akt and luecke >= 8:
+                abschnitte.append(akt); akt = []
+            akt.append(k); luecke = 0
+        else:
+            luecke += 1
+    if akt:
+        abschnitte.append(akt)
+    phrasen, cur = [], []
+    for i, w in enumerate(woerter):
+        cur.append(i)
+        if re.search(r'[,.!?:;]$', w) or w in ('–', '-'):
+            phrasen.append(cur); cur = []
+    if cur:
+        phrasen.append(cur)
+    # zu viele Abschnitte: kleinste Pausen zusammenlegen
+    while len(abschnitte) > len(phrasen) and len(abschnitte) > 1:
+        pausen = [abschnitte[j + 1][0] - abschnitte[j][-1] for j in range(len(abschnitte) - 1)]
+        j = pausen.index(min(pausen))
+        abschnitte[j] = abschnitte[j] + list(range(abschnitte[j][-1] + 1, abschnitte[j + 1][0])) + abschnitte[j + 1]
+        del abschnitte[j + 1]
+    if len(abschnitte) == len(phrasen) and len(phrasen) > 1:
+        starts = []
+        for ph, ab in zip(phrasen, abschnitte):
+            starts += verteilen([gew[i] for i in ph], ab)
+        return starts
+    return verteilen(gew, zeiten_aktiv)
+
+
+def sprechtext(text):
+    """Wörter in GROSSBUCHSTABEN (z. B. ROT, GRÜN) klein schreiben – sonst liest die Stimme sie
+    manchmal wie Abkürzungen Buchstabe für Buchstabe oder undeutlich vor."""
+    return re.sub(r'\b[A-ZÄÖÜ]{3,}\b', lambda m: m.group(0).lower(), text)
 
 
 def zuordnung_schreiben(texte):
@@ -142,7 +181,7 @@ def main():
     ap = argparse.ArgumentParser(description='Vorlesestimme mit ElevenLabs erzeugen')
     ap.add_argument('--budget', type=float, default=None, help='höchstens so viele Credits verbrauchen (Standard: verbleibende Credits, max. 900)')
     ap.add_argument('--voice', default=STANDARD_STIMME)
-    ap.add_argument('--model', default='eleven_turbo_v2_5')
+    ap.add_argument('--model', default='eleven_multilingual_v2')
     ap.add_argument('--probe', action='store_true', help='nur anzeigen, nichts erzeugen')
     ap.add_argument('--nur-zuordnung', action='store_true', help='nur data/sprachaudio.js aus vorhandenen Aufnahmen neu schreiben')
     args = ap.parse_args()
@@ -196,7 +235,7 @@ def main():
             verbraucht += kosten
             continue
         daten = {
-            'text': t['text'], 'model_id': args.model, 'language_code': 'de',
+            'text': sprechtext(t['text']), 'model_id': args.model, 'language_code': 'de',
             'voice_settings': {'stability': 0.55, 'similarity_boost': 0.8, 'style': 0.15, 'use_speaker_boost': True}
         }
         try:
