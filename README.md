@@ -17,7 +17,7 @@ Auswertung mit Diagrammen und druckfertige Berichte. Alle Programmteile, Grafike
 
 ## 2. Starten
 
-* Doppelklick auf **`Hirntraining starten`** (Programmsymbol im Ordner). Er öffnet `index.html` in Chrome, falls vorhanden, sonst in Safari. Für den Schreibtisch: mit **cmd + alt** auf den Schreibtisch ziehen (Alias). Beim ersten Mal ggf. Rechtsklick → *Öffnen*. Die Kurzanleitung steht in **`LIESMICH – Start auf iMac und iPad.txt`**.
+* Doppelklick auf **`Hirntraining starten`** (Programmsymbol im Ordner). Hirntraining öffnet sich als **eigenes Programmfenster im Vollbild** (Chrome im App-Modus, ohne Adressleiste, mit eigenem Profil `~/Library/Application Support/Hirntraining-Chrome`). Ohne Chrome öffnet sich Safari. Beenden mit cmd + Q, Vollbild umschalten mit cmd + ctrl + F. Immer über den Starter öffnen, denn ein normales Chrome-Fenster hat einen anderen Datenspeicher. Für den Schreibtisch: mit **cmd + alt** auf den Schreibtisch ziehen (Alias). Beim ersten Mal ggf. Rechtsklick → *Öffnen*. Die Kurzanleitung steht in **`LIESMICH – Start auf iMac und iPad.txt`**.
 * Alternativ Doppelklick auf **`index.html`**. Die Datei öffnet sich im Standardbrowser.
 * Empfehlung: Mit **Google Chrome** öffnen (Rechtsklick → *Öffnen mit* → *Google Chrome*). Chrome speichert die Daten am zuverlässigsten in der Datenbank (IndexedDB). Safari funktioniert ebenfalls. Unter `file://` nutzt Safari automatisch den Ersatzspeicher (localStorage), der kleiner ist.
 * Für den Vollbildmodus auf **Vollbild** klicken. Der Knopf ist auf dem Startbildschirm und unten in der Seitenleiste. Beim Start einer Trainingssitzung schaltet das Programm selbst in den Vollbildmodus.

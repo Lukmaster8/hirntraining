@@ -1,6 +1,7 @@
 #!/bin/bash
-# Startet Hirntraining (index.html) im Browser – ohne Internet, ohne Installation.
-# Sucht den Programmordner: neben diesem Starter, sonst auf dem Schreibtisch, in Dokumente oder Programme.
+# Startet Hirntraining (index.html) als eigenes Programmfenster im Vollbild – ohne Adressleiste und Browser-Leisten,
+# ohne Internet, ohne Installation. Mit Google Chrome im App-Modus und eigenem Profil (Daten getrennt vom normalen
+# Surfen). Ohne Chrome wird Safari genommen (dort mit normalem Browserfenster).
 APP="$(cd "$(dirname "$0")/../.." && pwd)"
 for D in "$(dirname "$APP")" "$HOME/Desktop/Hirntraining" "$HOME/Schreibtisch/Hirntraining" "$HOME/Documents/Hirntraining" "/Applications/Hirntraining" "/Users/Shared/Hirntraining"; do
   if [ -f "$D/index.html" ]; then F="$D/index.html"; break; fi
@@ -9,9 +10,24 @@ if [ -z "$F" ]; then
   osascript -e 'display dialog "Der Ordner „Hirntraining“ wurde nicht gefunden. Bitte den Ordner auf den Schreibtisch legen." buttons {"OK"} with icon caution' >/dev/null 2>&1
   exit 1
 fi
-# Chrome bevorzugt (Pult per USB-HID möglich), sonst Safari / Standardbrowser
-if [ -d "/Applications/Google Chrome.app" ] || [ -d "$HOME/Applications/Google Chrome.app" ]; then
-  open -a "Google Chrome" "$F"
+
+CHROME=""
+for C in "/Applications/Google Chrome.app" "$HOME/Applications/Google Chrome.app"; do
+  if [ -d "$C" ]; then CHROME="$C"; break; fi
+done
+
+if [ -n "$CHROME" ]; then
+  PROFIL="$HOME/Library/Application Support/Hirntraining-Chrome"
+  mkdir -p "$PROFIL"
+  # Leerzeichen im Pfad für die URL kodieren
+  URL="file://$(printf '%s' "$F" | sed 's/ /%20/g')"
+  open -na "$CHROME" --args \
+    --user-data-dir="$PROFIL" \
+    --app="$URL" \
+    --start-fullscreen \
+    --no-first-run --no-default-browser-check \
+    --disable-features=Translate --disable-sync \
+    --autoplay-policy=no-user-gesture-required
 else
-  open "$F"
+  open -a Safari "$F" 2>/dev/null || open "$F"
 fi
