@@ -37,7 +37,7 @@
       var gross = 120;
       function neuesPaket(x) {
         var abw = HT.zufall.chance(p.abweichungsrate);
-        var el = HT.el('div', { class: 'm-symbol', html: paket(abw, p.unauffaelligkeit), style: { position: 'absolute', width: gross + 'px', height: gross + 'px', top: 'calc(55% - ' + gross + 'px + 4px)', left: '0', cursor: 'pointer' } });
+        var el = HT.el('div', { class: 'm-symbol', html: paket(abw, p.unauffaelligkeit), style: { position: 'absolute', width: gross + 'px', height: gross + 'px', top: 'calc(55% - ' + gross + 'px + 4px)', left: '0', cursor: 'pointer', transform: 'translateX(' + Math.round(x) + 'px)', willChange: 'transform' } });
         voll.appendChild(el);
         var pk = { el: el, x: x, abw: abw, gesehen: false, erkannt: false, startZeit: null };
         HT.tap(el, function () { reagieren(pk); });

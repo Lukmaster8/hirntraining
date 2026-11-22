@@ -27,6 +27,12 @@
       // Animation läuft automatisch, sobald die Karte sichtbar ist (und stoppt außerhalb des Bildschirms)
       sichtbarkeit().observe(v);
       v._an = an; v._aus = aus;
+      // zusätzlich sofort starten, falls die Karte schon sichtbar ist (unabhängig vom Beobachter)
+      setTimeout(function () {
+        if (!document.body.contains(v)) return;
+        var r = v.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < (window.innerHeight || 800) && r.width > 0) an();
+      }, 120);
     } else { v.addEventListener('mouseenter', an); v.addEventListener('mouseleave', aus); v.addEventListener('touchstart', an, { passive: true }); }
     v.stoppen = aus;
     return v;
@@ -37,7 +43,6 @@
       beobachter = new IntersectionObserver(function (eintraege) {
         eintraege.forEach(function (e) { if (e.isIntersecting && e.intersectionRatio > 0.25) e.target._an(); else e.target._aus(); });
       }, { threshold: [0, 0.25, 0.6] });
-      window.addEventListener('hashchange', function () { if (beobachter) { beobachter.disconnect(); beobachter = null; } });
     }
     return beobachter;
   }
@@ -103,6 +108,7 @@
   };
 
   HT.route('/module', function (param, w) {
+    if (beobachter) { beobachter.disconnect(); }
     var inaktiv = HT.kopie(S.einstellungen().moduleInaktiv || {});
     w.appendChild(UI.seite(HT.t('nav_module'), HT.Module.liste.length + ' Trainingsmodule in ' + HT.KATEGORIEN.length + ' Bereichen · Die Vorschau zeigt, wie jedes Modul funktioniert'));
     var leiste = HT.el('div', { class: 'werkzeugleiste' });

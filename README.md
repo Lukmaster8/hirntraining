@@ -1,7 +1,7 @@
 # Hirntraining – kognitives Training für die Ergotherapie
 
 Eigenständige Offline-Software für computergestütztes Hirnleistungstraining.
-39 Trainingsmodule in 7 Bereichen, Patientenverwaltung, Trainingspläne, adaptive Levelsteuerung,
+49 Trainingsmodule in 7 Bereichen, Patientenverwaltung, Trainingspläne, adaptive Levelsteuerung,
 Auswertung mit Diagrammen und druckfertige Berichte. Alle Programmteile, Grafiken und Töne sind selbst erstellt.
 
 * **Kein Internet, kein Server, keine Lizenzprüfung, keine Telemetrie.** Alle Daten bleiben auf dem Mac.
@@ -65,7 +65,7 @@ So erzeugen Sie die Aufnahmen (einmalig; dafür ist kurz Internet nötig, danach
 | **Startbildschirm** | Kachel „Therapeut“ (Anmeldung mit PIN) oder „Patient starten“ (Patient wählt seinen Namen und trainiert seinen aktiven Plan) |
 | **Übersicht** | heutige Sitzungen, zuletzt trainierte Patienten, Trainingsminuten, Status der Datensicherung |
 | **Patienten** | Suche, Filter nach Therapeut und Archiv, Patientenakte mit Reitern *Stammdaten · Trainingsplan · Therapieziele · Verlauf · Berichte · Einstellungen* |
-| **Modulbibliothek** | alle 39 Module mit Vorschau-Animation, Beschreibung und Leveltabelle. Module lassen sich einzeln ein- und ausschalten und „Ausprobieren“ (ohne Speichern) |
+| **Modulbibliothek** | alle 49 Module mit laufender Vorschau-Animation, Beschreibung und Leveltabelle. Module lassen sich einzeln ein- und ausschalten und über „Training starten“ sofort ausprobieren (ohne Speichern) |
 | **Auswertung** | Verlauf je Patient und Modul: Level, Trefferquote, Treffer/Fehler/Auslassungen, Reaktionszeit, Links-Rechts-Verteilung, Vergleich zweier Zeiträume |
 | **Verwaltung** (nur Admin) | Therapeuten, Praxisdaten und Logo, Vorlagen, Schwellen der Levelsteuerung, Datensicherung, Testdaten, Daten löschen |
 | **Einstellungen** | Farbschema (6 Varianten inkl. dunkel), Schriftgröße 100–160 %, hoher Kontrast, Ton, Lautstärke, Sprachausgabe, Pausenhinweis, Standarddauer |
@@ -228,7 +228,7 @@ Hirntraining/
   css/                base · layout · components · training · print
   core/               app, storage, auth, patients, plans, session, adaptive, results,
                       charts, reports, audio, ui, i18n, moduleApi, admin, library, exploration, testdata, util
-  modules/            39 Modulordner + liste.js
+  modules/            49 Modulordner + liste.js
   data/               bilder.js (82 SVG-Objekte), woerter.js (>300 Wörter), texte.js, alltag.js, formen.js
   assets/icons.js     eigene SVG-Icons
   docs/               Entwickler-Dokumentation, Modulübersicht
@@ -236,11 +236,11 @@ Hirntraining/
 
 ## 8. Modulkatalog
 
-**Aufmerksamkeit:** Reaktion (Alertness) · Wahlreaktion · Daueraufmerksamkeit · Vigilanz · Selektive Aufmerksamkeit · Geteilte Aufmerksamkeit
-**Gedächtnis:** Arbeitsgedächtnis Folgen · Zahlenspanne · Bilder wiedererkennen · Wortlisten · Memory · Wege merken · Alltagsgedächtnis
-**Wahrnehmung & Neglect:** Visuelle Exploration · Neglect-Training · Gesichtsfeldtraining · Sakkadentraining · Formen unterscheiden · Figur-Grund
+**Aufmerksamkeit:** Reaktion (Alertness) · Wahlreaktion · Daueraufmerksamkeit · Vigilanz · Selektive Aufmerksamkeit · Geteilte Aufmerksamkeit · Hörtraining · Straßenverkehr (Fahrsimulation mit Tacho und Tempolimits) · Zahlenfeld
+**Gedächtnis:** Arbeitsgedächtnis Folgen · Zahlenspanne · Bilder wiedererkennen · Wortlisten · Memory · Wege merken · Alltagsgedächtnis · Einkaufen · Geschichten merken · Wort-Bild-Paare · Personen merken · Spielkarten merken
+**Wahrnehmung & Neglect:** Visuelle Exploration · Neglect-Training · Gesichtsfeldtraining · Sakkadentraining · Lesetraining · Formen unterscheiden · Figur-Grund
 **Räumliches Denken:** Richtungen · Mentale Rotation 2D · Mentale Rotation 3D · Muster nachbauen
-**Exekutivfunktionen:** Reihen fortsetzen · Regeln erkennen und wechseln · Turm-Aufgabe · Handlungsplanung · Tagesplanung · Kategorisieren
+**Exekutivfunktionen:** Reihen fortsetzen · Regeln erkennen und wechseln · Turm-Aufgabe · Handlungsplanung · Tagesplanung · Kategorisieren · Büroaufgaben
 **Rechnen & Sprache:** Rechnen im Alltag · Uhrzeit · Zahlen und Mengen · Wortfindung · Buchstaben- und Wortsuche · Textverständnis
 **Visuomotorik:** Zielklicken · Spur nachfahren · Labyrinth · Verfolgen
 

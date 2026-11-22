@@ -3,15 +3,15 @@
 window.HT = window.HT || {};
 HT.MODUL_LISTE = [
   // Aufmerksamkeit
-  'reaktion', 'wahlreaktion', 'daueraufmerksamkeit', 'vigilanz', 'selektive-aufmerksamkeit', 'geteilte-aufmerksamkeit',
+  'reaktion', 'wahlreaktion', 'daueraufmerksamkeit', 'vigilanz', 'selektive-aufmerksamkeit', 'geteilte-aufmerksamkeit', 'hoeren', 'strassenverkehr', 'zahlenfeld',
   // Gedächtnis
-  'arbeitsgedaechtnis', 'zahlenspanne', 'bilder-wiedererkennen', 'wortlisten', 'memory', 'wege-merken', 'alltagsgedaechtnis',
+  'arbeitsgedaechtnis', 'zahlenspanne', 'bilder-wiedererkennen', 'wortlisten', 'memory', 'wege-merken', 'alltagsgedaechtnis', 'einkaufen', 'geschichten', 'wort-bild-paare', 'personen-merken', 'spielkarten',
   // Wahrnehmung & Neglect
-  'visuelle-exploration', 'neglect-training', 'gesichtsfeld', 'sakkaden', 'formen-unterscheiden', 'figur-grund',
+  'visuelle-exploration', 'neglect-training', 'gesichtsfeld', 'sakkaden', 'lesetraining', 'formen-unterscheiden', 'figur-grund',
   // Räumliches Denken
   'richtungen', 'rotation-2d', 'rotation-3d', 'muster-nachbauen',
   // Exekutivfunktionen
-  'reihen-fortsetzen', 'regeln-wechseln', 'turm', 'handlungsplanung', 'tagesplanung', 'kategorisieren',
+  'reihen-fortsetzen', 'regeln-wechseln', 'turm', 'handlungsplanung', 'tagesplanung', 'kategorisieren', 'buero',
   // Rechnen & Sprache
   'rechnen-alltag', 'uhrzeit', 'zahlen-mengen', 'wortfindung', 'wortsuche', 'textverstaendnis',
   // Visuomotorik

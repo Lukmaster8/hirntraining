@@ -213,3 +213,29 @@ kbd { display: inline-block; min-width: 2rem; text-align: center; padding: .15re
   .befinden-gesicht { width: 44px; height: 44px; }
   .gross-taste { min-height: 64px; font-size: 1.05rem; }
 }
+
+/* Straßenverkehr: Bedienknöpfe für Touch */
+.sv-leiste { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 8px; z-index: 4; align-items: flex-end; }
+.sv-knopf { min-width: 64px; height: 64px; border-radius: 18px; border: 1px solid var(--linie); background: rgba(255, 255, 255, .92); font: inherit; font-size: 1.5rem; font-weight: 800; color: var(--text); box-shadow: var(--schatten-1); touch-action: none; user-select: none; -webkit-user-select: none; }
+.sv-knopf:active { transform: scale(.95); background: var(--akzent-hell); }
+.sv-knopf.bremse { min-width: 130px; background: #fde9e9; border-color: #f2b8b8; color: #b93c3c; font-size: 1.05rem; letter-spacing: .05em; }
+.sv-knopf.tempo { min-width: 54px; height: 54px; }
+@media (hover: hover) and (pointer: fine) { .sv-knopf.lenk, .sv-knopf.tempo { opacity: .75; } }
+
+/* Einkaufen */
+.ek-liste { background: #fffdf3; border: 1px solid #efe3b8; border-radius: 14px; padding: 1rem 1.3rem; box-shadow: var(--schatten-1); min-width: 240px; font-size: 1.2rem; line-height: 1.7; transform: rotate(-1deg); }
+.ek-liste h3 { margin: 0 0 .4rem; font-size: 1.1rem; color: #8a6510; }
+.ek-regal { display: grid; gap: 10px; width: 100%; max-width: 860px; }
+.ek-artikel { background: var(--karte); border: 2px solid var(--linie); border-radius: 14px; padding: 6px; display: flex; flex-direction: column; align-items: center; cursor: pointer; font-size: .82rem; font-weight: 600; }
+.ek-artikel svg { width: 100%; height: 64px; }
+.ek-artikel .preis { color: var(--text-3); font-weight: 700; }
+.ek-artikel.im-wagen { border-color: var(--akzent); background: var(--akzent-hell); }
+.ek-artikel.fokus { box-shadow: 0 0 0 3px var(--akzent); }
+.ek-leiste { display: flex; align-items: center; gap: .8rem; margin-top: .9rem; flex-wrap: wrap; justify-content: center; }
+.ek-wagen { font-weight: 700; color: var(--text-2); }
+/* Lesetraining */
+.lt-zeile { font-size: 2rem; font-weight: 600; letter-spacing: .02em; padding: 1rem 1.6rem; background: var(--karte); border-radius: 16px; border: 1px solid var(--linie); position: relative; max-width: 96%; text-align: center; }
+.lt-zeile.anker-links { border-left: 8px solid #E25C5C; }
+.lt-zeile.anker-rechts { border-right: 8px solid #E25C5C; }
+.lt-maske { color: transparent; text-shadow: none; background: repeating-linear-gradient(90deg, #dfe6ea 0 14px, transparent 14px 18px); border-radius: 6px; }
+@media (max-width: 760px) { .lt-zeile { font-size: 1.3rem; padding: .7rem .9rem; } .ek-artikel svg { height: 46px; } }
