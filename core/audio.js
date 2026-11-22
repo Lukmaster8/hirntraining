@@ -22,6 +22,8 @@
     an: true,
     lautstaerke: 0.7,
     sprache: true,
+    /* Web-Audio-Kontext für Module mit eigenen Geräuschen (z. B. Motor und Regen im Straßenverkehr) */
+    kontext: function () { return A.an ? audio() : null; },
 
     /* Grundton. pan: -1 (links) … 1 (rechts) */
     ton: function (freq, dauer, typ, verzoegerung, lautst, pan) {
