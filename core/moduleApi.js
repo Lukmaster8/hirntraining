@@ -425,6 +425,43 @@
     z.aktiv = function () { return z.links || z.rechts || z.hoch || z.runter; };
     return z;
   };
+  /* Bewegungsunschärfe (Motion Blur) für schnell bewegte Reize.
+   * HT.bewegungsUnschaerfe.canvas(ctx, vx, vy, zeichne): zeichnet ein Objekt mit kurzer, verblassender Nachzieh-Spur
+   *   entgegen der Bewegung (vx, vy in px/s); zeichne(dx, dy) malt das Objekt um dx/dy verschoben.
+   * HT.bewegungsUnschaerfe.element(el) liefert f(vx, vy): richtungsabhängige Unschärfe über einen SVG-Filter;
+   *   f.entfernen() räumt auf. Bei „Bewegung reduzieren“ im System bleibt alles scharf. */
+  (function () {
+    var NS = 'http://www.w3.org/2000/svg', defs = null, nr = 0;
+    var ruhig = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    HT.bewegungsUnschaerfe = {
+      canvas: function (ctx, vx, vy, zeichne, staerke) {
+        var k = staerke || 0.03, sp = Math.sqrt(vx * vx + vy * vy) * k;
+        if (!ruhig && sp > 1.5) {
+          var a0 = ctx.globalAlpha, n = sp > 8 ? 5 : 3;
+          for (var i = n; i >= 1; i--) { var f = i / n; ctx.globalAlpha = a0 * 0.24 * (1 - f * 0.55); zeichne(-vx * k * f, -vy * k * f); }
+          ctx.globalAlpha = a0;
+        }
+        zeichne(0, 0);
+      },
+      element: function (el) {
+        var leer = function () {}; leer.entfernen = function () {};
+        if (ruhig || !document.createElementNS) return leer;
+        if (!defs) { var svg = document.createElementNS(NS, 'svg'); svg.setAttribute('width', '0'); svg.setAttribute('height', '0'); svg.setAttribute('aria-hidden', 'true'); svg.style.position = 'absolute'; defs = document.createElementNS(NS, 'defs'); svg.appendChild(defs); document.body.appendChild(svg); }
+        var id = 'ht-mb-' + (++nr), fi = document.createElementNS(NS, 'filter'), bl = document.createElementNS(NS, 'feGaussianBlur');
+        fi.setAttribute('id', id); fi.setAttribute('x', '-40%'); fi.setAttribute('y', '-40%'); fi.setAttribute('width', '180%'); fi.setAttribute('height', '180%');
+        bl.setAttribute('stdDeviation', '0 0'); fi.appendChild(bl); defs.appendChild(fi);
+        var aktiv = false, sx = -1, sy = -1;
+        var f = function (vx, vy) {
+          var nx = Math.min(10, Math.abs(vx) * 0.011), ny = Math.min(10, Math.abs(vy) * 0.011);
+          if (nx < 0.5 && ny < 0.5) { if (aktiv) { el.style.filter = ''; aktiv = false; } return; }
+          if (Math.abs(nx - sx) > 0.25 || Math.abs(ny - sy) > 0.25) { sx = nx; sy = ny; bl.setAttribute('stdDeviation', nx.toFixed(1) + ' ' + ny.toFixed(1)); }
+          if (!aktiv) { el.style.filter = 'url(#' + id + ')'; aktiv = true; }
+        };
+        f.entfernen = function () { el.style.filter = ''; if (fi.parentNode) fi.parentNode.removeChild(fi); };
+        return f;
+      }
+    };
+  })();
   /* Canvas in HiDPI-Auflösung über die ganze Fläche */
   HT.canvasVoll = function (container) {
     var c = HT.el('canvas', { class: 'm-canvas' });

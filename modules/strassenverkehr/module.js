@@ -50,6 +50,22 @@
     c.kopf = [134 / 170, 50 / 560];
     return c;
   }
+  function blatt(farbe, form) {
+    return leinwand(64, 64, function (g) {
+      g.translate(32, 32);
+      var gr = g.createLinearGradient(-26, -16, 26, 16); gr.addColorStop(0, farbe[0]); gr.addColorStop(1, farbe[1]); g.fillStyle = gr;
+      g.beginPath();
+      if (form === 0) { g.moveTo(-28, 0); g.quadraticCurveTo(-6, -19, 25, -2); g.quadraticCurveTo(29, 0, 25, 2); g.quadraticCurveTo(-6, 19, -28, 0); }
+      else if (form === 1) { for (var i = 0; i < 10; i++) { var w = i / 10 * Math.PI * 2 - Math.PI / 2, r = i % 2 ? 11 : 28; if (i) g.lineTo(Math.cos(w) * r, Math.sin(w) * r + 3); else g.moveTo(Math.cos(w) * r, Math.sin(w) * r + 3); } }
+      else g.ellipse(0, 0, 25, 17, 0.3, 0, Math.PI * 2);
+      g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(70,35,10,.5)'; g.lineWidth = 1.6; g.beginPath();
+      if (form === 1) { for (var k = 0; k < 5; k++) { var a = k / 5 * Math.PI * 2 - Math.PI / 2; g.moveTo(0, 3); g.lineTo(Math.cos(a) * 22, Math.sin(a) * 22 + 3); } g.moveTo(0, 3); g.lineTo(0, 30); }
+      else { g.moveTo(-31, 0); g.lineTo(22, 0); for (var j = -16; j < 18; j += 8) { g.moveTo(j, 0); g.lineTo(j + 7, -9); g.moveTo(j, 0); g.lineTo(j + 7, 9); } }
+      g.stroke();
+      g.fillStyle = 'rgba(255,255,255,.12)'; g.beginPath(); g.ellipse(-6, -6, 12, 5, -0.3, 0, Math.PI * 2); g.fill();
+    });
+  }
   function laubbaum(seed, pal) {
     var R = zufallGen(seed);
     return leinwand(240, 300, function (g, b, h) {
@@ -358,6 +374,9 @@
 
   function grafikErzeugen() {
     var S = {};
+    S.laubHerbst = [laubbaum(5, ['#7a3410', '#b8541a', '#e0862c', '#f2b544']), laubbaum(19, ['#6e2a12', '#a8361c', '#d4572a', '#ef8d3a']), laubbaum(44, ['#7a5a12', '#b88a1e', '#e2b73a', '#f4d870']), laubbaum(61, ['#5e3a1a', '#8f5a26', '#c4843a', '#dfae5c'])];
+    var bf = [['#e8902a', '#b34a12'], ['#d9381e', '#8e1d10'], ['#f2c03a', '#c7861b'], ['#9a5a2a', '#5e3416'], ['#e06a1f', '#a83b12']];
+    S.blaetter = []; for (var bi = 0; bi < 10; bi++) S.blaetter.push(blatt(bf[bi % bf.length], bi % 3));
     S.laub = [laubbaum(3, ['#2f6b34', '#3f8a44', '#63ad57', '#7cc266']), laubbaum(17, ['#3a6d2c', '#4d8f39', '#78b552', '#92c968']), laubbaum(42, ['#2c5f3a', '#3b7f4b', '#5aa465', '#79bf7a'])];
     S.tanne = [tanne(7), tanne(23)]; S.birke = [birke(5), birke(31)]; S.busch = [busch(9), busch(27), busch(55)]; S.zaun = zaun();
     S.haus = [haus(1), haus(8), haus(15), haus(22), haus(36), haus(49)];
@@ -460,12 +479,13 @@
     for (var i = -1; i <= 1; i++) { g.beginPath(); g.moveTo(-r * 0.12, i * r * 0.36); g.lineTo(-r * 0.9, i * r * 0.36 + (fern ? 0 : r * 0.28)); g.stroke(); }
     g.restore();
   }
+  var letzteWahl = null; // zuletzt gewählte Tageszeit (für den nächsten Durchgang vorausgewählt)
   var AMPEL_F = { rot: '255,59,48', gelb: '255,190,0', gruen: '48,220,100' }, AMPEL_Y = { rot: 36 / 420, gelb: 96 / 420, gruen: 156 / 420 };
 
   HT.registerModule({
     id: 'strassenverkehr', name: 'Straßenverkehr', kategorie: 'aufmerksamkeit', symbol: 'weiter',
     ziel: 'Tempo halten und gleichzeitig auf echte Störungen und eine zweite Aufgabe achten',
-    beschreibung: 'Cockpit-Fahrt für geteilte Aufmerksamkeit auf einer Landstraße mit Kurven, Feldern, Wäldern und Ortschaften, bei Tag, in der Dämmerung oder nachts, auf Wunsch im Regen mit Scheibenwischern und nasser Fahrbahn. Die Spur hält das Auto, mit Pfeil links und rechts lässt sich leicht ausweichen. Pfeil hoch beschleunigt sanft, Pfeil runter bremst. Der Tachozeiger soll im grünen Band bleiben. Niedrigere Limits gelten schon vor dem Schild, höhere erst danach. Angehalten wird bei roter Ampel, Fußgänger am Übergang, Stoppschild, geschlossener Schranke und Blaulicht im Spiegel. Einem Tier, Ball oder Gegenstand auf der Fahrbahn kann man ausweichen oder davor anhalten. L schaltet das Abblendlicht, F das Fernlicht; bei Fernlicht gibt der Gegenverkehr Lichthupe. Parallel kommen Abbiegen, Kontrollleuchten und eine Durchsage. Leere Übergänge, grüne Ampeln und Werbetafeln verlangen keine Taste.',
+    beschreibung: 'Cockpit-Fahrt für geteilte Aufmerksamkeit auf einer Landstraße mit Kurven, Feldern, Wäldern und Ortschaften. Zu Beginn wird Tag-, Abend- oder Nachtfahrt gewählt; die Fahrt beginnt bei schönem Wetter, nach etwa 20 Sekunden zieht Herbstregen auf: nasse, spiegelnde Straße, Tropfen auf der Scheibe, Scheibenwischer laufen automatisch. Die Spur hält das Auto, mit Pfeil links und rechts lässt sich leicht ausweichen. Pfeil hoch beschleunigt sanft, Pfeil runter bremst. Der Tachozeiger soll im grünen Band bleiben. Niedrigere Limits gelten schon vor dem Schild, höhere erst danach. Angehalten wird bei roter Ampel, Fußgänger am Übergang, Stoppschild, geschlossener Schranke und Blaulicht im Spiegel. Einem Tier, Ball oder Gegenstand auf der Fahrbahn kann man ausweichen oder davor anhalten. L schaltet das Abblendlicht, F das Fernlicht; bei Fernlicht gibt der Gegenverkehr Lichthupe. Parallel kommen Abbiegen, Kontrollleuchten und eine Durchsage. Leere Übergänge, grüne Ampeln und Werbetafeln verlangen keine Taste.',
     anleitung: 'Pfeil nach oben ist Gas, Pfeil nach unten ist Bremse. Halten Sie den Zeiger im grünen Bereich. Vor einem langsameren Schild schon abbremsen, nach einem schnelleren Schild erst beschleunigen. Halten Sie nur an, wenn wirklich etwas auf der Straße ist. Einem Tier, Ball oder Gegenstand können Sie mit Pfeil links oder rechts ausweichen. Bei einer Abbiege-Ansage zählt links oder rechts als Abbiegen. Leuchtet eine Lampe im Cockpit, drücken Sie OK. Die Plustaste nur bei der genannten Autobahn. Im Dunkeln schaltet L das Licht ein, F das Fernlicht. Bei Gegenverkehr abblenden.',
     tasten: ['hoch', 'runter', 'links', 'rechts', 'ok', 'ja'], levels: levels,
     levelLabels: {
@@ -476,8 +496,9 @@
     parameterSchema: {
       dauerDurchgangSek: { typ: 'zahl', label: 'Dauer eines Durchgangs (Sek.)', min: 45, max: 240, schritt: 15, standard: 90 },
       cockpit: { typ: 'schalter', label: 'Cockpit anzeigen', standard: true },
-      tageszeit: { typ: 'auswahl', label: 'Tageszeit', standard: 'zufall', optionen: [{ wert: 'zufall', label: 'Wechselnd' }, { wert: 'tag', label: 'Tag' }, { wert: 'daemmerung', label: 'Dämmerung' }, { wert: 'nacht', label: 'Nacht' }] },
-      wetter: { typ: 'auswahl', label: 'Wetter', standard: 'zufall', optionen: [{ wert: 'zufall', label: 'Wechselnd' }, { wert: 'trocken', label: 'Trocken' }, { wert: 'regen', label: 'Regen' }] },
+      tageszeit: { typ: 'auswahl', label: 'Tageszeit', standard: 'auswahl', optionen: [{ wert: 'auswahl', label: 'Beim Start wählen' }, { wert: 'zufall', label: 'Zufällig' }, { wert: 'tag', label: 'Tag' }, { wert: 'daemmerung', label: 'Dämmerung' }, { wert: 'nacht', label: 'Nacht' }] },
+      wetter: { typ: 'auswahl', label: 'Wetter', standard: 'wechsel', optionen: [{ wert: 'zufall', label: 'Zufällig' }, { wert: 'trocken', label: 'Trocken' }, { wert: 'regen', label: 'Regen' }, { wert: 'wechsel', label: 'Erst schön, nach etwa 20 s Regen' }] },
+      jahreszeit: { typ: 'auswahl', label: 'Jahreszeit', standard: 'herbst', optionen: [{ wert: 'zufall', label: 'Zufällig' }, { wert: 'sommer', label: 'Sommer' }, { wert: 'herbst', label: 'Herbst mit fallendem Laub' }] },
       linksverkehr: { typ: 'schalter', label: 'Schilder links (Linksverkehr)', standard: false }
     },
     create: function (container, ctx) {
@@ -497,12 +518,27 @@
       var suchbahn = HT.zufall.wahl(AUTOBAHNEN), naechsteLampe = p.kontrollen ? 12 : 1e9, naechsterStau = p.stau ? 18 : 1e9, uhr = 0;
 
       // Tageszeit und Wetter: Umgebungslicht (wird mit dem Bild multipliziert), Dunkelheit 0 … 1
-      var TZ = p.tageszeit && p.tageszeit !== 'zufall' ? p.tageszeit : HT.zufall.wahl(['tag', 'tag', 'tag', 'tag', 'tag', 'daemmerung', 'daemmerung', 'nacht', 'nacht', 'nacht']);
-      var REGEN = p.wetter === 'regen' || (p.wetter !== 'trocken' && HT.zufall.chance(0.35));
-      var AMB = TZ === 'nacht' ? (REGEN ? [14, 17, 26] : [16, 20, 36]) : TZ === 'daemmerung' ? (REGEN ? [132, 122, 130] : [205, 162, 152]) : (REGEN ? [178, 184, 194] : null);
-      var AMB_F = AMB ? 'rgb(' + AMB.join(',') + ')' : '', DUNKEL = TZ === 'nacht' ? 1 : TZ === 'daemmerung' ? 0.55 : (REGEN ? 0.2 : 0);
+      var WAHL = !p.tageszeit || p.tageszeit === 'auswahl';
+      var TZ = WAHL ? (letzteWahl || 'tag') : p.tageszeit !== 'zufall' ? p.tageszeit : HT.zufall.wahl(['tag', 'tag', 'tag', 'tag', 'tag', 'daemmerung', 'daemmerung', 'nacht', 'nacht', 'nacht']);
+      // Wetter: Regenstärke regenI und Nässe der Fahrbahn ändern sich fließend; bei „wechsel“ setzt Regen ein oder hört auf
+      var WETTER = p.wetter && p.wetter !== 'zufall' ? p.wetter : HT.zufall.wahl(['trocken', 'trocken', 'trocken', 'regen', 'regen', 'wechsel', 'wechsel', 'wechsel']);
+      var REGEN_MOEGLICH = WETTER !== 'trocken', regenZiel = WETTER === 'regen' ? 1 : 0;
+      var regenI = regenZiel, nass = regenZiel, regenWechselBei = WETTER === 'wechsel' ? HT.zufall.int(18, 22) : 1e9;
+      var HERBST = p.jahreszeit === 'herbst' || (p.jahreszeit !== 'sommer' && HT.zufall.chance(0.5));
+      var AMB_T, AMB_R, LICHTKARTE, DUNKEL_T, DUNKEL, DUNST_T, DUNST_R, DUNST, REFL;
+      // Alles, was von der Tageszeit abhängt (auch nach der Auswahl am Start erneut aufgerufen)
+      function tageszeitSetzen(tz) {
+        TZ = tz;
+        AMB_T = TZ === 'nacht' ? [16, 20, 36] : TZ === 'daemmerung' ? [205, 162, 152] : [255, 255, 255];
+        AMB_R = TZ === 'nacht' ? [14, 17, 26] : TZ === 'daemmerung' ? [120, 112, 124] : [170, 176, 188];
+        LICHTKARTE = TZ !== 'tag' || REGEN_MOEGLICH; DUNKEL_T = TZ === 'nacht' ? 1 : TZ === 'daemmerung' ? 0.55 : 0; DUNKEL = Math.max(DUNKEL_T, 0.2 * regenI);
+        DUNST_T = TZ === 'nacht' ? [140, 152, 184] : TZ === 'daemmerung' ? [246, 206, 184] : [222, 238, 245];
+        DUNST_R = TZ === 'nacht' ? [140, 152, 184] : TZ === 'daemmerung' ? [184, 180, 188] : [196, 204, 212]; DUNST = misch3(DUNST_T, DUNST_R, regenI);
+        REFL = TZ === 'nacht' ? [120, 130, 160] : [150, 165, 180];
+        W = 0; lgK = null; // Hintergrund und Lichtkarte beim nächsten masse() neu
+      }
       var licht = 0, quer = 0, querV = 0, gasP = 0, bremsP = 0, ruck = -9, blendung = 0, blendHinweisBis = 0, lichtHinweisBis = 7, letztDt = 0;
-      var LM = null, lg = null, PUF = null, pufG = null, DPR = 1, leuchten = [], SR = { x: 0, y: 0, w: 0, h: 0 }, aktD = 0, aktA = 1;
+      var LM = null, lg = null, lgK = null, HGR = null, blaetter = [], wischT = 0, PUF = null, pufG = null, DPR = 1, leuchten = [], SR = { x: 0, y: 0, w: 0, h: 0 }, aktD = 0, aktA = 1;
       var striche = [], tropfen = [], tropfenRest = 0, wischAlt = 0.05, wischZyklus = -1, ton = null, pauseUhr = null;
 
       function haltenAn(el, key) {
@@ -531,7 +567,42 @@
       function ende(text) { if (fertig) return; fertig = true; meldung(text); if (ton) ton.update(0, 0, true); if (ctx.onFinish) ctx.onFinish(); }
       function naechstesSchild() { for (var i = 0; i < plan.events.length; i++) { var e = plan.events[i]; if (e.typ === 'schild' && !e.erledigt) return e; } return null; }
 
+      // Auswahl Tag-, Abend- oder Nachtfahrt vor dem Losfahren (Pfeile links/rechts, OK oder Antippen; Ziffern 1–3)
+      var wahl = null;
+      function auswahlZeigen(fertigFn) {
+        var opts = [['tag', 'Tagfahrt', 'Erst Sonne, dann Herbstregen'], ['daemmerung', 'Abendfahrt', 'Dämmerung, dann Regen auf nasser Straße'], ['nacht', 'Nachtfahrt', 'Dunkel, mit Licht und Regen']];
+        var ikon = {
+          tag: '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="10" fill="#ffc83a"/><g stroke="#ffc83a" stroke-width="3.5" stroke-linecap="round"><path d="M24 4v6M24 38v6M4 24h6M38 24h6M10 10l4 4M34 34l4 4M38 10l-4 4M14 34l-4 4"/></g></svg>',
+          daemmerung: '<svg viewBox="0 0 48 48"><path d="M8 32a16 16 0 0 1 32 0z" fill="#ff8a3d"/><path d="M4 32h40M10 38h28" stroke="#c96a3a" stroke-width="3.5" stroke-linecap="round"/></svg>',
+          nacht: '<svg viewBox="0 0 48 48"><path d="M30 6a18 18 0 1 0 12 30A15 15 0 0 1 30 6z" fill="#cfd8ff"/><circle cx="12" cy="10" r="1.6" fill="#cfd8ff"/><circle cx="40" cy="14" r="1.3" fill="#cfd8ff"/></svg>'
+        };
+        var box = HT.el('div', { class: 'sv-wahl' }), reihe = HT.el('div', { class: 'sv-wahl-reihe' }), idx = 0, knoepfe = [];
+        box.appendChild(HT.el('div', { class: 'sv-wahl-titel' }, 'Wann möchten Sie fahren?'));
+        opts.forEach(function (o, i) {
+          if (o[0] === TZ) idx = i;
+          var k = HT.el('button', { type: 'button', class: 'sv-wahl-knopf', html: '<span class="sv-wahl-ikon">' + ikon[o[0]] + '</span><b>' + o[1] + '</b><small>' + o[2] + '</small>' });
+          HT.tap(k, function () { idx = i; nehmen(); });
+          reihe.appendChild(k); knoepfe.push(k);
+        });
+        box.appendChild(reihe);
+        box.appendChild(HT.el('div', { class: 'sv-wahl-tipp' }, 'Pfeil links / rechts wählen, OK startet'));
+        container.appendChild(box);
+        function markieren() {
+          knoepfe.forEach(function (k, i) { k.classList.toggle('an', i === idx); });
+          tageszeitSetzen(opts[idx][0]); masse(); zeichne(); // Vorschau im Hintergrund
+        }
+        function nehmen() { if (box.parentNode) box.parentNode.removeChild(box); wahl = null; fertigFn(opts[idx][0]); }
+        wahl = { schiebe: function (d) { idx = (idx + d + opts.length) % opts.length; markieren(); }, nimm: function (i) { if (i !== undefined && opts[i]) idx = i; nehmen(); } };
+        markieren();
+      }
+
       function reagiere(aktion, detail) {
+        if (wahl) {
+          if (aktion === 'links') wahl.schiebe(-1); else if (aktion === 'rechts') wahl.schiebe(1);
+          else if (aktion === 'ok' || aktion === 'hoch') wahl.nimm();
+          else if (aktion === 'ziffer' && detail && detail.wert >= 1 && detail.wert <= 3) wahl.nimm(detail.wert - 1);
+          return;
+        }
         if (fertig) return;
         if (aktion === 'buchstabe' && detail) {
           if (detail.wert === 'L') lichtSchalten(licht ? 0 : 1);
@@ -659,9 +730,9 @@
       /* =================== Welt für die Darstellung =================== */
       // MJS = Meter je Segment: kleiner Wert = mehr Bewegung im Bild je km/h (50 km/h wirken zügiger)
       var SEG = 200, STRASSE = 2000, M = 570, MJS = 1.1, SICHT = 270, KTIEFE = 1 / Math.tan(50 * Math.PI / 180), KAMERA_H = 1050;
-      var FELDER = [[118, 178, 92], [104, 164, 80], [206, 184, 104], [226, 204, 92], [150, 120, 86], [132, 188, 98]];
-      var DUNST = TZ === 'nacht' ? [140, 152, 184] : TZ === 'daemmerung' ? (REGEN ? [190, 186, 190] : [246, 206, 184]) : REGEN ? [196, 204, 212] : [222, 238, 245];
-      var TROCKEN = [104, 110, 116], NASS = [54, 59, 65], REFL = TZ === 'nacht' ? [120, 130, 160] : [150, 165, 180];
+      var FELDER = HERBST ? [[150, 140, 70], [170, 122, 62], [124, 118, 64], [196, 158, 84], [142, 102, 70], [118, 128, 66]] : [[118, 178, 92], [104, 164, 80], [206, 184, 104], [226, 204, 92], [150, 120, 86], [132, 188, 98]];
+      var TROCKEN = [104, 110, 116], NASS = [54, 59, 65];
+      tageszeitSetzen(TZ);
       var welt = [];
       (function weltBauen() {
         var anzahl = Math.ceil((plan.laenge + 500) / MJS) + SICHT, i = 0, feldL = FELDER[0], feldR = FELDER[1], rest = 0;
@@ -688,7 +759,7 @@
           } else {
             var wald = Math.sin(n / 260) > 0.55, r = Math.random();
             if (wald) { if (r < 0.5) sg.objekte.push({ bild: zufall(G.tanne), x: (Math.random() < 0.5 ? -1 : 1) * (1.9 + Math.random() * 5), h: 11 + Math.random() * 6 }); }
-            else if (r < 0.07) sg.objekte.push({ bild: zufall(G.laub), x: (Math.random() < 0.5 ? -1 : 1) * (2 + Math.random() * 6), h: 9 + Math.random() * 5 });
+            else if (r < 0.07) sg.objekte.push({ bild: zufall(HERBST ? G.laubHerbst : G.laub), x: (Math.random() < 0.5 ? -1 : 1) * (2 + Math.random() * 6), h: 9 + Math.random() * 5 });
             else if (r < 0.1) sg.objekte.push({ bild: zufall(G.birke), x: (Math.random() < 0.5 ? -1 : 1) * (2 + Math.random() * 4), h: 10 + Math.random() * 3 });
             else if (r < 0.15) sg.objekte.push({ bild: zufall(G.busch), x: (Math.random() < 0.5 ? -1 : 1) * (1.8 + Math.random() * 3), h: 1.3 + Math.random() * 0.8 });
             else if (r < 0.16 && n % 4 === 0) sg.objekte.push({ bild: zufall(G.haus), x: (Math.random() < 0.5 ? -1 : 1) * (6 + Math.random() * 6), h: 9 });
@@ -700,6 +771,7 @@
       })();
       var gegenverkehr = [], naechstesGegenauto = 3;
       function misch3(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+      function nassDunkler(c) { var t = nass * 0.85; return [c[0] * (1 - 0.3 * t), c[1] * (1 - 0.27 * t), c[2] * (1 - 0.2 * t)]; }
       function glatt(t) { return t * t * (3 - 2 * t); }
       function mischen(a, b, t) { return 'rgb(' + Math.round(a[0] + (b[0] - a[0]) * t) + ',' + Math.round(a[1] + (b[1] - a[1]) * t) + ',' + Math.round(a[2] + (b[2] - a[2]) * t) + ')'; }
 
@@ -711,13 +783,13 @@
         cvs.width = Math.round(b * dpr); cvs.height = Math.round(h * dpr); DPR = dpr;
         g.setTransform(dpr, 0, 0, dpr, 0, 0); g.imageSmoothingQuality = 'high';
         // Lichtkarte in halber Auflösung: Umgebungslicht + Scheinwerfer, Laternen, Ampeln; wird mit dem Bild multipliziert
-        if (AMB) { LM = document.createElement('canvas'); LM.width = Math.max(2, Math.round(cvs.width / 2)); LM.height = Math.max(2, Math.round(cvs.height / 2)); lg = LM.getContext('2d'); lg.setTransform(dpr / 2, 0, 0, dpr / 2, 0, 0); }
+        if (LICHTKARTE) { LM = document.createElement('canvas'); LM.width = Math.max(2, Math.round(cvs.width / 2)); LM.height = Math.max(2, Math.round(cvs.height / 2)); lgK = LM.getContext('2d'); lgK.setTransform(dpr / 2, 0, 0, dpr / 2, 0, 0); }
         PUF = document.createElement('canvas'); PUF.width = cvs.width; PUF.height = cvs.height; pufG = PUF.getContext('2d', { alpha: false });
         dashTop = p.cockpit !== false ? H * 0.66 : H;
         horizont = p.cockpit !== false ? H * 0.36 : H * 0.44;
-        HG = hintergrund(W, horizont, REGEN ? 'grau' : TZ);
+        HG = hintergrund(W, horizont, TZ); HGR = REGEN_MOEGLICH ? hintergrund(W, horizont, 'grau') : null;
         HG.boden = g.createLinearGradient(0, horizont, 0, H); HG.boden.addColorStop(0, '#9cc78a'); HG.boden.addColorStop(1, '#6faa55');
-        if (TZ === 'daemmerung' && !REGEN) { HG.abendrot = g.createLinearGradient(0, 0, 0, horizont + H * 0.05); HG.abendrot.addColorStop(0, 'rgba(255,110,60,0)'); HG.abendrot.addColorStop(0.6, 'rgba(255,125,70,.14)'); HG.abendrot.addColorStop(0.86, 'rgba(255,150,80,.3)'); HG.abendrot.addColorStop(1, 'rgba(255,150,80,0)'); }
+        if (TZ === 'daemmerung') { HG.abendrot = g.createLinearGradient(0, 0, 0, horizont + H * 0.05); HG.abendrot.addColorStop(0, 'rgba(255,110,60,0)'); HG.abendrot.addColorStop(0.6, 'rgba(255,125,70,.14)'); HG.abendrot.addColorStop(0.86, 'rgba(255,150,80,.3)'); HG.abendrot.addColorStop(1, 'rgba(255,150,80,0)'); }
       }
 
       /* =================== Zeichnen =================== */
@@ -755,7 +827,7 @@
         leuchten.push([glut(f), lx - r, ly - r, r * 2, r * 2, (0.45 + 0.55 * DUNKEL) * aktA]);
         leuchten.push([glut('255,255,255'), lx - r * 0.16, ly - r * 0.16, r * 0.32, r * 0.32, 0.6 * DUNKEL]);
         if (lg) { var r2 = SR.w * 3.2; lg.globalAlpha = 0.35; lg.drawImage(glut(f), lx - r2, ly - r2, r2 * 2, r2 * 2); lg.globalAlpha = 1; }
-        if (REGEN) leuchten.push([glut(f), lx - r * 0.22, boden, r * 0.44, SR.h * 0.9, 0.55]);
+        if (nass > 0.05) leuchten.push([glut(f), lx - r * 0.22, boden, r * 0.44, SR.h * 0.9, 0.55 * nass]);
       }
       function warnLicht(bildNr) {
         if (DUNKEL <= 0) return;
@@ -771,15 +843,20 @@
           lg.globalAlpha = 0.95 * DUNKEL; lg.drawImage(glut('255,214,160'), kx - pr, boden - pr * 0.3, pr * 2, pr * 0.6);
           lg.globalAlpha = 0.5 * DUNKEL; lg.drawImage(glut('255,214,160'), kx - r * 0.9, ky, r * 1.8, boden - ky + r * 0.2); lg.globalAlpha = 1;
         }
-        if (REGEN) leuchten.push([glut('255,200,140'), kx - r * 0.1, boden, r * 0.2, SR.h * 0.8, 0.4 * DUNKEL]);
+        if (nass > 0.05) leuchten.push([glut('255,200,140'), kx - r * 0.1, boden, r * 0.2, SR.h * 0.8, 0.4 * DUNKEL * nass]);
       }
       // Gegenverkehr: zwischen zwei Segmenten weich interpoliert (kein Springen), nachts mit Licht und Lichthupe
       function gegenAuto(o, sg, rs) {
         var a = sg.p1.s, b = sg.p2.s, f = HT.klemmen(o.z / MJS - sg.i, 0, 1), oy = a.y + (b.y - a.y) * f, ow = a.w + (b.w - a.w) * f, kp = ow / STRASSE;
         var cx = a.x + (b.x - a.x) * f - rs * 0.5 * ow;
-        if (REGEN) {
+        if (nass > 0.05) {
           var hh = 1.55 * M * kp, ww = hh * o.bild.width / o.bild.height;
-          if (hh > 2 && oy < H + hh) { var ga = g.globalAlpha; g.save(); g.globalAlpha = ga * 0.22; g.translate(cx, oy); g.scale(1, -0.55); g.drawImage(o.bild, -ww / 2, -hh, ww, hh); g.restore(); }
+          if (hh > 2 && oy < H + hh) {
+            var ga = g.globalAlpha;
+            // Spiegelbild auf der nassen Fahrbahn und Gischt hinter den Rädern
+            g.save(); g.globalAlpha = ga * 0.24 * nass; g.translate(cx, oy); g.scale(1, -0.55); g.drawImage(o.bild, -ww / 2, -hh, ww, hh); g.restore();
+            if (regenI > 0.2) { g.save(); g.globalAlpha = ga * 0.3 * nass * regenI; g.drawImage(glut('214,220,228'), cx - ww * 0.95, oy - hh * 0.5, ww * 1.9, hh * 0.75); g.restore(); }
+          }
         }
         if (!sprite(o.bild, cx, oy, kp, 1.55) || DUNKEL <= 0) return;
         var t = o.hupe === undefined ? 9 : uhr - o.hupe, hupe = t < 0.18 || (t > 0.32 && t < 0.5), st = hupe ? 2.6 : 1;
@@ -787,7 +864,7 @@
           var X = SR.x + SR.w * (q ? 0.8333 : 0.1667), Y = SR.y + SR.h * 0.573, r = SR.w * 0.32 * st;
           leuchten.push([glut('255,248,225'), X - r, Y - r, r * 2, r * 2, 0.95]);
           leuchten.push([glut('255,255,255'), X - r * 0.2, Y - r * 0.12, r * 0.4, r * 0.24, 0.9]);
-          if (REGEN) leuchten.push([glut('255,240,210'), X - r * 0.16, oy, r * 0.32, SR.h * 1.5 * (hupe ? 1.4 : 1), 0.5]);
+          if (nass > 0.05) leuchten.push([glut('255,240,210'), X - r * 0.16, oy, r * 0.32, SR.h * 1.5 * (hupe ? 1.4 : 1), 0.5 * nass]);
         }
         if (hupe && SR.w > W * 0.03) blendung = Math.max(blendung, 0.18 * DUNKEL);
         if (lg) { lg.globalAlpha = 0.55 * DUNKEL; lg.drawImage(glut('255,240,215'), SR.x - SR.w * 0.6, oy - SR.h * 0.15, SR.w * 2.2, SR.h * 0.9); lg.globalAlpha = 1; }
@@ -812,8 +889,8 @@
       function lichtPass() {
         if (lg) { g.globalCompositeOperation = 'multiply'; g.drawImage(LM, 0, 0, W, H); }
         g.globalCompositeOperation = 'lighter';
-        if (HG.sterne) { g.globalAlpha = 0.85; ebene(HG.sterne, parallax * 0.15, 0); }
-        if (HG.abendrot) { g.globalAlpha = 1; g.fillStyle = HG.abendrot; g.fillRect(0, 0, W, horizont + H * 0.05); }
+        if (HG.sterne && regenI < 0.95) { g.globalAlpha = 0.85 * (1 - regenI); ebene(HG.sterne, parallax * 0.15, 0); }
+        if (HG.abendrot && regenI < 0.95) { g.globalAlpha = 1 - regenI; g.fillStyle = HG.abendrot; g.fillRect(0, 0, W, horizont + H * 0.05); }
         for (var i = 0; i < leuchten.length; i++) { var l = leuchten[i]; g.globalAlpha = l[5]; g.drawImage(l[0], l[1], l[2], l[3], l[4]); }
         g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
         if (blendung > 0.01) { g.fillStyle = 'rgba(255,250,235,' + Math.min(0.5, blendung).toFixed(3) + ')'; g.fillRect(0, 0, W, H); }
@@ -825,13 +902,36 @@
         pufG.drawImage(cvs, 0, 0);
         g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
         g.beginPath(); g.rect(0, (horizont - H * 0.06) * DPR, cvs.width, cvs.height); g.clip();
-        for (var i = 1; i <= 2; i++) { var z = 1 + 0.017 * st * i; g.globalAlpha = 0.3 * st / i; g.drawImage(PUF, cx - cx * z, cy - cy * z, cvs.width * z, cvs.height * z); }
+        for (var i = 1; i <= 3; i++) { var z = 1 + 0.009 * st * i; g.globalAlpha = 0.34 * st / (i + 0.5); g.drawImage(PUF, cx - cx * z, cy - cy * z, cvs.width * z, cvs.height * z); }
         g.restore();
+      }
+      // Herbst: Blätter taumeln von den Bäumen, drehen und wenden sich und fliegen beim Fahren am Auto vorbei
+      function neuesBlatt(start) {
+        var vorn = !start && Math.random() < 0.5;
+        return { x: vorn ? W * (0.25 + Math.random() * 0.5) : Math.random() * W, y: start ? Math.random() * dashTop : vorn ? horizont - H * 0.1 + Math.random() * H * 0.12 : -10 - Math.random() * 50,
+          z: vorn ? 0.25 + Math.random() * 0.3 : 0.3 + Math.random() * 0.75, rot: Math.random() * 6.3, rv: (Math.random() - 0.5) * 5, fl: Math.random() * 6.3, fv: 2 + Math.random() * 5, fw: 0.8 + Math.random() * 1.6, ph: Math.random() * 6.3,
+          bild: G.blaetter[Math.floor(Math.random() * G.blaetter.length)] };
+      }
+      function laubZeichnen(dt) {
+        var unten = p.cockpit !== false ? dashTop : H, sk = W / 1280, n = Math.round(46 * (1 - regenI * 0.5)), i, b;
+        while (blaetter.length < n) blaetter.push(neuesBlatt(true));
+        if (blaetter.length > n) blaetter.length = n;
+        var wind = Math.sin(uhr * 0.4) * 30 + Math.sin(uhr * 1.3) * 12, zoom = v * 0.0055 * dt;
+        for (i = 0; i < blaetter.length; i++) {
+          b = blaetter[i];
+          b.x += (b.x - W / 2) * zoom * b.z * 1.4 + (wind + Math.sin(uhr * b.fw + b.ph) * 36) * b.z * sk * dt;
+          b.y += (b.y - horizont) * zoom * b.z * 1.4 + (26 + 34 * b.z) * sk * dt;
+          b.z += b.z * zoom * 0.9; b.rot += b.rv * dt; b.fl += b.fv * dt;
+          if (b.y > unten + 20 || b.x < -40 || b.x > W + 40 || b.z > 1.8) { blaetter[i] = neuesBlatt(false); continue; }
+          var gr = 30 * b.z * sk;
+          g.save(); g.translate(b.x, b.y); g.rotate(b.rot); g.scale(Math.cos(b.fl), 1); g.globalAlpha = Math.min(1, b.z * 2.2); g.drawImage(b.bild, -gr / 2, -gr / 2, gr, gr); g.restore();
+        }
       }
       // Regen: Regenstriche, Tropfen auf der Scheibe und Scheibenwischer
       function regenZeichnen(dt) {
-        var unten = p.cockpit !== false ? dashTop : H, drift = v / 130, i, r;
-        while (striche.length < 170) striche.push({ x: Math.random() * W, y: Math.random() * unten, l: 10 + Math.random() * 18, sp: 0.9 + Math.random() * 0.6 });
+        var unten = p.cockpit !== false ? dashTop : H, drift = v / 130, i, r, anz = Math.round(190 * regenI), sk = W / 1280;
+        if (striche.length > anz) striche.length = anz;
+        while (striche.length < anz) striche.push({ x: Math.random() * W, y: Math.random() * unten, l: 10 + Math.random() * 18, sp: 0.9 + Math.random() * 0.6 });
         g.strokeStyle = DUNKEL > 0.5 ? 'rgba(160,172,195,.3)' : 'rgba(225,232,240,.4)'; g.lineWidth = 1; g.beginPath();
         for (i = 0; i < striche.length; i++) {
           r = striche[i];
@@ -843,22 +943,57 @@
         }
         g.stroke();
         if (p.cockpit === false) return;
-        var T = 1.3, f = (uhr % T) / T, th0 = 0.05, th1 = 2.75, th;
+        // Scheibenwischer laufen automatisch, solange es regnet oder Tropfen auf der Scheibe sind; ein Wischzug wird immer zu Ende geführt
+        var T = 1.3, an = regenI > 0.04 || tropfen.length > 4;
+        if (an || wischT % T > 0.001) { var vor = wischT; wischT += dt; if (!an && Math.floor(wischT / T) > Math.floor(vor / T)) wischT = Math.ceil(vor / T) * T; }
+        var f = (wischT % T) / T, th0 = 0.05, th1 = 2.75, th;
         if (f < 0.42) th = th0 + (th1 - th0) * glatt(f / 0.42); else if (f < 0.84) th = th1 - (th1 - th0) * glatt((f - 0.42) / 0.42); else th = th0;
-        var zyklus = Math.floor(uhr / T) * 2 + (f >= 0.42 ? 1 : 0);
-        if (zyklus !== wischZyklus && f < 0.84) { wischZyklus = zyklus; if (ton) ton.wisch(); }
+        var zyklus = Math.floor(wischT / T) * 2 + (f >= 0.42 ? 1 : 0);
+        if (zyklus !== wischZyklus && f < 0.84 && f > 0) { wischZyklus = zyklus; if (ton) ton.wisch(); }
         var piv = [[W * 0.26, dashTop + 6], [W * 0.62, dashTop + 6]], L = W * 0.36;
-        tropfenRest += dt * 34;
-        while (tropfenRest >= 1) { tropfenRest -= 1; if (tropfen.length < 110) tropfen.push({ x: W * 0.04 + Math.random() * W * 0.92, y: H * 0.03 + Math.random() * (dashTop - H * 0.03), r: 2 + Math.random() * 4.5 }); }
+        // Neue Tropfen prasseln auf die Scheibe (mit kleinem Aufprallring und leisem Ticken)
+        tropfenRest += dt * 36 * regenI;
+        while (tropfenRest >= 1) {
+          tropfenRest -= 1;
+          if (tropfen.length < 130) tropfen.push({ x: W * 0.04 + Math.random() * W * 0.92, y: H * 0.03 + Math.random() * (dashTop - H * 0.03), r: (1.6 + Math.random() * Math.random() * 5.5) * Math.max(0.7, sk), t: uhr, lauf: false, vy: 0, ph: Math.random() * 6, spur: [], halt: 0 });
+          if (ton && Math.random() < 0.45) ton.tick();
+        }
+        // Schwere Tropfen laufen herunter, schlucken kleinere, halten kurz an und ziehen eine feuchte Spur; bei Tempo drückt der Fahrtwind sie nach oben
+        for (i = 0; i < tropfen.length; i++) {
+          r = tropfen[i]; if (r.weg) continue;
+          if (!r.lauf && r.r > 3.6 * Math.max(0.7, sk) && Math.random() < dt * 0.5) r.lauf = true;
+          if (r.lauf) {
+            if (!r.halt && Math.random() < dt * 0.35) r.halt = uhr + 0.25 + Math.random() * 0.6;
+            var stopp = r.halt && uhr < r.halt; if (r.halt && uhr >= r.halt) r.halt = 0;
+            var zielV = stopp ? 0 : ((40 + r.r * 14) - v * 0.9) * sk;
+            r.vy += (zielV - r.vy) * Math.min(1, dt * 3); r.y += r.vy * dt; r.x += Math.sin(r.y * 0.045 + r.ph) * 9 * sk * dt;
+            var letzt = r.spur[r.spur.length - 1];
+            if (!letzt || Math.abs(r.y - letzt[1]) > 4) { r.spur.push([r.x, r.y, uhr]); if (r.spur.length > 18) r.spur.shift(); }
+            for (var j = 0; j < tropfen.length; j++) { var o2 = tropfen[j]; if (o2 === r || o2.weg || o2.lauf) continue; if (Math.abs(o2.x - r.x) < r.r + o2.r && Math.abs(o2.y - r.y) < r.r + o2.r) { r.r = Math.min(9 * sk + 3, Math.sqrt(r.r * r.r + o2.r * o2.r * 0.6)); o2.weg = true; } }
+            r.r -= dt * 0.25; if (r.r < 2.4) { r.lauf = false; r.spur = []; }
+            if (r.y > dashTop + 4 || r.y < 0) r.weg = true;
+          } else if (v > 70) r.y -= (v - 70) * 0.25 * sk * dt;
+        }
         var lo = Math.min(wischAlt, th) - 0.03, hi = Math.max(wischAlt, th) + 0.03;
         tropfen = tropfen.filter(function (t) {
-          for (var q = 0; q < 2; q++) { var dx = t.x - piv[q][0], dy = piv[q][1] - t.y, rr = Math.sqrt(dx * dx + dy * dy); if (rr < L && rr > L * 0.1) { var an = Math.atan2(dy, dx); if (an >= lo && an <= hi) return false; } }
+          if (t.weg) return false;
+          for (var q = 0; q < 2; q++) { var dx = t.x - piv[q][0], dy = piv[q][1] - t.y, rr = Math.sqrt(dx * dx + dy * dy); if (rr < L && rr > L * 0.1) { var w2 = Math.atan2(dy, dx); if (w2 >= lo && w2 <= hi) return false; } }
           return true;
         });
         wischAlt = th;
-        g.globalAlpha = DUNKEL > 0.5 ? 0.55 : 0.85;
-        for (i = 0; i < tropfen.length; i++) { r = tropfen[i]; g.drawImage(G.tropfen, r.x - r.r, r.y - r.r, r.r * 2, r.r * 2); }
-        g.globalAlpha = 1; g.lineCap = 'round'; g.strokeStyle = '#0d1114';
+        var hell = DUNKEL > 0.5 ? 0.55 : 0.85;
+        g.lineCap = 'round';
+        for (i = 0; i < tropfen.length; i++) {
+          r = tropfen[i];
+          if (r.lauf && r.spur.length) {
+            r.spur = r.spur.filter(function (pt) { return uhr - pt[2] < 1.4; });
+            if (r.spur.length) { g.strokeStyle = 'rgba(225,238,250,' + (0.2 * hell).toFixed(3) + ')'; g.lineWidth = r.r * 0.7; g.beginPath(); g.moveTo(r.spur[0][0], r.spur[0][1]); for (var k = 1; k < r.spur.length; k++) g.lineTo(r.spur[k][0], r.spur[k][1]); g.lineTo(r.x, r.y); g.stroke(); }
+          }
+          var alter = uhr - r.t;
+          if (alter < 0.14) { var kk = alter / 0.14; g.strokeStyle = 'rgba(235,245,255,' + (0.5 * (1 - kk) * hell).toFixed(3) + ')'; g.lineWidth = 1; g.beginPath(); g.arc(r.x, r.y, r.r * (1 + kk * 2.2), 0, Math.PI * 2); g.stroke(); }
+          g.globalAlpha = hell; g.drawImage(G.tropfen, r.x - r.r, r.y - r.r * (r.lauf ? 1.3 : 1), r.r * 2, r.r * (r.lauf ? 2.6 : 2)); g.globalAlpha = 1;
+        }
+        g.strokeStyle = '#0d1114';
         piv.forEach(function (pv) {
           var c = Math.cos(th), sn = Math.sin(th);
           g.lineWidth = Math.max(3, W * 0.005); g.beginPath(); g.moveTo(pv[0], pv[1]); g.lineTo(pv[0] + c * L * 0.55, pv[1] - sn * L * 0.55); g.stroke();
@@ -872,9 +1007,12 @@
         var rs = p.linksverkehr ? -1 : 1, stoss = uhr - ruck < 0.35 ? Math.sin(uhr * 90) * 70 * (0.35 - (uhr - ruck)) / 0.35 : 0;
         var kamX = (0.5 + quer) * STRASSE * rs, kamY = basis.p1.y + (basis.p2.y - basis.p1.y) * pr + KAMERA_H + stoss;
         leuchten.length = 0; blendung = 0;
-        if (lg) { lg.globalCompositeOperation = 'source-over'; lg.globalAlpha = 1; lg.fillStyle = AMB_F; lg.fillRect(0, 0, W, H); lg.globalCompositeOperation = 'lighter'; }
+        DUNKEL = Math.max(DUNKEL_T, 0.2 * regenI); DUNST = misch3(DUNST_T, DUNST_R, regenI);
+        lg = lgK && (TZ !== 'tag' || regenI > 0.01) ? lgK : null;
+        if (lg) { var am = misch3(AMB_T, AMB_R, regenI); lg.globalCompositeOperation = 'source-over'; lg.globalAlpha = 1; lg.fillStyle = 'rgb(' + Math.round(am[0]) + ',' + Math.round(am[1]) + ',' + Math.round(am[2]) + ')'; lg.fillRect(0, 0, W, H); lg.globalCompositeOperation = 'lighter'; }
         parallax += basis.kurve * v * 0.00001;
         ebene(HG.himmel, parallax * 0.15, 0);
+        if (HGR && regenI > 0.01) { g.globalAlpha = Math.min(1, regenI); ebene(HGR.himmel, parallax * 0.15, 0); g.globalAlpha = 1; }
         ebene(HG.berge, parallax * 0.35, horizont - HG.berge.height + 6);
         ebene(HG.huegel, parallax * 0.7, horizont - HG.huegel.height + 4);
         g.fillStyle = HG.boden; g.fillRect(0, horizont, W, H - horizont);
@@ -885,7 +1023,7 @@
           projizieren(sg.p1, sg.i * SEG, x, pos, kamX, kamY);
           projizieren(sg.p2, (sg.i + 1) * SEG, x + dx, pos, kamX, kamY);
           x += dx; dx += sg.kurve;
-          sg.nebel = Math.min(1, Math.pow(k / SICHT, 1.5) * (REGEN ? 1.6 : 1.05));
+          sg.nebel = Math.min(1, Math.pow(k / SICHT, 1.5) * (1.05 + 0.55 * regenI));
           liste.push(sg);
         }
         var maxY = H;
@@ -895,18 +1033,20 @@
           sg = liste[k]; if (!sg.sicht) continue;
           var a = sg.p1.s, b = sg.p2.s, nb = sg.nebel, y1 = Math.min(a.y, sg.clip) + 0.6, y2 = b.y;
           var fl = sg.ort ? [178, 186, 174] : sg.feldL, fr = sg.ort ? [178, 186, 174] : sg.feldR;
+          if (nass > 0.01) { fl = nassDunkler(fl); fr = nassDunkler(fr); }
           g.fillStyle = mischen(fl, DUNST, nb); g.fillRect(0, y2, Math.max(0, Math.min(a.x - a.w * 1.2, b.x - b.w * 1.2)) + 2, y1 - y2);
           var rx = Math.min(W, Math.max(a.x + a.w * 1.2, b.x + b.w * 1.2)) - 2; g.fillStyle = mischen(fr, DUNST, nb); g.fillRect(rx, y2, W - rx, y1 - y2);
           viereck(a, y1, b, y2, -3.4, -1.18, mischen(fl, DUNST, nb)); viereck(a, y1, b, y2, 1.18, 3.4, mischen(fr, DUNST, nb));
-          var bank = sg.ort ? [198, 198, 194] : [126, 172, 98];
+          var bank = sg.ort ? [198, 198, 194] : HERBST ? [160, 128, 70] : [126, 172, 98]; if (nass > 0.01) bank = nassDunkler(bank);
           viereck(a, y1, b, y2, -1.2, -1.0, mischen(bank, DUNST, nb)); viereck(a, y1, b, y2, 1.0, 1.2, mischen(bank, DUNST, nb));
           // nasse Fahrbahn: dunkler Asphalt, der in der Ferne zunehmend den Himmel spiegelt
-          var asph = REGEN ? misch3(NASS, REFL, Math.min(0.8, 0.04 + k / SICHT * 2.0)) : TROCKEN, af = mischen(asph, DUNST, nb);
+          var asph = nass > 0.01 ? misch3(TROCKEN, misch3(NASS, REFL, Math.min(0.8, 0.04 + k / SICHT * 2.0)), nass) : TROCKEN, af = mischen(asph, DUNST, nb);
           if (sg.kreuzung) { viereck(a, y1, b, y2, -3.4, -1.0, af); viereck(a, y1, b, y2, 1.0, 3.4, af); }
           viereck(a, y1, b, y2, -1.0, 1.0, af);
-          var spur = mischen(REGEN ? [asph[0] - 10, asph[1] - 10, asph[2] - 8] : [96, 102, 108], DUNST, nb);
+          var spur = mischen(nass > 0.01 ? misch3([96, 102, 108], [asph[0] - 10, asph[1] - 10, asph[2] - 8], nass) : [96, 102, 108], DUNST, nb);
+          if (HERBST && !sg.ort && (sg.i * 7919) % 13 < 2) { var lf = misch3(sg.i % 2 ? [184, 96, 36] : [196, 150, 50], bank, 0.45); viereck(a, y1, b, y2, -1.2, -1.0, mischen(lf, DUNST, nb)); if (sg.i % 3) viereck(a, y1, b, y2, 1.0, 1.18, mischen(lf, DUNST, nb)); }
           viereck(a, y1, b, y2, 0.22, 0.38, spur); viereck(a, y1, b, y2, 0.62, 0.78, spur); viereck(a, y1, b, y2, -0.78, -0.62, spur); viereck(a, y1, b, y2, -0.38, -0.22, spur);
-          var lin = mischen(REGEN ? [200, 206, 210] : [240, 243, 245], DUNST, nb);
+          var lin = mischen(nass > 0.01 ? misch3([240, 243, 245], [200, 206, 210], nass) : [240, 243, 245], DUNST, nb);
           if (!sg.kreuzung) { viereck(a, y1, b, y2, -0.97, -0.93, lin); viereck(a, y1, b, y2, 0.93, 0.97, lin); }
           if (sg.i % 6 < 2) viereck(a, y1, b, y2, -0.022, 0.022, lin);
           if (sg.zebra) for (var zz = -0.86; zz < 0.86; zz += 0.22) viereck(a, y1, b, y2, zz, zz + 0.12, lin);
@@ -935,9 +1075,10 @@
           for (var gi = 0; gi < gegenverkehr.length; gi++) if (gegenverkehr[gi].seg === sg.i) gegenAuto(gegenverkehr[gi], sg, rs);
           g.globalAlpha = 1;
         }
+        if (HERBST) laubZeichnen(letztDt);
+        unschaerfe(); // vor dem Licht: Lichter bleiben klar, keine Doppelbilder heller Fenster
         lichtPass();
-        unschaerfe();
-        if (REGEN) regenZeichnen(letztDt);
+        if (regenI > 0.01 || tropfen.length) regenZeichnen(letztDt);
         if (p.cockpit !== false) cockpit(); else frontsicht();
       }
 
@@ -984,7 +1125,7 @@
         g.save();
         g.fillStyle = '#14191c'; rrect(g, mx - 6, my - 6, mb + 12, mh + 12, 14); g.fill();
         rrect(g, mx, my, mb, mh, 10); g.clip();
-        var spf = DUNKEL > 0.5 ? ['#0a1220', '#1c2636', '#10151c', '#0b0f14', '#1a1e22'] : REGEN || DUNKEL > 0.3 ? ['#8e99a4', '#c5ccd2', '#6f8a66', '#5f7a58', '#4d5358'] : ['#9fcbe6', '#d9edf6', '#8bbd76', '#79ad66', '#6a7076'];
+        var spf = DUNKEL > 0.5 ? ['#0a1220', '#1c2636', '#10151c', '#0b0f14', '#1a1e22'] : regenI > 0.5 || DUNKEL > 0.3 ? ['#8e99a4', '#c5ccd2', '#6f8a66', '#5f7a58', '#4d5358'] : ['#9fcbe6', '#d9edf6', '#8bbd76', '#79ad66', '#6a7076'];
         var sk = g.createLinearGradient(0, my, 0, my + mh); sk.addColorStop(0, spf[0]); sk.addColorStop(0.5, spf[1]); sk.addColorStop(0.5, spf[2]); sk.addColorStop(1, spf[3]);
         g.fillStyle = sk; g.fillRect(mx, my, mb, mh);
         g.fillStyle = spf[4]; g.beginPath(); g.moveTo(mx + mb * 0.42, my + mh * 0.5); g.lineTo(mx + mb * 0.58, my + mh * 0.5); g.lineTo(mx + mb * 0.95, my + mh); g.lineTo(mx + mb * 0.05, my + mh); g.closePath(); g.fill();
@@ -1078,6 +1219,9 @@
       function schritt(dt) {
         if (fertig) return;
         masse(); letztDt = dt;
+        if (uhr > regenWechselBei) { regenWechselBei = 1e9; regenZiel = regenZiel ? 0 : 1; meldung(regenZiel ? 'Es fängt an zu regnen. Die Scheibenwischer laufen automatisch.' : 'Der Regen hört auf. Die Straße bleibt noch eine Weile nass.'); }
+        regenI += (regenZiel - regenI) * Math.min(1, dt * 0.12);
+        var nassZiel = Math.min(1, regenI * 1.5); nass += (nassZiel - nass) * Math.min(1, dt * (nassZiel > nass ? 0.25 : 0.03));
         var gas = halten.gas || tasten.hoch || uhr < gasBis, bremse = halten.bremse || tasten.runter || uhr < bremseBis;
         // Weich ansprechende Pedale; die Beschleunigung nimmt mit dem Tempo ab (0 auf 50 in etwa 7 s), ohne Gas rollt der Wagen langsam aus
         gasP += ((gas && !bremse ? 1 : 0) - gasP) * Math.min(1, dt * 4.5);
@@ -1129,7 +1273,7 @@
           m1.type = 'sawtooth'; m2.type = 'square'; mf.type = 'lowpass'; mf.frequency.value = 260; mg.gain.value = 0.018;
           m1.connect(mf); m2.connect(mf); mf.connect(mg); mg.connect(master); m1.start(); m2.start();
           var wind = rauschen('lowpass', 400, 0, 0);
-          var regen1 = REGEN ? rauschen('highpass', 1100, 0, 0.11) : null, regen2 = REGEN ? rauschen('bandpass', 2600, 0.8, 0.05) : null;
+          var regen1 = REGEN_MOEGLICH ? rauschen('highpass', 1100, 0, 0) : null, regen2 = REGEN_MOEGLICH ? rauschen('bandpass', 2600, 0.8, 0) : null;
           var GAENGE = [0, 18, 34, 54, 78, 200];
           return {
             update: function (vv, gasAnteil, pause) {
@@ -1140,8 +1284,16 @@
               m1.frequency.setTargetAtTime(rpm / 30, t, 0.08); m2.frequency.setTargetAtTime(rpm / 60, t, 0.08);
               mf.frequency.setTargetAtTime(200 + gasAnteil * 380 + rpm * 0.05, t, 0.1);
               mg.gain.setTargetAtTime(0.016 + gasAnteil * 0.022, t, 0.1);
-              wind.g.gain.setTargetAtTime(Math.min(0.09, vv / 130 * 0.07) * (REGEN ? 1.5 : 1), t, 0.2);
+              wind.g.gain.setTargetAtTime(Math.min(0.09, vv / 130 * 0.07) * (1 + 0.5 * nass), t, 0.2);
+              if (regen1) { regen1.g.gain.setTargetAtTime(0.11 * regenI, t, 0.3); regen2.g.gain.setTargetAtTime(0.05 * regenI + 0.02 * nass * Math.min(1, vv / 60), t, 0.3); }
               wind.f.frequency.setTargetAtTime(250 + vv * 9, t, 0.2);
+            },
+            tick: function () {
+              if (!A.an) return;
+              var t = ac.currentTime, src = ac.createBufferSource(), fl = ac.createBiquadFilter(), gn = ac.createGain();
+              src.buffer = buf; fl.type = 'highpass'; fl.frequency.value = 2500 + Math.random() * 3000;
+              gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(0.015 + Math.random() * 0.03, t + 0.004); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+              src.connect(fl); fl.connect(gn); gn.connect(master); src.start(t, Math.random() * 1.5); src.stop(t + 0.04);
             },
             wisch: function () {
               if (!A.an) return;
@@ -1161,12 +1313,17 @@
       return {
         start: function () {
           aus.push(HT.eingabe.an(reagiere));
-          ton = klangStarten();
-          pauseUhr = setInterval(function () { if (ton && Z.pausiert) ton.update(v, 0, true); }, 300);
           if (HT.pult && HT.pult.an && HT.pult.aktionVon) aus.push(HT.pult.an(function (art, d) { if (art !== 'taste' || !d) return; var akt = HT.pult.aktionVon(d.rolle); if (akt === 'hoch') halten.gas = !!d.gedrueckt; if (akt === 'runter') halten.bremse = !!d.gedrueckt; }));
-          masse(); meldung(DUNKEL > 0.4 ? 'Es ist dunkel: Licht mit L einschalten, dann Pfeil nach oben.' : 'Pfeil nach oben, um loszufahren');
-          frameId = Z.frame(function (dt) { schritt(Math.min(dt, 0.05)); });
-          zeichne();
+          var los = function () {
+            ton = klangStarten();
+            pauseUhr = setInterval(function () { if (ton && Z.pausiert) ton.update(v, 0, true); }, 300);
+            masse(); meldung(DUNKEL > 0.4 ? 'Es ist dunkel: Licht mit L einschalten, dann Pfeil nach oben.' : 'Pfeil nach oben, um loszufahren');
+            frameId = Z.frame(function (dt) { schritt(Math.min(dt, 0.05)); });
+            zeichne();
+          };
+          masse();
+          if (WAHL) { hinweis.className = 'sv-hinweis'; auswahlZeigen(function (tz) { letzteWahl = tz; tageszeitSetzen(tz); los(); }); }
+          else los();
         },
         stop: function () { if (frameId) Z.abbrechen(frameId); aus.forEach(function (f) { f(); }); tasten.entfernen(); if (pauseUhr) clearInterval(pauseUhr); if (ton) { ton.ende(); ton = null; } }
       };

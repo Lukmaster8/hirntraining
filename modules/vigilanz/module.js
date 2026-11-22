@@ -80,7 +80,10 @@
             weg += dx;
             pakete.forEach(function (q) {
               q.x += dx;
-              q.el.style.transform = 'translateX(' + Math.round(q.x) + 'px)';
+              // ohne Runden und auf der Grafikkarte: gleichmäßige, ruckelfreie Bewegung, dazu leichte Bewegungsunschärfe
+              q.el.style.transform = 'translate3d(' + q.x.toFixed(2) + 'px,0,0)';
+              if (!q.mb) q.mb = HT.bewegungsUnschaerfe.element(q.el);
+              if (dt > 0) q.mb(dx / dt, 0);
               var drin = imFenster(q);
               if (q.abw && drin && !q.startZeit) q.startZeit = Z.jetzt();
               if (q.abw && q.imFenster && !drin && !q.gewertet) {
@@ -91,13 +94,14 @@
             });
             while (pakete.length && pakete[0].x > b + 10) {
               var alt = pakete.shift();
+              if (alt.mb) alt.mb.entfernen();
               alt.el.remove();
             }
             var letztes = pakete[pakete.length - 1];
             if (!letztes || letztes.x - p.abstandPx > -gross * 1.5) neuesPaket((letztes ? letztes.x : 0) - p.abstandPx);
           });
         },
-        stop: function () { aus.forEach(function (f) { f(); }); }
+        stop: function () { aus.forEach(function (f) { f(); }); pakete.forEach(function (q) { if (q.mb) q.mb.entfernen(); }); }
       };
     },
     preview: function (el) {

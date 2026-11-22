@@ -45,7 +45,8 @@
             verlauf.forEach(function (q, i) { if (i) cx.lineTo(q[0], q[1]); else cx.moveTo(q[0], q[1]); }); cx.stroke();
             var g = cx.createRadialGradient(ball.x - r * 0.3, ball.y - r * 0.3, r * 0.1, ball.x, ball.y, r);
             g.addColorStop(0, treffer ? '#8fe0b3' : '#ffd9a8'); g.addColorStop(1, treffer ? '#2EAD6B' : '#E8833A');
-            cx.fillStyle = g; cx.beginPath(); cx.arc(ball.x, ball.y, r, 0, 7); cx.fill();
+            cx.fillStyle = g;
+            HT.bewegungsUnschaerfe.canvas(cx, Math.cos(ball.w) * p.tempo, Math.sin(ball.w) * p.tempo, function (ox, oy) { cx.beginPath(); cx.arc(ball.x + ox, ball.y + oy, r, 0, 7); cx.fill(); });
             if (zeiger) {
               cx.strokeStyle = '#26333c'; cx.lineWidth = 3;
               cx.beginPath(); cx.arc(zeiger[0], zeiger[1], 9, 0, 7); cx.stroke();

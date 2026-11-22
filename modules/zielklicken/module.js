@@ -46,7 +46,7 @@
         });
         ziele.push(z);
       }
-      function entfernen(z) { if (z.el.parentNode) z.el.parentNode.removeChild(z.el); ziele = ziele.filter(function (x) { return x !== z; }); Z.nach(HT.zufall.int(250, 700), auffuellen); }
+      function entfernen(z) { if (z.mb) z.mb.entfernen(); if (z.el.parentNode) z.el.parentNode.removeChild(z.el); ziele = ziele.filter(function (x) { return x !== z; }); Z.nach(HT.zufall.int(250, 700), auffuellen); }
       function auffuellen() { while (ziele.length < p.gleichzeitig) neuesZiel(); }
       return {
         start: function () {
@@ -63,11 +63,13 @@
               if (z.x < 0 || z.x > b - g) z.vx *= -1;
               if (z.y < 0 || z.y > h - g) z.vy *= -1;
               z.el.style.left = z.x + 'px'; z.el.style.top = z.y + 'px';
+              if (!z.mb) z.mb = HT.bewegungsUnschaerfe.element(z.el);
+              z.mb(z.vx, z.vy);
             });
           });
           Z.nach(500, auffuellen);
         },
-        stop: function () { aus.forEach(function (f) { f(); }); }
+        stop: function () { aus.forEach(function (f) { f(); }); ziele.forEach(function (z) { if (z.mb) z.mb.entfernen(); }); }
       };
     },
     preview: function (el) {
