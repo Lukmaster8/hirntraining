@@ -16,7 +16,8 @@
     parameterSchema: { seite: { typ: 'auswahl', label: 'Vernachlässigte Seite', standard: 'patient', optionen: [{ wert: 'patient', label: 'Aus Patientenakte' }, { wert: 'links', label: 'Links' }, { wert: 'rechts', label: 'Rechts' }] } },
     create: function (container, ctx) {
       var p = ctx.params;
-      var seite = p.seite === 'patient' ? (ctx.patient.betroffeneSeite === 'rechts' ? 'rechts' : 'links') : p.seite;
+      var pat = ctx.patient || {};
+      var seite = p.seite === 'patient' ? (pat.betroffeneSeite === 'rechts' ? 'rechts' : 'links') : p.seite;
       return HT.suchSzene(container, ctx, { ziele: p.ziele, ablenker: p.ablenker, groesse: p.groesse, seitenGewicht: p.seitenGewicht, betonteSeite: seite, anker: { seite: seite, staerke: p.ankerStaerke }, hinweisTon: p.hinweisTon });
     },
     preview: function (el) { return HT.suchVorschau(el, true); }

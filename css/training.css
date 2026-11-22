@@ -215,7 +215,8 @@ kbd { display: inline-block; min-width: 2rem; text-align: center; padding: .15re
 }
 
 /* Straßenverkehr: Bedienknöpfe für Touch */
-.sv-leiste { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 8px; z-index: 4; align-items: flex-end; }
+.sv-leiste { position: absolute; left: 8px; right: 8px; bottom: 10px; display: flex; z-index: 4; align-items: flex-end; justify-content: center; flex-wrap: wrap; }
+.sv-knopf { margin: 3px; }
 .sv-knopf { min-width: 64px; height: 64px; border-radius: 18px; border: 1px solid var(--linie); background: rgba(255, 255, 255, .92); font: inherit; font-size: 1.5rem; font-weight: 800; color: var(--text); box-shadow: var(--schatten-1); touch-action: none; user-select: none; -webkit-user-select: none; }
 .sv-knopf:active { transform: scale(.95); background: var(--akzent-hell); }
 .sv-knopf.bremse { min-width: 130px; background: #fde9e9; border-color: #f2b8b8; color: #b93c3c; font-size: 1.05rem; letter-spacing: .05em; }
@@ -247,3 +248,7 @@ kbd { display: inline-block; min-width: 2rem; text-align: center; padding: .15re
 .sv-banner.info { background: rgba(21, 110, 140, .9); }
 .sv-knopf.gas { min-width: 90px; background: #e5f7ec; border-color: #b9e3c8; color: #1f7a48; font-size: 1.05rem; }
 @media (max-width: 760px) { .sv-banner { font-size: .9rem; top: 8px; } .sv-knopf { min-width: 52px; height: 54px; font-size: 1.2rem; } .sv-knopf.bremse { min-width: 96px; } .sv-knopf.gas { min-width: 66px; } }
+.sv-hinweis { position: absolute; top: 19%; left: 50%; transform: translate(-50%, -6px); opacity: 0; transition: opacity .25s, transform .25s; z-index: 5; padding: .5rem 1.1rem; border-radius: 30px; background: rgba(16, 24, 28, .84); color: #fff; font-weight: 700; font-size: 1.05rem; white-space: nowrap; box-shadow: 0 6px 18px rgba(0, 0, 0, .25); pointer-events: none; max-width: 92%; overflow: hidden; text-overflow: ellipsis; border: 1px solid rgba(27, 168, 181, .5); }
+.sv-hinweis.an { opacity: 1; transform: translate(-50%, 0); }
+@media (hover: hover) and (pointer: fine) { .sv-leiste { display: none; } }
+@media (max-width: 760px) { .sv-hinweis { font-size: .85rem; top: 22%; white-space: normal; text-align: center; } }

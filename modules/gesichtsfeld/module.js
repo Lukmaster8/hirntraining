@@ -16,8 +16,9 @@
     parameterSchema: { seite: { typ: 'auswahl', label: 'Trainierte Seite', standard: 'patient', optionen: [{ wert: 'patient', label: 'Aus Patientenakte' }, { wert: 'links', label: 'Links' }, { wert: 'rechts', label: 'Rechts' }, { wert: 'beide', label: 'Beide Seiten' }] } },
     create: function (container, ctx) {
       var p = ctx.params, Z = HT.zeit, aus = [];
+      var pat = ctx.patient || {};
       var seite = p.seite;
-      if (seite === 'patient') seite = /links/.test(ctx.patient.gesichtsfeld) ? 'links' : /rechts/.test(ctx.patient.gesichtsfeld) ? 'rechts' : 'beide';
+      if (seite === 'patient') seite = /links/.test(pat.gesichtsfeld || '') ? 'links' : /rechts/.test(pat.gesichtsfeld || '') ? 'rechts' : 'beide';
       container.style.background = '#1b2329';
       var voll = HT.m.neu(container, 'm-voll', '', { background: '#1b2329' });
       var kreuz = HT.m.neu(voll, '', '<svg viewBox="0 0 40 40" width="40" height="40"><path d="M20 4 V36 M4 20 H36" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>', { position: 'absolute', left: 'calc(50% - 20px)', top: 'calc(50% - 20px)', color: '#f2f5f7' });

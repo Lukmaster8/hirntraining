@@ -22,8 +22,8 @@
   HT.registerModule({
     id: 'hoeren', name: 'Hörtraining', kategorie: 'aufmerksamkeit', symbol: 'ton',
     ziel: 'Auf bestimmte Töne achten und gezielt reagieren (akustische Aufmerksamkeit)',
-    beschreibung: 'Nacheinander erklingen tiefe und hohe Töne. Reagiert wird nur auf den Zielton. In den ersten Leveln ist der Zielton deutlich höher, später werden die Tonhöhen ähnlicher und die Töne folgen schneller. Ab Level 8 gilt eine neue Regel: Reagieren, wenn derselbe Ton zweimal hintereinander kommt (akustisches Arbeitsgedächtnis). Ab Level 10 kommen die Töne von links oder rechts (Kopfhörer empfohlen). Gemessen werden Treffer, Auslassungen, Fehlreaktionen und Reaktionszeit.',
-    anleitung: 'Hören Sie genau hin. Drücken Sie die Leertaste oder tippen Sie auf den Lautsprecher, sobald der HOHE Ton erklingt. Bei tiefen Tönen nicht reagieren.',
+    beschreibung: 'Mehrere Töne folgen nacheinander: tief, mittel und hoch. Reagiert wird nur auf den hohen Zielton. Später liegen die Tonhöhen näher beieinander. Ab Level 8 gilt: reagieren, wenn derselbe Ton zweimal hintereinander kommt. Ab Level 10 kommen die Töne von links oder rechts.',
+    anleitung: 'Hören Sie genau hin. Drücken Sie die Leertaste oder tippen Sie auf den Lautsprecher nur beim HOHEN Ton. Der tiefe und der mittlere Ton zählen nicht.',
     tasten: ['ok'], levels: levels,
     levelLabels: { abstandMs: 'Abstand der Töne (ms)', halbtoene: 'Tonhöhenunterschied (Halbtöne)', regel: 'Regel', stereo: 'Links/rechts', tondauer: 'Tondauer (s)' },
     bewertung: { aufstufenAb: 0.85, abstufenUnter: 0.6 },
@@ -33,7 +33,7 @@
       var anw = HT.m.neu(zone, 'm-anweisung', p.regel === 'wiederholung' ? 'Reagieren, wenn derselbe Ton <b>zweimal hintereinander</b> kommt' : 'Reagieren beim <b>hohen</b> Ton');
       var lsp = HT.m.neu(zone, 'm-symbol', lautsprecher(false), { width: '220px', height: '220px', cursor: 'pointer' });
       var info = HT.m.neu(zone, 'm-anweisung', '', { marginTop: '1rem', fontSize: '1rem' });
-      var tief = 440, hoch = 440 * Math.pow(2, p.halbtoene / 12);
+      var tief = 440, hoch = 440 * Math.pow(2, p.halbtoene / 12), mitte = 440 * Math.pow(2, (p.halbtoene / 2) / 12);
       var vorher = null, aktuell = null, timer = null;
       function ton() {
         var ziel;
@@ -46,7 +46,7 @@
           vorher = f;
         } else {
           ziel = HT.zufall.chance(p.zielAnteil);
-          aktuell = { ziel: ziel, freq: ziel ? hoch : tief, start: Z.jetzt(), beantwortet: false };
+          aktuell = { ziel: ziel, freq: ziel ? hoch : (HT.zufall.chance(0.45) ? mitte : tief), start: Z.jetzt(), beantwortet: false };
         }
         var pan = p.stereo ? HT.zufall.wahl([-0.9, 0.9]) : 0;
         aktuell.seite = pan < 0 ? 'links' : pan > 0 ? 'rechts' : 'mitte';
@@ -74,8 +74,8 @@
           aus.push(HT.eingabe.an(function (a) { if (a === 'ok') reagieren(); }));
           aus.push(HT.tap(container, function (ev) { if (!ev.target.closest('button')) reagieren(); }));
           // Beispieltöne vorspielen
-          info.textContent = p.regel === 'wiederholung' ? 'Gleich geht es los …' : 'So klingt der tiefe Ton … und so der hohe Ton.';
-          if (p.regel !== 'wiederholung') { ctx.audio.ton(tief, 0.4, 'sine', 0.2, 0.5); ctx.audio.ton(hoch, 0.4, 'sine', 1.2, 0.5); }
+          info.textContent = p.regel === 'wiederholung' ? 'Gleich geht es los …' : 'Erst tief, dann mittel, dann der hohe Zielton.';
+          if (p.regel !== 'wiederholung') { ctx.audio.ton(tief, 0.35, 'sine', 0.2, 0.5); ctx.audio.ton(mitte, 0.35, 'sine', 0.8, 0.5); ctx.audio.ton(hoch, 0.4, 'sine', 1.4, 0.5); }
           timer = Z.nach(2600, function () { info.textContent = ''; ton(); });
         },
         stop: function () { aus.forEach(function (f) { f(); }); Z.abbrechen(timer); }

@@ -1,5 +1,5 @@
 /* Modul: Arbeitsgedächtnis – Folgen
- * Felder eines 3×3- bis 5×5-Rasters leuchten nacheinander auf, die Reihenfolge wird nachgetippt; ab Level 8 rückwärts.
+ * Punkte auf einem Kreis leuchten nacheinander auf, die Reihenfolge wird nachgetippt; ab Level 8 rückwärts.
  * Level: Folgenlänge 2–9, Tempo, Rastergröße. */
 (function () {
   'use strict';
@@ -19,8 +19,8 @@
     kategorie: 'gedaechtnis',
     symbol: 'raster',
     ziel: 'Räumlich-visuelles Arbeitsgedächtnis und Merkspanne trainieren',
-    beschreibung: 'Felder in einem Raster leuchten nacheinander auf. Anschließend wird die Reihenfolge durch Antippen wiederholt – in höheren Leveln in umgekehrter Reihenfolge (rückwärts), was zusätzlich die Manipulation im Arbeitsgedächtnis fordert. Jede vollständig richtige Folge zählt als Treffer.',
-    anleitung: 'Merken Sie sich, in welcher Reihenfolge die Felder aufleuchten. Tippen Sie danach die Felder in derselben Reihenfolge an. Wenn „rückwärts“ angezeigt wird, beginnen Sie mit dem zuletzt leuchtenden Feld.',
+    beschreibung: 'Punkte liegen auf einem Kreis und leuchten nacheinander auf. Anschließend wird die Reihenfolge durch Antippen wiederholt, in höheren Leveln rückwärts. Jede vollständig richtige Folge zählt als Treffer. Die Zahl der Punkte und die Länge der Folge steigen mit dem Level.',
+    anleitung: 'Merken Sie sich, in welcher Reihenfolge die Punkte auf dem Kreis aufleuchten. Tippen Sie danach dieselben Punkte in derselben Reihenfolge an. Wenn „rückwärts“ angezeigt wird, beginnen Sie mit dem zuletzt leuchtenden Punkt.',
     eingabe: ['tastatur', 'maus', 'touch'],
     tasten: [],
     levels: levels,
@@ -36,25 +36,36 @@
       var zone = HT.m.neu(container, 'm-zentrum');
       var anw = HT.m.neu(zone, 'm-anweisung', '');
       var groesse = Math.min(520, Math.max(300, container.clientHeight - 170));
-      var raster = HT.m.neu(zone, 'm-raster', '', { gridTemplateColumns: 'repeat(' + p.raster + ', 1fr)', width: groesse + 'px', height: groesse + 'px' });
-      var zellen = [];
-      for (var i = 0; i < p.raster * p.raster; i++) {
+      var anzahl = p.raster <= 3 ? 6 : p.raster === 4 ? 8 : 9;
+      var raster = HT.m.neu(zone, '', '', { position: 'relative', width: groesse + 'px', height: groesse + 'px' });
+      var zellen = [], dot = Math.max(54, Math.min(78, Math.round(groesse / 7)));
+      var radius = groesse * 0.36;
+      for (var i = 0; i < anzahl; i++) {
         (function (idx) {
-          var z = HT.el('div', { class: 'm-zelle' });
+          var winkel = -Math.PI / 2 + (idx / anzahl) * Math.PI * 2;
+          var z = HT.el('div', { class: 'm-zelle', style: {
+            position: 'absolute', width: dot + 'px', height: dot + 'px', borderRadius: '50%',
+            left: Math.round(groesse / 2 + Math.cos(winkel) * radius - dot / 2) + 'px',
+            top: Math.round(groesse / 2 + Math.sin(winkel) * radius - dot / 2) + 'px'
+          } });
           HT.tap(z, function () { klick(idx); });
           raster.appendChild(z);
           zellen.push(z);
         })(i);
       }
-      var tf = HT.tastenFokus(zellen, { spalten: p.raster, beiWahl: function (i) { klick(i); } });
+      var tf = HT.tastenFokus(zellen, { spalten: Math.ceil(anzahl / 2), beiWahl: function (i) { klick(i); } });
       var folge = [], eingabe = [], phase = 'zeigen', startEingabe = 0;
+      function seiteVon(idx) {
+        var winkel = -Math.PI / 2 + (idx / anzahl) * Math.PI * 2;
+        return HT.seiteVon(0.5 + Math.cos(winkel) * 0.36);
+      }
 
       function runde() {
         phase = 'zeigen';
         eingabe = [];
         zellen.forEach(function (z) { z.className = 'm-zelle'; });
         folge = HT.zufall.stichprobe(zellen.map(function (z, i) { return i; }), p.laenge);
-        anw.innerHTML = 'Gut merken … <b>' + p.laenge + ' Felder</b>';
+        anw.innerHTML = 'Gut merken … <b>' + p.laenge + ' Punkte</b>';
         var k = 0;
         function zeige() {
           if (k > 0) zellen[folge[k - 1]].classList.remove('leuchtet');
@@ -81,7 +92,7 @@
           ctx.audio.klick();
           if (eingabe.length === folge.length) {
             phase = 'ende';
-            ctx.onEvent({ korrekt: true, reiz: folge.join('-'), reaktion: eingabe.join('-'), rtMs: (Z.jetzt() - startEingabe) / folge.length, seite: HT.seiteVon((folge[0] % p.raster + 0.5) / p.raster) });
+            ctx.onEvent({ korrekt: true, reiz: folge.join('-'), reaktion: eingabe.join('-'), rtMs: (Z.jetzt() - startEingabe) / folge.length, seite: seiteVon(folge[0]) });
             ctx.feedback(true);
             Z.nach(1000, runde);
           }
@@ -90,7 +101,7 @@
           zellen[i].classList.add('falsch');
           var richtigIdx = soll;
           Z.nach(250, function () { zellen[richtigIdx].classList.add('gewaehlt'); });
-          ctx.onEvent({ korrekt: false, reiz: folge.join('-'), reaktion: eingabe.join('-'), seite: HT.seiteVon((folge[0] % p.raster + 0.5) / p.raster) });
+          ctx.onEvent({ korrekt: false, reiz: folge.join('-'), reaktion: eingabe.join('-'), seite: seiteVon(folge[0]) });
           ctx.feedback(false);
           Z.nach(1500, runde);
         }
@@ -105,14 +116,18 @@
     preview: function (el) {
       function gitter(an, rich) {
         var s = '';
-        for (var i = 0; i < 9; i++) {
-          var x = 110 + (i % 3) * 62, y = 60 + Math.floor(i / 3) * 62;
+        for (var i = 0; i < 6; i++) {
+          var w = -Math.PI / 2 + (i / 6) * Math.PI * 2;
+          var x = 200 + Math.cos(w) * 90 - 22, y = 160 + Math.sin(w) * 80 - 22;
           var f = an === i ? '#1BA8B5' : (rich && rich.indexOf(i) >= 0 ? '#e2f5ea' : '#edf2f5');
-          s += '<rect x="' + x + '" y="' + y + '" width="54" height="54" rx="10" fill="' + f + '"' + (rich && rich.indexOf(i) >= 0 ? ' stroke="#2EAD6B" stroke-width="3"' : '') + '/>';
+          s += '<circle cx="' + (x + 22) + '" cy="' + (y + 22) + '" r="22" fill="' + f + '"' + (rich && rich.indexOf(i) >= 0 ? ' stroke="#2EAD6B" stroke-width="3"' : '') + '/>';
         }
         return '<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">' + s + '</svg>';
       }
-      var pos = function (i) { return [(110 + (i % 3) * 62 + 27) / 4, (60 + Math.floor(i / 3) * 62 + 27) / 3]; };
+      var pos = function (i) {
+        var w = -Math.PI / 2 + (i / 6) * Math.PI * 2;
+        return [(200 + Math.cos(w) * 90) / 4, (160 + Math.sin(w) * 80) / 3];
+      };
       return HT.beispiel(el, [
         { svg: gitter(1), text: 'Merken: 1.', dauer: 900 },
         { svg: gitter(5), text: 'Merken: 2.', dauer: 900 },

@@ -24,12 +24,15 @@
     kategorie: 'aufmerksamkeit',
     symbol: 'auge',
     ziel: 'Aufmerksamkeit über längere Zeit halten und gezielt reagieren',
-    beschreibung: 'Symbole erscheinen in gleichmäßigem Takt in der Bildschirmmitte. Nur auf das zu Beginn gezeigte Zielsymbol soll reagiert werden. Mit steigendem Level wird das Tempo schneller, Zielreize werden seltener und die Ablenker dem Ziel ähnlicher (erst gleiche Farbe, dann auch ähnliche Form). Gemessen werden Treffer, Fehlreaktionen, Auslassungen und Reaktionszeit.',
+    beschreibung: 'Symbole erscheinen in gleichmäßigem Takt in der Bildschirmmitte. Nur auf das zu Beginn gezeigte Zielsymbol soll reagiert werden. Mit steigendem Level wird das Tempo schneller, Zielreize werden seltener und die Ablenker dem Ziel ähnlicher. Zu viele Fehlreaktionen können den Durchgang abbrechen. Gemessen werden Treffer, Fehlreaktionen, Auslassungen und Reaktionszeit.',
     anleitung: 'Oben sehen Sie Ihr Zielsymbol. In der Mitte erscheinen nacheinander verschiedene Symbole. Drücken Sie nur dann die Leertaste oder tippen auf das Symbol, wenn Ihr Zielsymbol erscheint.',
     eingabe: ['tastatur', 'maus', 'touch'],
     tasten: ['ok'],
     levels: levels,
     levelLabels: { tempoMs: 'Takt (ms)', zielanteil: 'Zielanteil', aehnlichkeit: 'Ähnlichkeit (1–3)', groesse: 'Größe (px)' },
+    parameterSchema: {
+      abbruchNachFehlern: { typ: 'zahl', label: 'Abbruch nach Fehlreaktionen (0 = nie)', min: 0, max: 40, schritt: 1, standard: 20 }
+    },
     bewertung: { aufstufenAb: 0.85, abstufenUnter: 0.6 },
 
     create: function (container, ctx) {
@@ -38,7 +41,7 @@
       var oben = HT.m.neu(container, 'm-oben', '<div class="m-anweisung" style="display:inline-flex;align-items:center;margin:0">Ziel:&nbsp;<span style="display:inline-block;width:52px;height:52px">' + HT.formSvg(zielForm, zielFarbe) + '</span></div>');
       var zone = HT.m.neu(container, 'm-zentrum');
       var reizEl = HT.m.neu(zone, 'm-symbol m-reiz', '', { width: p.groesse + 'px', height: p.groesse + 'px', cursor: 'pointer' });
-      var aktuell = null, reizStart = 0, beantwortet = false, timer = null, aus = [], seitZiel = 0;
+      var aktuell = null, reizStart = 0, beantwortet = false, timer = null, aus = [], seitZiel = 0, fehler = 0, zuEnde = false;
 
       function ablenker() {
         var farbe = zielFarbe, form;
@@ -73,7 +76,17 @@
         beantwortet = true;
         var rt = Z.jetzt() - reizStart;
         if (aktuell.ziel) { ctx.onEvent({ korrekt: true, reiz: aktuell.form, reaktion: 'reagiert', rtMs: rt, seite: 'mitte' }); ctx.feedback(true, null, null, { dauer: 300 }); }
-        else { ctx.onEvent({ korrekt: false, reiz: aktuell.form + '/' + aktuell.farbe, reaktion: 'reagiert', rtMs: rt, typ: 'fehlreaktion', seite: 'mitte' }); ctx.feedback(false, null, null, { dauer: 300 }); }
+        else {
+          fehler++;
+          ctx.onEvent({ korrekt: false, reiz: aktuell.form + '/' + aktuell.farbe, reaktion: 'reagiert', rtMs: rt, typ: 'fehlreaktion', seite: 'mitte' });
+          ctx.feedback(false, null, null, { dauer: 300 });
+          if (!zuEnde && p.abbruchNachFehlern > 0 && fehler >= p.abbruchNachFehlern) {
+            zuEnde = true;
+            Z.abbrechen(timer);
+            reizEl.innerHTML = '';
+            if (ctx.onFinish) ctx.onFinish();
+          }
+        }
       }
 
       return {
@@ -82,7 +95,7 @@
           aus.push(HT.tap(container, function (ev) { if (!ev.target.closest('button')) reagieren(); }));
           timer = Z.nach(1200, takt);
         },
-        stop: function () { aus.forEach(function (f) { f(); }); }
+        stop: function () { aus.forEach(function (f) { f(); }); Z.abbrechen(timer); }
       };
     },
 

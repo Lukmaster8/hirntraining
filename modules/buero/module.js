@@ -11,18 +11,49 @@
     'Technik': ['Der Drucker im 2. Stock ist ausgefallen', 'Neues Passwort für den Computer beantragt', 'Wartungstermin für die Heizung am Dienstag', 'Das Internet im Lager funktioniert nicht', 'Bestellung von zwei neuen Bildschirmen']
   };
   var EILIG = ['DRINGEND', 'EILT', 'Bitte sofort'];
-  var levels = HT.stufen(12, function (t, i) { return { abteilungen: i <= 2 ? 2 : i <= 5 ? 3 : i <= 8 ? 4 : 5, eilregel: i >= 7, zeitlimitSek: i >= 10 ? HT.lerpInt(14, 9, (i - 10) / 2) : 0 }; });
+  var levels = HT.stufen(12, function (t, i) { return { abteilungen: i <= 2 ? 2 : i <= 5 ? 3 : i <= 8 ? 4 : 5, eilregel: i >= 7, unterbrechung: i >= 8, zeitlimitSek: i >= 10 ? HT.lerpInt(14, 9, (i - 10) / 2) : 0 }; });
   HT.registerModule({
     id: 'buero', name: 'Büroaufgaben', kategorie: 'exekutiv', symbol: 'dokument',
     ziel: 'Schriftstücke lesen, verstehen und nach Regeln richtig zuordnen',
-    beschreibung: 'Berufs- und alltagsnahes Training. Nacheinander kommen Schreiben aus dem Posteingang (Rechnungen, Bewerbungen, Beschwerden, Einladungen, Störungsmeldungen). Jedes Schreiben wird der zuständigen Abteilung zugeordnet. Die Zahl der Abteilungen steigt von 2 auf 5. Ab Level 7 gilt eine Zusatzregel: Schreiben mit dem Vermerk „DRINGEND“ oder „EILT“ gehen immer zuerst an die Geschäftsleitung. Ab Level 10 gibt es ein Zeitlimit. Trainiert werden Leseverständnis, Kategorisieren und das Beachten von Regeln.',
-    anleitung: 'Lesen Sie das Schreiben und tippen Sie auf die Abteilung, die dafür zuständig ist. Wenn angezeigt: Alles mit „DRINGEND“ oder „EILT“ geht immer an die Geschäftsleitung.',
+    beschreibung: 'Berufs- und alltagsnahes Training. Schreiben aus dem Posteingang werden der zuständigen Abteilung zugeordnet. Die Zahl der Abteilungen steigt von 2 auf 5. Ab Level 7 gilt: „DRINGEND“ oder „EILT“ geht an die Geschäftsleitung. Ab Level 8 kommt vor jedem Schreiben eine kurze Merkaufgabe, danach geht es zum Schreiben zurück. Ab Level 10 gibt es ein Zeitlimit.',
+    anleitung: 'Lesen Sie das Schreiben und tippen Sie auf die Abteilung, die dafür zuständig ist. Dringendes geht an die Geschäftsleitung. Kommt zwischendurch eine Zahlenfolge, merken Sie sie sich und wählen Sie sie danach aus. Dann bearbeiten Sie das Schreiben.',
     tasten: [], levels: levels,
     levelLabels: { abteilungen: 'Abteilungen', eilregel: 'Regel „Dringend → Geschäftsleitung“', zeitlimitSek: 'Zeitlimit (s)' },
     create: function (container, ctx) {
       var p = ctx.params, abts = null, z = 0, nr = 0;
       var q = HT.quiz(container, ctx, {
         pauseMs: 700,
+        vorher: function (zeigen, felder) {
+          if (!p.unterbrechung) { zeigen(); return; }
+          var Z = HT.zeit;
+          var ziffern = [HT.zufall.int(1, 9), HT.zufall.int(1, 9), HT.zufall.int(1, 9)];
+          var ziel = ziffern.join(' ');
+          felder.frage.textContent = 'Kurz merken. Danach kommt das Schreiben.';
+          felder.inhalt.style.display = '';
+          felder.inhalt.innerHTML = '<div style="font-size:2.4rem;font-weight:800;letter-spacing:.25em">' + ziel + '</div>';
+          HT.leeren(felder.wahl);
+          Z.nach(1100, function () {
+            var offen = true;
+            function zu(ok, reaktion) {
+              if (!offen) return;
+              offen = false;
+              ctx.onEvent({ korrekt: ok, auslassung: !ok && reaktion === 'keine', reiz: 'ziffern ' + ziel, reaktion: reaktion, typ: 'unterbrechung' });
+              if (ok) ctx.audio.richtig(); else ctx.audio.falsch();
+              HT.leeren(felder.wahl);
+              zeigen();
+            }
+            felder.inhalt.innerHTML = '';
+            felder.frage.textContent = 'Welche Ziffern waren das?';
+            var falsch = ziffern.slice().reverse().join(' ');
+            if (falsch === ziel) falsch = '2 4 6';
+            HT.zufall.mischen([{ html: ziel, wert: 1 }, { html: falsch, wert: 0 }]).forEach(function (o) {
+              var b = HT.el('button', { class: 'm-wahl-knopf', type: 'button' }, o.html);
+              HT.tap(b, function () { zu(o.wert === 1, o.html); });
+              felder.wahl.appendChild(b);
+            });
+            Z.nach(8000, function () { zu(false, 'keine'); });
+          });
+        },
         aufgabe: function () {
           if (!abts || z++ % 10 === 0) { abts = HT.zufall.stichprobe(Object.keys(ABT), p.abteilungen); if (p.eilregel && abts.indexOf('Geschäftsleitung') < 0) abts[0] = 'Geschäftsleitung'; }
           var abt = HT.zufall.wahl(abts.filter(function (a) { return a !== 'Geschäftsleitung'; }).concat(abts.indexOf('Geschäftsleitung') >= 0 ? ['Geschäftsleitung'] : []));

@@ -1,7 +1,7 @@
 /* Hirntraining – Offline-Speicher (Service Worker). Automatisch erzeugt von tools/offline_liste.py – nicht von Hand ändern.
  * Wirkt nur in der Online-Version (https, z. B. GitHub Pages): Nach dem ersten Öffnen läuft das Programm
  * auch ohne Internet. Die Patientendaten liegen davon unabhängig im Speicher des jeweiligen Geräts. */
-var VERSION = 'ht-ff0834264a';
+var VERSION = 'ht-fea101d809';
 var DATEIEN = [
  "./",
  "index.html",
@@ -48,6 +48,7 @@ var DATEIEN = [
  "data/sprachaudio.js",
  "data/texte.js",
  "data/woerter.js",
+ "modules/alarm-strasse/module.js",
  "modules/alltagsgedaechtnis/module.js",
  "modules/arbeitsgedaechtnis/module.js",
  "modules/bilder-wiedererkennen/module.js",
@@ -135,13 +136,12 @@ self.addEventListener('activate', function (e) {
 });
 self.addEventListener('fetch', function (e) {
   if (e.request.method !== 'GET') return;
-  e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(function (treffer) {
-    return treffer || fetch(e.request).then(function (antwort) {
-      if (antwort && antwort.ok && new URL(e.request.url).origin === self.location.origin) {
-        var kopie = antwort.clone();
-        caches.open(VERSION).then(function (c) { c.put(e.request, kopie); });
-      }
-      return antwort;
-    }).catch(function () { return caches.match('./index.html'); });
+  var gleich = new URL(e.request.url).origin === self.location.origin;
+  // Zuerst aus dem Netz (immer die neueste Version), ohne Internet aus dem Offline-Speicher
+  e.respondWith(fetch(e.request).then(function (antwort) {
+    if (antwort && antwort.ok && gleich) { var kopie = antwort.clone(); caches.open(VERSION).then(function (c) { c.put(e.request, kopie); }); }
+    return antwort;
+  }).catch(function () {
+    return caches.match(e.request, { ignoreSearch: true }).then(function (treffer) { return treffer || caches.match('./index.html'); });
   }));
 });

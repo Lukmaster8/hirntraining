@@ -22,40 +22,50 @@
   HT.registerModule({
     id: 'vigilanz', name: 'Vigilanz', kategorie: 'aufmerksamkeit', symbol: 'uhr',
     ziel: 'Aufmerksamkeit in monotonen Situationen über lange Zeit aufrechterhalten',
-    beschreibung: 'Auf einem gleichmäßig laufenden Förderband ziehen Pakete vorbei. Nur selten weicht ein Paket ab (anderes Etikett, andere Farbe, verschobenes Etikett). Diese Abweichungen sollen erkannt werden. Die Rohdaten erlauben die Analyse des Leistungsverlaufs über die Zeit.',
-    anleitung: 'Pakete fahren auf dem Band vorbei. Die meisten sind gleich. Drücken Sie die Leertaste oder tippen Sie auf das Paket, sobald ein Paket anders aussieht.',
+    beschreibung: 'Auf einem gleichmäßig laufenden Förderband ziehen Pakete vorbei. Nur selten weicht ein Paket ab. Gedrückt wird erst, wenn dieses Paket im markierten Kontrollfenster ist. Vorher oder nachher zählt nicht. Das Bandtempo kann normal oder schnell gestellt werden.',
+    anleitung: 'Pakete fahren auf dem Band vorbei. Drücken Sie die Leertaste nur dann, wenn ein abweichendes Paket im türkisen Fenster ist. Vor dem Fenster und dahinter nicht drücken.',
     tasten: ['ok'],
     levels: levels,
     levelLabels: { abweichungsrate: 'Anteil Abweichungen', unauffaelligkeit: 'Unauffälligkeit (1–3)', tempoPxS: 'Tempo (px/s)', abstandPx: 'Abstand (px)' },
-    parameterSchema: { dauerDurchgangSek: { typ: 'zahl', label: 'Dauer eines Durchgangs (Sek.)', min: 60, max: 300, schritt: 30, standard: 180 } },
+    parameterSchema: {
+      dauerDurchgangSek: { typ: 'zahl', label: 'Dauer eines Durchgangs (Sek.)', min: 60, max: 300, schritt: 30, standard: 180 },
+      tempo: { typ: 'auswahl', label: 'Bandtempo', standard: 'normal', optionen: [{ wert: 'normal', label: 'Normal' }, { wert: 'schnell', label: 'Schnell' }] }
+    },
     create: function (container, ctx) {
       var p = ctx.params, Z = HT.zeit;
       var voll = HT.m.neu(container, 'm-voll');
       var musterBox = HT.m.neu(voll, 'm-oben', '<div class="m-anweisung" style="display:inline-flex;align-items:center;margin:0">Normales Paket:&nbsp;<span style="width:56px;height:56px;display:inline-block">' + paket(false) + '</span></div>');
       var band = HT.m.neu(voll, '', '', { position: 'absolute', left: '0', right: '0', top: '55%', height: '28px', background: 'repeating-linear-gradient(90deg,#8c98a3 0 18px,#6f7b86 18px 36px)', borderTop: '4px solid #26333c', borderBottom: '4px solid #26333c' });
+      HT.m.neu(voll, '', 'Fenster', { position: 'absolute', left: '50%', top: 'calc(55% - 148px)', width: '150px', marginLeft: '-75px', textAlign: 'center', fontWeight: '700', color: '#1BA8B5', zIndex: 2 });
+      HT.m.neu(voll, '', '', { position: 'absolute', left: '50%', top: 'calc(55% - 128px)', width: '150px', height: '132px', marginLeft: '-75px', border: '3px solid #1BA8B5', borderRadius: '16px', pointerEvents: 'none', zIndex: 2 });
       var pakete = [], frame = null, aus = [], weg = 0, b = container.clientWidth;
       var gross = 120;
       function neuesPaket(x) {
         var abw = HT.zufall.chance(p.abweichungsrate);
         var el = HT.el('div', { class: 'm-symbol', html: paket(abw, p.unauffaelligkeit), style: { position: 'absolute', width: gross + 'px', height: gross + 'px', top: 'calc(55% - ' + gross + 'px + 4px)', left: '0', cursor: 'pointer', transform: 'translateX(' + Math.round(x) + 'px)', willChange: 'transform' } });
         voll.appendChild(el);
-        var pk = { el: el, x: x, abw: abw, gesehen: false, erkannt: false, startZeit: null };
+        var pk = { el: el, x: x, abw: abw, gesehen: false, erkannt: false, gewertet: false, imFenster: false, startZeit: null };
         HT.tap(el, function () { reagieren(pk); });
         pakete.push(pk);
       }
+      function imFenster(q) {
+        var mitte = q.x + gross / 2;
+        return mitte > b * 0.5 - 75 && mitte < b * 0.5 + 75;
+      }
       function reagieren(pk) {
         if (!pk) {
-          var sichtbar = pakete.filter(function (q) { return q.x > -gross && q.x < b && q.abw && !q.erkannt; });
-          pk = sichtbar[0] || null;
+          var im = pakete.filter(function (q) { return q.abw && !q.erkannt && imFenster(q); });
+          pk = im[0] || null;
         }
-        if (pk && pk.abw && !pk.erkannt) {
+        if (pk && pk.abw && !pk.erkannt && imFenster(pk)) {
           pk.erkannt = true;
+          pk.gewertet = true;
           pk.el.style.opacity = '.45';
           var r = pk.el.getBoundingClientRect(), c = container.getBoundingClientRect();
-          ctx.onEvent({ korrekt: true, reiz: 'abweichung', reaktion: 'erkannt', rtMs: Z.jetzt() - pk.startZeit, seite: HT.seiteVon((pk.x + gross / 2) / b) });
+          ctx.onEvent({ korrekt: true, reiz: 'abweichung', reaktion: 'im fenster', rtMs: Z.jetzt() - (pk.startZeit || Z.jetzt()), seite: 'mitte' });
           ctx.feedback(true, r.left - c.left + gross / 2, r.top - c.top + gross / 2);
         } else {
-          ctx.onEvent({ korrekt: false, reiz: 'normal', reaktion: 'reagiert', typ: 'fehlreaktion' });
+          ctx.onEvent({ korrekt: false, reiz: pk && pk.abw ? 'abweichung ausserhalb' : 'normal', reaktion: 'reagiert', typ: 'fehlreaktion' });
           ctx.feedback(false, null, null, { dauer: 350 });
         }
       }
@@ -66,17 +76,21 @@
           pakete.forEach(function (q) { q.abw = false; q.el.innerHTML = paket(false); });
           aus.push(HT.eingabe.an(function (a) { if (a === 'ok') reagieren(null); }));
           frame = Z.frame(function (dt) {
-            var dx = p.tempoPxS * dt;
+            var dx = p.tempoPxS * (p.tempo === 'schnell' ? 1.45 : 1) * dt;
             weg += dx;
             pakete.forEach(function (q) {
               q.x += dx;
               q.el.style.transform = 'translateX(' + Math.round(q.x) + 'px)';
-              if (!q.gesehen && q.x > -gross * 0.4) { q.gesehen = true; q.startZeit = Z.jetzt(); }
+              var drin = imFenster(q);
+              if (q.abw && drin && !q.startZeit) q.startZeit = Z.jetzt();
+              if (q.abw && q.imFenster && !drin && !q.gewertet) {
+                q.gewertet = true;
+                ctx.onEvent({ korrekt: false, auslassung: true, reiz: 'abweichung', reaktion: 'nicht im fenster', seite: 'mitte' });
+              }
+              q.imFenster = drin;
             });
-            // Pakete am rechten Rand entfernen
             while (pakete.length && pakete[0].x > b + 10) {
               var alt = pakete.shift();
-              if (alt.abw && !alt.erkannt) ctx.onEvent({ korrekt: false, auslassung: true, reiz: 'abweichung', reaktion: 'keine', seite: 'rechts' });
               alt.el.remove();
             }
             var letztes = pakete[pakete.length - 1];
@@ -99,7 +113,7 @@
         { svg: szene(0, -1), text: 'Pakete fahren vorbei …', dauer: 900 },
         { svg: szene(40, -1), dauer: 900 },
         { svg: szene(80, 1), text: 'Anderes Etikett!', dauer: 900 },
-        { svg: szene(110, 1), zeiger: [56, 50], klick: true, text: 'Jetzt drücken', dauer: 1400 }
+        { svg: szene(110, 1) + '', zeiger: [56, 50], klick: true, text: 'Im Fenster drücken', dauer: 1400 }
       ]);
     }
   });

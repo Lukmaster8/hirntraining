@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var HT = window.HT;
-  var levels = HT.stufen(14, function (t, i) { return { stufe: i, laenge: i <= 6 ? 5 : 6, optionen: i <= 4 ? 3 : 4, zeitlimitSek: i >= 11 ? 25 : 0 }; });
+  var levels = HT.stufen(14, function (t, i) { return { stufe: i, laenge: i <= 6 ? 4 : 6, optionen: i <= 4 ? 3 : 4, zeitlimitSek: i >= 11 ? 25 : 0 }; });
   var FARBEN = ['#3D7BE0', '#E25C5C', '#2EAD6B', '#F2B630', '#8A63D2'];
 
   function zahlKarte(n) { return '<div style="font-size:2rem;font-weight:800;min-width:2.2em;text-align:center">' + n + '</div>'; }
@@ -21,14 +21,14 @@
   function folge(stufe, laenge) {
     var r = HT.zufall, a, d, el = [], i;
     var zahlen = function (fn) { for (i = 0; i < laenge + 1; i++) el.push(fn(i)); return { art: 'zahl', elemente: el.slice(0, laenge), richtig: el[laenge] }; };
-    var typ = (stufe % 2 === 1) ? 'zahl' : 'form';
-    if (typ === 'zahl') {
-      if (stufe <= 1) { a = r.int(1, 10); d = r.int(1, 2); return zahlen(function (k) { return a + k * d; }); }
-      if (stufe <= 3) { a = r.int(2, 20); d = r.int(3, 6); return zahlen(function (k) { return a + k * d; }); }
-      if (stufe <= 5) { if (r.chance(0.5)) { a = r.int(40, 70); d = r.int(3, 7); return zahlen(function (k) { return a - k * d; }); } a = r.int(1, 3); return zahlen(function (k) { return a * Math.pow(2, k); }); }
-      if (stufe <= 7) { a = r.int(1, 10); var d1 = r.int(1, 4), d2 = r.int(5, 9); return zahlen(function (k) { var s = a; for (var j = 0; j < k; j++) s += j % 2 ? d2 : d1; return s; }); }
-      if (stufe <= 9) { a = r.int(1, 9); var b = r.int(20, 30); return zahlen(function (k) { return k % 2 ? b - Math.floor(k / 2) * 2 : a + (k / 2) * 3; }); }
-      if (stufe <= 11) { a = r.int(1, 5); return zahlen(function (k) { return a + k * (k + 1) / 2; }); }
+    if (stufe > 6) {
+      var s = stufe - 6;
+      if (s <= 1) { a = r.int(1, 10); d = r.int(1, 2); return zahlen(function (k) { return a + k * d; }); }
+      if (s <= 2) { a = r.int(2, 20); d = r.int(3, 6); return zahlen(function (k) { return a + k * d; }); }
+      if (s <= 3) { if (r.chance(0.5)) { a = r.int(40, 70); d = r.int(3, 7); return zahlen(function (k) { return a - k * d; }); } a = r.int(1, 3); return zahlen(function (k) { return a * Math.pow(2, k); }); }
+      if (s <= 4) { a = r.int(1, 10); var d1 = r.int(1, 4), d2 = r.int(5, 9); return zahlen(function (k) { var sum = a; for (var j = 0; j < k; j++) sum += j % 2 ? d2 : d1; return sum; }); }
+      if (s <= 5) { a = r.int(1, 9); var b = r.int(20, 30); return zahlen(function (k) { return k % 2 ? b - Math.floor(k / 2) * 2 : a + (k / 2) * 3; }); }
+      if (s <= 6) { a = r.int(1, 5); return zahlen(function (k) { return a + k * (k + 1) / 2; }); }
       a = r.int(1, 3); var bb = r.int(2, 4);
       return zahlen(function (k) { var x = a, y = bb; if (k === 0) return x; for (var j = 1; j < k; j++) { var t = x + y; x = y; y = t; } return y; });
     }
@@ -62,8 +62,8 @@
   HT.registerModule({
     id: 'reihen-fortsetzen', name: 'Reihen fortsetzen', kategorie: 'exekutiv', symbol: 'trend',
     ziel: 'Regeln erkennen und logisch weiterdenken',
-    beschreibung: 'Eine Folge aus Zahlen oder Formen folgt einer Regel. Das nächste Element soll aus mehreren Möglichkeiten gewählt werden. Die Regeln werden mit dem Level komplexer: von einfachen Wiederholungen und +1-Schritten über Farb-Form-Kombinationen, Drehungen und Verdopplungen bis zu verschachtelten und wachsenden Abständen.',
-    anleitung: 'Schauen Sie sich die Reihe an: Nach welcher Regel geht sie weiter? Tippen Sie unten auf das Element, das als Nächstes kommt (oder Ziffer 1–4).',
+    beschreibung: 'Zuerst eine Reihe aus vier Bildern: das fünfte Element wird gewählt. Die Bildregeln werden von Wiederholung über Farbe und Drehung bis zu wachsenden Mengen schwerer. Ab Level 7 folgen Zahlenregeln, vom einfachen Schritt bis zu verschachtelten Abständen.',
+    anleitung: 'Schauen Sie sich die Reihe an: Nach welcher Regel geht sie weiter? Bei den Bildern fehlt das fünfte Element. Tippen Sie unten auf das passende Element (oder Ziffer 1–4).',
     tasten: [], levels: levels,
     levelLabels: { stufe: 'Regelstufe', laenge: 'Länge der Reihe', optionen: 'Antworten', zeitlimitSek: 'Zeitlimit (s)' },
     create: function (container, ctx) {

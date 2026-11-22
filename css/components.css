@@ -106,8 +106,8 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 24px;
 .dialog.pin-dialog { max-width: 420px; }
 
 /* ---------- Toasts ---------- */
-#toasts { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
-.toast { display: flex; align-items: center; background: #1E2A33; color: #fff; padding: .8rem 1.2rem; border-radius: 14px; box-shadow: var(--schatten-3); margin-top: .5rem; font-weight: 600; font-size: .92rem; opacity: 0; transform: translateY(12px); transition: all var(--mittel) var(--kurve); }
+#toasts { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+.toast { display: flex; align-items: center; background: #1E2A33; color: #fff; padding: .8rem 1.2rem; border-radius: 14px; box-shadow: var(--schatten-3); margin-top: .5rem; font-weight: 600; font-size: .92rem; opacity: 0; transform: translateY(-12px); transition: all var(--mittel) var(--kurve); }
 .toast .ic { margin-right: .6rem; }
 .toast.ok .ic { color: #6be3a2; }
 .toast.fehler { background: #b8403f; }

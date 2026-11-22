@@ -9,7 +9,7 @@
     [[0, 0], [1, 0], [1, 1], [1, 2], [2, 2]], [[0, 1], [1, 0], [1, 1], [1, 2], [2, 0]], [[0, 0], [0, 1], [0, 2], [1, 0], [2, 0]], [[0, 0], [1, 0], [2, 0], [2, 1], [3, 1]]
   ];
   var DIFF = ['form', 'form', 'form', 'drehung', 'drehung', 'drehung', 'spiegel', 'detail', 'detail', 'spiegel', 'detail', 'groesse', 'spiegel', 'groesse'];
-  var levels = DIFF.map(function (d, i) { return { unterschied: d, alternativen: Math.min(8, 3 + Math.floor(i / 2)), zeitlimitSek: i >= 10 ? 12 : 0 }; });
+  var levels = DIFF.map(function (d, i) { return { unterschied: d, alternativen: Math.min(8, 3 + Math.floor(i / 2)), zeitlimitSek: i >= 10 ? 12 : 0, mitglied: i >= 8 }; });
 
   function transform(cells, dreh, spiegel) {
     var c = cells.map(function (q) { return [spiegel ? -q[0] : q[0], q[1]]; });
@@ -41,8 +41,8 @@
   HT.registerModule({
     id: 'formen-unterscheiden', name: 'Formen unterscheiden', kategorie: 'wahrnehmung', symbol: 'raster',
     ziel: 'Genaues Hinsehen: Formen, Lage und Details vergleichen',
-    beschreibung: 'Zwei Aufgabentypen wechseln sich ab: „Welche Figur ist anders?“ (eine Figur weicht ab) und „Welche Figur passt genau zur Vorlage?“. Die Unterschiede werden mit dem Level feiner: erst eine andere Form, dann Drehung, Spiegelung, die Lage eines kleinen Details und schließlich die Größe. Zusätzlich steigt die Anzahl der Alternativen.',
-    anleitung: 'Vergleichen Sie die Figuren genau. Tippen Sie auf die Figur, die anders ist – oder auf die Figur, die genau wie die Vorlage oben aussieht. Mit Pfeiltasten und Leertaste oder den Ziffern geht es auch.',
+    beschreibung: 'Zuerst wird verglichen: welche Figur anders ist, oder welche genau zur Vorlage passt. Die Unterschiede werden feiner: Form, Drehung, Spiegelung, Detail, Größe. Ab Level 9 kommt die Zuordnung aus dem Symbolfeld: Die linke Taste, wenn die gezeigte Figur im Feld vorkommt, die rechte Taste, wenn sie fehlt.',
+    anleitung: 'Vergleichen Sie die Figuren genau. Tippen Sie auf die Figur, die anders ist – oder auf die Figur, die genau wie die Vorlage aussieht. In späteren Stufen: Linke Taste, wenn die Figur im Feld ist, rechte Taste, wenn nicht.',
     tasten: [], levels: levels,
     levelLabels: { unterschied: 'Unterschied', alternativen: 'Alternativen', zeitlimitSek: 'Zeitlimit (s)' },
     create: function (container, ctx) {
@@ -50,6 +50,22 @@
       return HT.quiz(container, ctx, {
         aufgabe: function () {
           var basis = { poly: HT.zufall.int(0, POLY.length - 1), dreh: HT.zufall.int(0, 3), spiegel: false, detail: HT.zufall.int(0, 3), farbe: HT.zufall.wahl(['#3D7BE0', '#E8833A', '#2EAD6B', '#8A63D2', '#E25C5C']), skala: 1 };
+          if (p.mitglied) {
+            var drin = HT.zufall.chance(0.5);
+            var nFeld = Math.min(6, Math.max(4, p.alternativen - 1));
+            var stelle = HT.zufall.int(0, nFeld - 1);
+            var feld = [];
+            for (var k = 0; k < nFeld; k++) feld.push(drin && k === stelle ? basis : variante(basis, p.unterschied));
+            var feldHtml = '<div style="display:flex;flex-wrap:wrap;justify-content:center;max-width:460px">' + feld.map(function (f) {
+              return '<div style="width:84px;height:84px;margin:6px;background:#fff;border-radius:12px;border:1px solid #e1e8ed">' + figurSvg(f) + '</div>';
+            }).join('') + '</div>';
+            return {
+              frage: 'Ist die linke Figur im Feld? <b>Links = ja</b>, <b>rechts = nein</b>.',
+              inhalt: '<div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap"><div style="width:120px;height:120px;margin:8px;border:3px solid var(--akzent);border-radius:14px;background:#fff">' + figurSvg(basis) + '</div>' + feldHtml + '</div>',
+              optionen: [{ html: 'Ja, ist dabei', wert: 1, taste: 'links' }, { html: 'Nein, fehlt', wert: 0, taste: 'rechts' }],
+              richtig: drin ? 1 : 0, reiz: 'mitglied-' + p.unterschied, zeitMs: p.zeitlimitSek ? p.zeitlimitSek * 1000 : 0
+            };
+          }
           var vorlage = (nr++ % 2) === 1;
           var n = p.alternativen, opts = [], richtig = HT.zufall.int(0, n - 1);
           for (var i = 0; i < n; i++) {
