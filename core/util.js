@@ -228,7 +228,8 @@
   HT.skriptLaden = function (src) {
     return new Promise(function (resolve) {
       var s = document.createElement('script');
-      s.src = src;
+      // Versionsnummer anhängen, damit der Browser nach einer Änderung nicht die alte Datei aus dem Zwischenspeicher nimmt
+      s.src = src + (window.HT_STAND && src.indexOf('?') < 0 ? '?v=' + window.HT_STAND.v : '');
       s.onload = function () { resolve(true); };
       s.onerror = function () { console.warn('Konnte nicht laden:', src); resolve(false); };
       document.head.appendChild(s);

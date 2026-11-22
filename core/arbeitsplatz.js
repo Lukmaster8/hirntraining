@@ -666,7 +666,7 @@
       ['Übersicht & Statistik', 'diagramm', admin ? 'Alle Klienten, Auswertung' : 'Meine Klienten, Auswertung', function () { location.hash = '#/auswertung'; }, true],
       ['Modulbibliothek', 'raster', 'Module ansehen, ein-/ausblenden', function () { location.hash = '#/module'; }, true],
       ['Info', 'info', 'Version und Speicher', function () {
-        UI.hinweis('Hirntraining', 'Version 2.0 · lokal und offline · Datenspeicher: ' + S.backend + ' · ' + HT.Module.liste.length + ' Module · ' + S.alle('patients').length + ' Klienten · ' + S.alle('runs').length + ' Durchgänge gespeichert.');
+        UI.hinweis('Hirntraining', 'Version 2.0' + (window.HT_STAND ? ' · Stand ' + window.HT_STAND.datum + ' (' + window.HT_STAND.v + ')' : '') + ' · lokal und offline · Datenspeicher: ' + S.backend + ' · ' + HT.Module.liste.length + ' Module · ' + S.alle('patients').length + ' Klienten · ' + S.alle('runs').length + ' Durchgänge gespeichert.');
       }, true]
     ];
     var g = HT.el('div', { class: 'ap-system' });
