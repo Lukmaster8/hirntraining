@@ -161,7 +161,7 @@
       HT.leeren(app);
       var start = HT.el('div', { class: 'start' });
       var box = HT.el('div', { class: 'anmelde-box', style: { maxWidth: '820px' } });
-      box.appendChild(UI.iconKnopf('links', 'Abmelden', function () { location.hash = '#/patientenstart'; HT.app.neuZeichnen(); }, 'zurueck-knopf rand'));
+      box.appendChild(UI.iconKnopf('links', 'Menü (Therapeut oder Patient)', function () { location.hash = '#/start'; HT.app.neuZeichnen(); }, 'zurueck-knopf rand'));
       box.appendChild(HT.el('h1', null, 'Hallo ' + (p.vorname || p.pseudonym) + '!'));
       var heute = V.heute(p);
       var plan = HT.plaene.aktiverPlan(p.id);

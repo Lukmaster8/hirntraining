@@ -66,6 +66,23 @@
       g.fillStyle = 'rgba(255,255,255,.12)'; g.beginPath(); g.ellipse(-6, -6, 12, 5, -0.3, 0, Math.PI * 2); g.fill();
     });
   }
+  function blitzerBild() {
+    var c = leinwand(130, 380, function (g, b, h) {
+      schatten(g, b / 2, h - 4, 34, 7, 0.3);
+      var pg = g.createLinearGradient(b / 2 - 8, 0, b / 2 + 8, 0); pg.addColorStop(0, '#5d676e'); pg.addColorStop(0.5, '#a3adb4'); pg.addColorStop(1, '#4f5960');
+      g.fillStyle = pg; g.fillRect(b / 2 - 8, 150, 16, h - 154);
+      var kg = g.createLinearGradient(0, 30, 0, 160); kg.addColorStop(0, '#c9d0d4'); kg.addColorStop(1, '#8c969c');
+      g.fillStyle = kg; rrect(g, 14, 30, b - 28, 130, 10); g.fill();
+      g.strokeStyle = '#4b555b'; g.lineWidth = 3; rrect(g, 14, 30, b - 28, 130, 10); g.stroke();
+      g.fillStyle = '#1b2125'; rrect(g, 26, 48, b - 52, 44, 8); g.fill();
+      kreis(g, b / 2 - 16, 70, 13, '#2d3a44'); kreis(g, b / 2 - 16, 70, 7, '#5d7f99'); kreis(g, b / 2 - 19, 67, 2.5, 'rgba(255,255,255,.8)');
+      g.fillStyle = '#e9edf0'; rrect(g, b / 2 + 4, 56, 24, 28, 4); g.fill();
+      g.fillStyle = '#d32f2f'; g.fillRect(14, 112, b - 28, 14);
+      g.fillStyle = '#fff'; g.font = '800 13px -apple-system, Helvetica, sans-serif'; g.textAlign = 'center'; g.fillText('RADAR', b / 2, 147);
+    });
+    c.blitz = [(130 / 2 + 16) / 130, 70 / 380];
+    return c;
+  }
   function laubbaum(seed, pal) {
     var R = zufallGen(seed);
     return leinwand(240, 300, function (g, b, h) {
@@ -392,7 +409,9 @@
     S.pfeil = { links: pfeilSchild(false), rechts: pfeilSchild(true) };
     S.gegen = ['#d64545', '#3d6fd6', '#f2b630', '#2e9e62', '#e8eef2', '#3a3f45'].map(function (f) { return autoVorn(f, false); });
     S.polizei = autoVorn('#f2f4f5', true);
-    S.laterne = laterne(); S.tropfen = tropfenBild();
+    S.laterne = laterne(); S.tropfen = tropfenBild(); S.blitzer = blitzerBild();
+    var kf = [['#f2c03a', '#2b6cb0'], ['#e8504a', '#3a4a7a'], ['#7bc96f', '#5b4a8a'], ['#f08bb4', '#2f6f6a']];
+    S.kind = kf.map(function (p) { return [0, 1, 2, 3].map(function (ph) { return person(p[0], p[1], ph, false); }); });
     return S;
   }
 
@@ -412,7 +431,7 @@
 
   function streckeBauen(p, dauerSek) {
     var meter = (50 / 3.6) * Math.max(45, dauerSek) * 0.8, events = [], s = 160, limit = 50, katalog = [];
-    if (p.schilder) katalog.push('schild'); if (p.ampeln) katalog.push('ampel'); if (p.fuss) katalog.push('fuss'); if (p.stopps) katalog.push('stop');
+    if (p.schilder) { katalog.push('schild'); katalog.push('schild'); } if (p.ampeln) katalog.push('ampel'); if (p.fuss) katalog.push('fuss'); if (p.stopps) katalog.push('stop');
     if (p.hindernis) katalog.push('hindernis'); if (p.bahn) katalog.push('bahn'); if (p.werbung) katalog.push('werbung'); if (p.blinker) katalog.push('blinker'); if (p.polizei) katalog.push('polizei');
     var n = 0;
     while (s < meter - 80 && n < 28) {
@@ -426,9 +445,11 @@
       else if (typ === 'bahn') e.zu = HT.zufall.chance(0.55);
       else if (typ === 'blinker') e.seite = HT.zufall.wahl(['links', 'rechts']);
       else if (typ === 'polizei') e.blau = true;
-      else if (typ === 'hindernis') e.art = HT.zufall.wahl(['reh', 'hund', 'kisten', 'ball']);
+      else if (typ === 'hindernis') e.art = HT.zufall.wahl(['person', 'kind', 'ball', 'kind', 'reh', 'hund']);
       e.farbe = HT.zufall.int(0, 3);
       events.push(e);
+      // Nach manchen Temposchildern steht ein Blitzer am Straßenrand
+      if (typ === 'schild' && HT.zufall.chance(0.55)) events.push({ typ: 'blitzer', s: s + HT.zufall.int(55, 95), erledigt: false, minV: 999, stehZeit: 0 });
       s += HT.zufall.int(p.abstandMin, p.abstandMax);
     }
     return { laenge: Math.max(meter, s + 40), events: events };
@@ -485,8 +506,8 @@
   HT.registerModule({
     id: 'strassenverkehr', name: 'Straßenverkehr', kategorie: 'aufmerksamkeit', symbol: 'weiter',
     ziel: 'Tempo halten und gleichzeitig auf echte Störungen und eine zweite Aufgabe achten',
-    beschreibung: 'Cockpit-Fahrt für geteilte Aufmerksamkeit auf einer Landstraße mit Kurven, Feldern, Wäldern und Ortschaften. Zu Beginn wird Tag-, Abend- oder Nachtfahrt gewählt; die Fahrt beginnt bei schönem Wetter, nach etwa 20 Sekunden zieht Herbstregen auf: nasse, spiegelnde Straße, Tropfen auf der Scheibe, Scheibenwischer laufen automatisch. Die Spur hält das Auto, mit Pfeil links und rechts lässt sich leicht ausweichen. Pfeil hoch beschleunigt sanft, Pfeil runter bremst. Der Tachozeiger soll im grünen Band bleiben. Niedrigere Limits gelten schon vor dem Schild, höhere erst danach. Angehalten wird bei roter Ampel, Fußgänger am Übergang, Stoppschild, geschlossener Schranke und Blaulicht im Spiegel. Einem Tier, Ball oder Gegenstand auf der Fahrbahn kann man ausweichen oder davor anhalten. L schaltet das Abblendlicht, F das Fernlicht; bei Fernlicht gibt der Gegenverkehr Lichthupe. Parallel kommen Abbiegen, Kontrollleuchten und eine Durchsage. Leere Übergänge, grüne Ampeln und Werbetafeln verlangen keine Taste.',
-    anleitung: 'Pfeil nach oben ist Gas, Pfeil nach unten ist Bremse. Halten Sie den Zeiger im grünen Bereich. Vor einem langsameren Schild schon abbremsen, nach einem schnelleren Schild erst beschleunigen. Halten Sie nur an, wenn wirklich etwas auf der Straße ist. Einem Tier, Ball oder Gegenstand können Sie mit Pfeil links oder rechts ausweichen. Bei einer Abbiege-Ansage zählt links oder rechts als Abbiegen. Leuchtet eine Lampe im Cockpit, drücken Sie OK. Die Plustaste nur bei der genannten Autobahn. Im Dunkeln schaltet L das Licht ein, F das Fernlicht. Bei Gegenverkehr abblenden.',
+    beschreibung: 'Cockpit-Fahrt für geteilte Aufmerksamkeit auf einer Landstraße mit Kurven, Feldern, Wäldern und Ortschaften. Zu Beginn wird Tag-, Abend- oder Nachtfahrt gewählt; die Fahrt beginnt bei schönem Wetter, nach 30 bis 60 Sekunden zieht Herbstregen auf: nasse, spiegelnde Straße, Tropfen auf der Scheibe, Scheibenwischer laufen automatisch. Die Spur hält das Auto, mit Pfeil links und rechts lässt sich leicht ausweichen. Pfeil hoch beschleunigt sanft, Pfeil runter bremst. Der Tachozeiger soll im grünen Band bleiben. Niedrigere Limits gelten schon vor dem Schild, höhere erst danach. Angehalten wird bei roter Ampel, Fußgänger am Übergang, Stoppschild, geschlossener Schranke und Blaulicht im Spiegel. Plötzlich laufen Menschen oder Kinder auf die Fahrbahn, ein Ball rollt über die Straße oder ein Tier steht im Weg: bremsen oder ausweichen. Wer einen Menschen anfährt, beendet die Fahrt. Fünf Sekunden im grünen Band bringen 10 Punkte, fünf Sekunden zu schnell kosten 5 Punkte; Blitzer am Straßenrand blitzen bei zu hohem Tempo. L schaltet das Abblendlicht, F das Fernlicht; bei Fernlicht gibt der Gegenverkehr Lichthupe. Parallel kommen Abbiegen, Kontrollleuchten und eine Durchsage. Leere Übergänge, grüne Ampeln und Werbetafeln verlangen keine Taste.',
+    anleitung: 'Pfeil nach oben ist Gas, Pfeil nach unten ist Bremse. Halten Sie den Zeiger im grünen Bereich. Vor einem langsameren Schild schon abbremsen, nach einem schnelleren Schild erst beschleunigen. Halten Sie nur an, wenn wirklich etwas auf der Straße ist. Läuft ein Mensch oder Kind auf die Straße oder rollt ein Ball heran, sofort bremsen. Einem Tier können Sie auch mit Pfeil links oder rechts ausweichen. Fünf Sekunden im grünen Bereich bringen 10 Punkte, zu schnell kostet 5 Punkte. Achten Sie auf Blitzer. Bei einer Abbiege-Ansage zählt links oder rechts als Abbiegen. Leuchtet eine Lampe im Cockpit, drücken Sie OK. Die Plustaste nur bei der genannten Autobahn. Im Dunkeln schaltet L das Licht ein, F das Fernlicht. Bei Gegenverkehr abblenden.',
     tasten: ['hoch', 'runter', 'links', 'rechts', 'ok', 'ja'], levels: levels,
     levelLabels: {
       band: 'Grünes Band (± km/h)', schilder: 'Temposchilder', ampeln: 'Ampeln', fuss: 'Fußgänger', stopps: 'Stoppschilder',
@@ -497,7 +518,7 @@
       dauerDurchgangSek: { typ: 'zahl', label: 'Dauer eines Durchgangs (Sek.)', min: 45, max: 240, schritt: 15, standard: 90 },
       cockpit: { typ: 'schalter', label: 'Cockpit anzeigen', standard: true },
       tageszeit: { typ: 'auswahl', label: 'Tageszeit', standard: 'auswahl', optionen: [{ wert: 'auswahl', label: 'Beim Start wählen' }, { wert: 'zufall', label: 'Zufällig' }, { wert: 'tag', label: 'Tag' }, { wert: 'daemmerung', label: 'Dämmerung' }, { wert: 'nacht', label: 'Nacht' }] },
-      wetter: { typ: 'auswahl', label: 'Wetter', standard: 'wechsel', optionen: [{ wert: 'zufall', label: 'Zufällig' }, { wert: 'trocken', label: 'Trocken' }, { wert: 'regen', label: 'Regen' }, { wert: 'wechsel', label: 'Erst schön, nach etwa 20 s Regen' }] },
+      wetter: { typ: 'auswahl', label: 'Wetter', standard: 'wechsel', optionen: [{ wert: 'zufall', label: 'Zufällig' }, { wert: 'trocken', label: 'Trocken' }, { wert: 'regen', label: 'Regen' }, { wert: 'wechsel', label: 'Erst schön, nach 30 bis 60 s Regen' }] },
       jahreszeit: { typ: 'auswahl', label: 'Jahreszeit', standard: 'herbst', optionen: [{ wert: 'zufall', label: 'Zufällig' }, { wert: 'sommer', label: 'Sommer' }, { wert: 'herbst', label: 'Herbst mit fallendem Laub' }] },
       linksverkehr: { typ: 'schalter', label: 'Schilder links (Linksverkehr)', standard: false }
     },
@@ -523,7 +544,7 @@
       // Wetter: Regenstärke regenI und Nässe der Fahrbahn ändern sich fließend; bei „wechsel“ setzt Regen ein oder hört auf
       var WETTER = p.wetter && p.wetter !== 'zufall' ? p.wetter : HT.zufall.wahl(['trocken', 'trocken', 'trocken', 'regen', 'regen', 'wechsel', 'wechsel', 'wechsel']);
       var REGEN_MOEGLICH = WETTER !== 'trocken', regenZiel = WETTER === 'regen' ? 1 : 0;
-      var regenI = regenZiel, nass = regenZiel, regenWechselBei = WETTER === 'wechsel' ? HT.zufall.int(18, 22) : 1e9;
+      var regenI = regenZiel, nass = regenZiel, regenWechselBei = WETTER === 'wechsel' ? HT.zufall.int(30, 60) : 1e9;
       var HERBST = p.jahreszeit === 'herbst' || (p.jahreszeit !== 'sommer' && HT.zufall.chance(0.5));
       var AMB_T, AMB_R, LICHTKARTE, DUNKEL_T, DUNKEL, DUNST_T, DUNST_R, DUNST, REFL;
       // Alles, was von der Tageszeit abhängt (auch nach der Auswahl am Start erneut aufgerufen)
@@ -539,6 +560,7 @@
       }
       var licht = 0, quer = 0, querV = 0, gasP = 0, bremsP = 0, ruck = -9, blendung = 0, blendHinweisBis = 0, lichtHinweisBis = 7, letztDt = 0;
       var LM = null, lg = null, lgK = null, HGR = null, blaetter = [], wischT = 0, PUF = null, pufG = null, DPR = 1, leuchten = [], SR = { x: 0, y: 0, w: 0, h: 0 }, aktD = 0, aktA = 1;
+      var punkte = 0, punktAnim = [], warnAn = false, blitzZeit = -9, blitzE = null, huepfer = -9, waldF = 0;
       var striche = [], tropfen = [], tropfenRest = 0, wischAlt = 0.05, wischZyklus = -1, ton = null, pauseUhr = null;
 
       function haltenAn(el, key) {
@@ -564,6 +586,7 @@
 
       function meldung(text) { hinweis.textContent = text; hinweis.className = 'sv-hinweis an'; hinweisBis = uhr + 3.5; }
       function zaehle(o) { if (!fertig) ctx.onEvent(o); }
+      function punkteAendern(n) { punkte += n; punktAnim.push({ n: n, t: uhr }); if (punktAnim.length > 6) punktAnim.shift(); }
       function ende(text) { if (fertig) return; fertig = true; meldung(text); if (ton) ton.update(0, 0, true); if (ctx.onFinish) ctx.onFinish(); }
       function naechstesSchild() { for (var i = 0; i < plan.events.length; i++) { var e = plan.events[i]; if (e.typ === 'schild' && !e.erledigt) return e; } return null; }
 
@@ -643,6 +666,18 @@
           } else zaehle({ korrekt: false, reiz: 'keine durchsage', reaktion: 'plus', typ: 'stau_falsch' });
         }
       }
+      // Seitliche Lage eines Hindernisses in Straßeneinheiten zur eigenen Seite hin (0,45 = Mitte der eigenen Spur)
+      var HALB = { reh: 0.24, hund: 0.16, ball: 0.07, kisten: 0.26, person: 0.14, kind: 0.1 };
+      function laeuftAuf(e) { return e.art === 'person' || e.art === 'kind' || e.art === 'ball'; }
+      function hindernisX(e) {
+        var flucht = HT.klemmen((e.stehZeit - 0.8) / 1.2, 0, 1);
+        if (!laeuftAuf(e)) return 0.45 + flucht * 2.5;
+        if (e.lauf === undefined) return e.art === 'ball' ? 2.1 : 1.75;
+        var t = uhr - e.lauf;
+        if (e.art === 'ball') return 2.1 - t * 1.55; // rollt einfach weiter über die Straße
+        var rein = HT.klemmen(t / (e.art === 'kind' ? 0.9 : 1.1), 0, 1);
+        return 1.75 - (1.75 - 0.45) * glatt(rein) - flucht * 2.6; // läuft auf die Fahrbahn, bleibt erschrocken stehen, geht nach dem Anhalten weiter
+      }
       function mussHalten(e) { if (e.typ === 'ampel') return !!e.rot; if (e.typ === 'fuss') return !!e.person; if (e.typ === 'bahn') return !!e.zu; if (e.typ === 'stop' || e.typ === 'hindernis') return true; return false; }
 
       function pruefeStopps(dt) {
@@ -650,6 +685,18 @@
           var e = plan.events[i];
           if (e.erledigt || e.typ === 'schild' || e.typ === 'werbung' || e.typ === 'blinker') continue;
           var ds = e.s - s;
+          if (e.typ === 'blitzer') {
+            if (ds < 0) {
+              e.erledigt = true;
+              if (v > soll + p.band) {
+                blitzZeit = uhr; blitzE = e; punkteAendern(-5); if (ton) ton.blitz();
+                zaehle({ korrekt: false, reiz: 'blitzer ' + soll, reaktion: Math.round(v) + '', typ: 'tempo' });
+                meldung('Geblitzt! ' + Math.round(v) + ' statt ' + soll + ' km/h. Minus 5 Punkte.');
+              } else zaehle({ korrekt: true, reiz: 'blitzer ' + soll, reaktion: Math.round(v) + '', typ: 'tempo' });
+            }
+            continue;
+          }
+          if (e.typ === 'hindernis' && laeuftAuf(e) && e.lauf === undefined && ds < 18 + v * 0.5) { e.lauf = uhr; if (e.art !== 'ball' && ton) ton.ruf(); }
           if (e.typ === 'polizei') {
             if (!e.offen && ds < 8 && ds > -5) { e.offen = true; e.seit = uhr; ctx.audio.warnung(); meldung('Blaulicht im Spiegel. Anhalten.'); }
             if (e.offen && v < 6) e.stehZeit += dt;
@@ -663,9 +710,26 @@
           if (e.typ === 'hindernis' && !e.passiert && ds < 0.6) {
             e.passiert = true;
             if (e.stehZeit <= 0.35) {
-              var halb = { reh: 0.24, hund: 0.16, ball: 0.07, kisten: 0.26 }[e.art] || 0.2;
-              e.ausgewichen = Math.abs(0.5 + quer - 0.45) > 0.2 + halb;
-              if (!e.ausgewichen) { ruck = uhr; e.weg = true; }
+              e.ausgewichen = Math.abs(0.5 + quer - hindernisX(e)) > 0.2 + (HALB[e.art] || 0.2);
+              if (!e.ausgewichen) {
+                e.weg = true; e.erledigt = true;
+                if (e.art === 'person' || e.art === 'kind') {
+                  ruck = uhr;
+                  zaehle({ korrekt: false, auslassung: true, reiz: 'hindernis ' + e.art, reaktion: 'angefahren', typ: 'hindernis' });
+                  ende('Ein Mensch wurde angefahren. Die Fahrt ist beendet. Bitte immer bremsbereit sein.');
+                  return;
+                }
+                if (e.art === 'ball') {
+                  // Über den Ball gefahren: Wagen hüpft kurz, weiches „Plopp“, bricht leicht zur Seite aus
+                  huepfer = uhr; querV += (Math.random() < 0.5 ? -1 : 1) * 0.75; if (ton) ton.plopp();
+                  zaehle({ korrekt: false, reiz: 'hindernis ball', reaktion: 'überfahren', typ: 'hindernis' });
+                  meldung('Ball überfahren. Bei einem Ball immer bremsen, oft folgt ein Kind.');
+                } else {
+                  ruck = uhr; ctx.audio.falsch();
+                  zaehle({ korrekt: false, auslassung: true, reiz: 'hindernis ' + e.art, reaktion: 'durchgefahren', typ: 'hindernis' });
+                  meldung('Zusammenstoß. Anhalten oder ausweichen.');
+                }
+              }
             }
           }
           if (!e.erledigt && ds < -6) {
@@ -696,7 +760,7 @@
         if (!e.runter && ds < 0) soll = e.neu;
         if (ds < -2 && !e.erledigt) {
           e.erledigt = true;
-          if (e.runter && v > e.neu + p.band) { tempoZahl++; zaehle({ korrekt: false, reiz: 'schild ' + e.neu, reaktion: Math.round(v) + '', typ: 'tempo' }); ctx.audio.falsch(); meldung('Vor dem Schild auf ' + e.neu + ' kommen.'); }
+          if (e.runter && v > e.neu + p.band) { tempoZahl++; punkteAendern(-5); zaehle({ korrekt: false, reiz: 'schild ' + e.neu, reaktion: Math.round(v) + '', typ: 'tempo' }); ctx.audio.falsch(); meldung('Vor dem Schild auf ' + e.neu + ' kommen.'); }
           else zaehle({ korrekt: true, reiz: 'schild ' + e.neu, reaktion: Math.round(v) + '', typ: 'tempo' });
         }
       }
@@ -720,11 +784,20 @@
         if (p.stau && !stau && uhr > naechsterStau) { var name = HT.zufall.chance(0.45) ? suchbahn : HT.zufall.wahl(AUTOBAHNEN); stau = { name: name, seit: uhr, erledigt: false }; naechsterStau = uhr + HT.zufall.int(16, 26); meldung('Durchsage Autobahn ' + name + '. Gesucht ist ' + suchbahn + '.'); }
         if (stau && !stau.erledigt && uhr - stau.seit > 4) { var relevant = stau.name === suchbahn; stau.erledigt = true; if (relevant) zaehle({ korrekt: false, auslassung: true, reiz: 'stau ' + stau.name, reaktion: 'keine', typ: 'stau_relevant' }); else zaehle({ korrekt: true, reiz: 'stau ' + stau.name, reaktion: 'keine', typ: 'stau_falsch' }); stau = null; }
       }
+      // Tempo: 5 s im grünen Band = +10 Punkte; 5 s zu schnell = −5 Punkte. Solange zu schnell, erscheint eine Warnung.
       function tempoPruefen(dt) {
-        if (v > soll + p.band + 2) tempoUeber += dt; else tempoUeber = 0;
-        if (tempoUeber > 1.1) { tempoUeber = 0; tempoZahl++; zaehle({ korrekt: false, reiz: 'tempo ' + soll, reaktion: Math.round(v) + '', typ: 'tempo' }); meldung('Zu schnell. Ziel ist ' + soll + '.'); if (tempoZahl >= 20) ende('Zwanzigmal zu schnell. Der Durchgang endet.'); }
+        if (v > soll + p.band) {
+          if (!warnAn) { warnAn = true; if (HT.audio.ton) HT.audio.ton(880, 0.12, 'sine', 0, 0.07); }
+          tempoUeber += dt;
+        } else { warnAn = false; tempoUeber = 0; }
+        if (tempoUeber >= 5) {
+          tempoUeber = 0; tempoZahl++; punkteAendern(-5);
+          zaehle({ korrekt: false, reiz: 'tempo ' + soll, reaktion: Math.round(v) + '', typ: 'tempo' });
+          meldung('Geschwindigkeit zu hoch: minus 5 Punkte. Ziel ist ' + soll + ' km/h.');
+          if (tempoZahl >= 20) ende('Zwanzigmal zu schnell. Der Durchgang endet.');
+        }
         if (v > 8 && Math.abs(v - soll) <= p.band) seitHalt += dt; else seitHalt = 0;
-        if (seitHalt > 8) { seitHalt = 0; zaehle({ korrekt: true, reiz: 'tempo ' + soll, reaktion: Math.round(v) + '', typ: 'tempo' }); }
+        if (seitHalt >= 5) { seitHalt = 0; punkteAendern(10); zaehle({ korrekt: true, reiz: 'tempo ' + soll, reaktion: Math.round(v) + '', typ: 'tempo' }); }
       }
 
       /* =================== Welt für die Darstellung =================== */
@@ -758,7 +831,8 @@
             if (n % 26 === 13) { var lx = (n % 52 === 13 ? -1 : 1) * 1.32; sg.objekte.push({ bild: G.laterne, x: lx, h: 5.4, laterne: true, spiegeln: lx > 0 }); }
           } else {
             var wald = Math.sin(n / 260) > 0.55, r = Math.random();
-            if (wald) { if (r < 0.5) sg.objekte.push({ bild: zufall(G.tanne), x: (Math.random() < 0.5 ? -1 : 1) * (1.9 + Math.random() * 5), h: 11 + Math.random() * 6 }); }
+            sg.wald = wald;
+            if (wald) { if (r < 0.5) sg.objekte.push(HERBST && Math.random() < 0.5 ? { bild: zufall(G.laubHerbst), x: (Math.random() < 0.5 ? -1 : 1) * (1.9 + Math.random() * 5), h: 10 + Math.random() * 5 } : { bild: zufall(G.tanne), x: (Math.random() < 0.5 ? -1 : 1) * (1.9 + Math.random() * 5), h: 11 + Math.random() * 6 }); }
             else if (r < 0.07) sg.objekte.push({ bild: zufall(HERBST ? G.laubHerbst : G.laub), x: (Math.random() < 0.5 ? -1 : 1) * (2 + Math.random() * 6), h: 9 + Math.random() * 5 });
             else if (r < 0.1) sg.objekte.push({ bild: zufall(G.birke), x: (Math.random() < 0.5 ? -1 : 1) * (2 + Math.random() * 4), h: 10 + Math.random() * 3 });
             else if (r < 0.15) sg.objekte.push({ bild: zufall(G.busch), x: (Math.random() < 0.5 ? -1 : 1) * (1.8 + Math.random() * 3), h: 1.3 + Math.random() * 0.8 });
@@ -827,7 +901,7 @@
         leuchten.push([glut(f), lx - r, ly - r, r * 2, r * 2, (0.45 + 0.55 * DUNKEL) * aktA]);
         leuchten.push([glut('255,255,255'), lx - r * 0.16, ly - r * 0.16, r * 0.32, r * 0.32, 0.6 * DUNKEL]);
         if (lg) { var r2 = SR.w * 3.2; lg.globalAlpha = 0.35; lg.drawImage(glut(f), lx - r2, ly - r2, r2 * 2, r2 * 2); lg.globalAlpha = 1; }
-        if (nass > 0.05) leuchten.push([glut(f), lx - r * 0.22, boden, r * 0.44, SR.h * 0.9, 0.55 * nass]);
+        if (nass > 0.05) { leuchten.push([glut(f), lx - r * 0.3, boden, r * 0.6, SR.h * 1.25, 0.85 * nass]); leuchten.push([glut(f), lx - r * 0.08, boden, r * 0.16, SR.h * 1.6, 0.6 * nass]); }
       }
       function warnLicht(bildNr) {
         if (DUNKEL <= 0) return;
@@ -843,7 +917,7 @@
           lg.globalAlpha = 0.95 * DUNKEL; lg.drawImage(glut('255,214,160'), kx - pr, boden - pr * 0.3, pr * 2, pr * 0.6);
           lg.globalAlpha = 0.5 * DUNKEL; lg.drawImage(glut('255,214,160'), kx - r * 0.9, ky, r * 1.8, boden - ky + r * 0.2); lg.globalAlpha = 1;
         }
-        if (nass > 0.05) leuchten.push([glut('255,200,140'), kx - r * 0.1, boden, r * 0.2, SR.h * 0.8, 0.4 * DUNKEL * nass]);
+        if (nass > 0.05) { leuchten.push([glut('255,200,140'), kx - r * 0.16, boden - SR.h * 0.05, r * 0.32, SR.h * 1.15, 0.75 * DUNKEL * nass]); leuchten.push([glut('255,214,160'), kx - r * 0.5, boden - r * 0.05, r, r * 0.25, 0.5 * DUNKEL * nass]); }
       }
       // Gegenverkehr: zwischen zwei Segmenten weich interpoliert (kein Springen), nachts mit Licht und Lichthupe
       function gegenAuto(o, sg, rs) {
@@ -854,7 +928,7 @@
           if (hh > 2 && oy < H + hh) {
             var ga = g.globalAlpha;
             // Spiegelbild auf der nassen Fahrbahn und Gischt hinter den Rädern
-            g.save(); g.globalAlpha = ga * 0.24 * nass; g.translate(cx, oy); g.scale(1, -0.55); g.drawImage(o.bild, -ww / 2, -hh, ww, hh); g.restore();
+            g.save(); g.globalAlpha = ga * 0.34 * nass; g.translate(cx, oy); g.scale(1, -0.6); g.drawImage(o.bild, -ww / 2, -hh, ww, hh); g.restore();
             if (regenI > 0.2) { g.save(); g.globalAlpha = ga * 0.3 * nass * regenI; g.drawImage(glut('214,220,228'), cx - ww * 0.95, oy - hh * 0.5, ww * 1.9, hh * 0.75); g.restore(); }
           }
         }
@@ -864,7 +938,7 @@
           var X = SR.x + SR.w * (q ? 0.8333 : 0.1667), Y = SR.y + SR.h * 0.573, r = SR.w * 0.32 * st;
           leuchten.push([glut('255,248,225'), X - r, Y - r, r * 2, r * 2, 0.95]);
           leuchten.push([glut('255,255,255'), X - r * 0.2, Y - r * 0.12, r * 0.4, r * 0.24, 0.9]);
-          if (nass > 0.05) leuchten.push([glut('255,240,210'), X - r * 0.16, oy, r * 0.32, SR.h * 1.5 * (hupe ? 1.4 : 1), 0.5 * nass]);
+          if (nass > 0.05) { leuchten.push([glut('255,240,210'), X - r * 0.2, oy, r * 0.4, SR.h * 2.0 * (hupe ? 1.4 : 1), 0.8 * nass]); leuchten.push([glut('255,250,235'), X - r * 0.06, oy, r * 0.12, SR.h * 2.6, 0.55 * nass]); }
         }
         if (hupe && SR.w > W * 0.03) blendung = Math.max(blendung, 0.18 * DUNKEL);
         if (lg) { lg.globalAlpha = 0.55 * DUNKEL; lg.drawImage(glut('255,240,215'), SR.x - SR.w * 0.6, oy - SR.h * 0.15, SR.w * 2.2, SR.h * 0.9); lg.globalAlpha = 1; }
@@ -894,15 +968,18 @@
         for (var i = 0; i < leuchten.length; i++) { var l = leuchten[i]; g.globalAlpha = l[5]; g.drawImage(l[0], l[1], l[2], l[3], l[4]); }
         g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
         if (blendung > 0.01) { g.fillStyle = 'rgba(255,250,235,' + Math.min(0.5, blendung).toFixed(3) + ')'; g.fillRect(0, 0, W, H); }
+        // Blitzer: doppelter, heller Blitz
+        var bt = uhr - blitzZeit;
+        if (bt < 0.55) { var ba = bt < 0.12 ? 0.85 * (1 - bt / 0.12) : (bt > 0.2 && bt < 0.32 ? 0.6 * (1 - (bt - 0.2) / 0.12) : 0); if (ba > 0.01) { g.fillStyle = 'rgba(255,246,246,' + ba.toFixed(3) + ')'; g.fillRect(0, 0, W, H); } }
       }
       // Bewegungsunschärfe: das Bild leicht vergrößert vom Fluchtpunkt aus überblenden (Mitte bleibt scharf)
       function unschaerfe() {
-        if (v < 22 || !PUF) return;
-        var st = Math.min(1, (v - 22) / 70), cx = W / 2 * DPR, cy = horizont * DPR;
+        if (v < 12 || !PUF) return;
+        var st = Math.min(1, (v - 12) / 55), cx = W / 2 * DPR, cy = horizont * DPR;
         pufG.drawImage(cvs, 0, 0);
         g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
         g.beginPath(); g.rect(0, (horizont - H * 0.06) * DPR, cvs.width, cvs.height); g.clip();
-        for (var i = 1; i <= 3; i++) { var z = 1 + 0.009 * st * i; g.globalAlpha = 0.34 * st / (i + 0.5); g.drawImage(PUF, cx - cx * z, cy - cy * z, cvs.width * z, cvs.height * z); }
+        for (var i = 1; i <= 3; i++) { var z = 1 + 0.015 * st * i; g.globalAlpha = 0.42 * st / (i + 0.3); g.drawImage(PUF, cx - cx * z, cy - cy * z, cvs.width * z, cvs.height * z); }
         g.restore();
       }
       // Herbst: Blätter taumeln von den Bäumen, drehen und wenden sich und fliegen beim Fahren am Auto vorbei
@@ -913,16 +990,18 @@
           bild: G.blaetter[Math.floor(Math.random() * G.blaetter.length)] };
       }
       function laubZeichnen(dt) {
-        var unten = p.cockpit !== false ? dashTop : H, sk = W / 1280, n = Math.round(46 * (1 - regenI * 0.5)), i, b;
-        while (blaetter.length < n) blaetter.push(neuesBlatt(true));
-        if (blaetter.length > n) blaetter.length = n;
+        // Laub fällt nur im Wald; beim Hinausfahren verschwinden die Blätter nach und nach
+        var vorne = welt[Math.min(welt.length - 1, Math.floor(s / MJS) + 25)], ziel = vorne && vorne.wald && !vorne.ort ? 1 : 0;
+        waldF += (ziel - waldF) * Math.min(1, dt * 0.7);
+        var unten = p.cockpit !== false ? dashTop : H, sk = W / 1280, n = Math.round(50 * waldF * (1 - regenI * 0.4)), i, b;
+        if (blaetter.length < n && Math.random() < dt * 30) blaetter.push(neuesBlatt(false));
         var wind = Math.sin(uhr * 0.4) * 30 + Math.sin(uhr * 1.3) * 12, zoom = v * 0.0055 * dt;
         for (i = 0; i < blaetter.length; i++) {
           b = blaetter[i];
           b.x += (b.x - W / 2) * zoom * b.z * 1.4 + (wind + Math.sin(uhr * b.fw + b.ph) * 36) * b.z * sk * dt;
           b.y += (b.y - horizont) * zoom * b.z * 1.4 + (26 + 34 * b.z) * sk * dt;
           b.z += b.z * zoom * 0.9; b.rot += b.rv * dt; b.fl += b.fv * dt;
-          if (b.y > unten + 20 || b.x < -40 || b.x > W + 40 || b.z > 1.8) { blaetter[i] = neuesBlatt(false); continue; }
+          if (b.y > unten + 20 || b.x < -40 || b.x > W + 40 || b.z > 1.8) { if (blaetter.length > n) { blaetter.splice(i, 1); i--; } else blaetter[i] = neuesBlatt(false); continue; }
           var gr = 30 * b.z * sk;
           g.save(); g.translate(b.x, b.y); g.rotate(b.rot); g.scale(Math.cos(b.fl), 1); g.globalAlpha = Math.min(1, b.z * 2.2); g.drawImage(b.bild, -gr / 2, -gr / 2, gr, gr); g.restore();
         }
@@ -1005,7 +1084,8 @@
       function zeichne() {
         var pos = s / MJS * SEG, bi = Math.floor(pos / SEG), basis = welt[Math.min(bi, welt.length - 1)], pr = (pos % SEG) / SEG;
         var rs = p.linksverkehr ? -1 : 1, stoss = uhr - ruck < 0.35 ? Math.sin(uhr * 90) * 70 * (0.35 - (uhr - ruck)) / 0.35 : 0;
-        var kamX = (0.5 + quer) * STRASSE * rs, kamY = basis.p1.y + (basis.p2.y - basis.p1.y) * pr + KAMERA_H + stoss;
+        var hp = uhr - huepfer, hops = hp < 0.4 ? Math.sin(hp / 0.4 * Math.PI) * 240 : 0;
+        var kamX = (0.5 + quer) * STRASSE * rs, kamY = basis.p1.y + (basis.p2.y - basis.p1.y) * pr + KAMERA_H + stoss + hops;
         leuchten.length = 0; blendung = 0;
         DUNKEL = Math.max(DUNKEL_T, 0.2 * regenI); DUNST = misch3(DUNST_T, DUNST_R, regenI);
         lg = lgK && (TZ !== 'tag' || regenI > 0.01) ? lgK : null;
@@ -1068,7 +1148,7 @@
             if (o.breite) { var hz = o.h * M * kp; if (hz > 1) g.drawImage(o.bild, sx + o.x * wpx - wpx * 0.45, sy - hz, wpx * 0.9, hz); continue; }
             if (!sprite(o.bild, sx + o.x * wpx, sy, kp, o.h, o.spiegeln) || DUNKEL < 0.3) continue;
             if (o.laterne) laternenLicht(o, sy, wpx);
-            else if (o.bild.licht) leuchten.push([o.bild.licht, SR.x, SR.y, SR.w, SR.h, DUNKEL * aktA]);
+            else if (o.bild.licht) { leuchten.push([o.bild.licht, SR.x, SR.y, SR.w, SR.h, DUNKEL * aktA]); if (nass > 0.05) leuchten.push([glut('255,180,100'), SR.x + SR.w * 0.15, sy - SR.h * 0.04, SR.w * 0.7, SR.h * 0.55, 0.3 * DUNKEL * nass * aktA]); }
           }
           var e = sg.ereignis;
           if (e && !e.weg) ereignisZeichnen(e, sx, sy, kp, wpx, phase, rs);
@@ -1095,12 +1175,29 @@
           if (e.person) { var weg = HT.klemmen((gewartet - 0.3) / 1.8, 0, 1), px = rs * (1.6 - weg * 3.4); bld = weg > 0 && weg < 1 ? G.person[e.farbe][phase] : G.steht[e.farbe]; if (sprite(bld, sx + px * wpx, sy, kp, 1.75, rs > 0)) beleuchte(bld, rs > 0); }
         }
         else if (e.typ === 'hindernis') {
-          var flucht = HT.klemmen((gewartet - 0.8) / 1.2, 0, 1), hx = (0.45 + flucht * 2.5) * rs, laeuft = flucht > 0, hh = 1.3, sp = false;
+          var flucht = HT.klemmen((gewartet - 0.8) / 1.2, 0, 1), hx = hindernisX(e) * rs, laeuft = flucht > 0, hh = 1.3, sp = false, tl = e.lauf === undefined ? -1 : uhr - e.lauf;
+          var rennt = tl >= 0 && (tl < (e.art === 'kind' ? 0.9 : 1.1) || laeuft), ph2 = Math.floor(uhr * (e.art === 'kind' ? 11 : 9)) % 4;
           if (e.art === 'reh') { bld = G.reh[laeuft ? phase : 0]; hh = 1.5; sp = rs < 0; }
           else if (e.art === 'hund') { bld = G.hund[laeuft ? phase : 0]; hh = 0.8; sp = rs < 0; }
-          else if (e.art === 'ball') { bld = G.ball; hh = 0.4; }
-          else { bld = G.kisten; hx = (0.45 + flucht * 3) * rs; }
+          else if (e.art === 'person') { bld = rennt ? G.person[e.farbe][ph2] : G.steht[e.farbe]; hh = 1.75; sp = rs > 0; }
+          else if (e.art === 'kind') { bld = G.kind[e.farbe][rennt ? ph2 : 0]; hh = 1.15; sp = rs > 0; }
+          else if (e.art === 'ball') {
+            hh = 0.42; var bh = hh * M * kp, bx = sx + hx * wpx;
+            if (bh > 1.2 && bx > -bh && bx < W + bh) {
+              g.save(); g.translate(bx, sy - bh / 2); g.rotate(-(tl > 0 ? tl : 0) * 9 * rs); g.drawImage(G.ball, -bh / 2, -bh / 2, bh, bh); g.restore();
+              SR.x = bx - bh / 2; SR.y = sy - bh; SR.w = bh; SR.h = bh; beleuchte(G.ball);
+            }
+            return;
+          }
+          else { bld = G.kisten; }
           if (sprite(bld, sx + hx * wpx, sy, kp, hh, sp)) beleuchte(bld, sp);
+        }
+        else if (e.typ === 'blitzer') {
+          if (sprite(G.blitzer, randX + rs * 0.25 * wpx, sy, kp, 3.2)) {
+            beleuchte(G.blitzer);
+            var bt = uhr - blitzZeit;
+            if (blitzE === e && bt < 0.6) { var bx2 = SR.x + SR.w * G.blitzer.blitz[0], by2 = SR.y + SR.h * G.blitzer.blitz[1], br = SR.w * 6 * (1 - bt / 0.6); leuchten.push([glut('255,235,235'), bx2 - br, by2 - br, br * 2, br * 2, 1]); }
+          }
         }
         else if (e.typ === 'bahn') {
           var zu = e.zu && gewartet < 1.6, blink = Math.floor(uhr * 2.2) % 2, nrR = zu ? 1 + blink : 0, nrL = zu ? 2 - blink : 0;
@@ -1197,7 +1294,24 @@
         // Tempo-Hinweis links
         var lbx = W * 0.03, lby = dt0 + (H - dt0) * 0.18, lbb = W * 0.17, lbh = (H - dt0) * 0.26;
         g.fillStyle = '#0d1316'; rrect(g, lbx, lby, lbb, lbh, 10); g.fill();
-        g.fillStyle = '#cfd8dd'; passText('Ziel ' + soll + ' km/h', lbx + lbb / 2, lby + lbh / 2, lbb * 0.86, lbh * 0.3);
+        g.fillStyle = '#cfd8dd'; passText('Ziel ' + soll + ' km/h', lbx + lbb / 2, lby + lbh * 0.32, lbb * 0.86, lbh * 0.26);
+        g.fillStyle = punkte < 0 ? '#ff8a80' : '#7fe3ec'; passText('Punkte: ' + punkte, lbx + lbb / 2, lby + lbh * 0.72, lbb * 0.86, lbh * 0.28);
+        // Aufsteigende +10 / −5
+        for (var pa = 0; pa < punktAnim.length; pa++) {
+          var an2 = punktAnim[pa], at = uhr - an2.t; if (at > 1.6) continue;
+          g.globalAlpha = 1 - at / 1.6; g.fillStyle = an2.n > 0 ? '#5fe08e' : '#ff6b5e';
+          passText((an2.n > 0 ? '+' : '−') + Math.abs(an2.n), lbx + lbb * 0.8, lby - at * 40, lbb, lbh * 0.36); g.globalAlpha = 1;
+        }
+        // Warnung, solange zu schnell gefahren wird
+        if (warnAn && Math.floor(uhr * 2.5) % 2 === 0) {
+          var wb = Math.min(W * 0.42, 360), wh = Math.max(34, H * 0.055), wx = W / 2 - wb / 2, wy = dt0 - wh - H * 0.03;
+          g.fillStyle = 'rgba(200,30,30,.92)'; rrect(g, wx, wy, wb, wh, wh / 2); g.fill();
+          g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 2; rrect(g, wx, wy, wb, wh, wh / 2); g.stroke();
+          var ts = wh * 0.62, tx = wx + wh * 0.62, ty = wy + wh / 2;
+          g.fillStyle = '#ffd60a'; g.beginPath(); g.moveTo(tx, ty - ts * 0.5); g.lineTo(tx + ts * 0.55, ty + ts * 0.45); g.lineTo(tx - ts * 0.55, ty + ts * 0.45); g.closePath(); g.fill();
+          g.fillStyle = '#1b1b1b'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '900 ' + Math.round(ts * 0.7) + 'px -apple-system, Helvetica, sans-serif'; g.fillText('!', tx, ty + ts * 0.08);
+          g.fillStyle = '#fff'; passText('Geschwindigkeit zu hoch', wx + wb / 2 + wh * 0.3, ty, wb - wh * 1.6, wh * 0.46);
+        }
       }
       function passText(text, x, y, maxB, gr) {
         var f = Math.round(gr); g.font = '700 ' + f + 'px -apple-system, Helvetica, sans-serif';
@@ -1295,6 +1409,27 @@
               gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(0.015 + Math.random() * 0.03, t + 0.004); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
               src.connect(fl); fl.connect(gn); gn.connect(master); src.start(t, Math.random() * 1.5); src.stop(t + 0.04);
             },
+            plopp: function () {
+              if (!A.an) return;
+              var t = ac.currentTime, o = ac.createOscillator(), gn = ac.createGain();
+              o.type = 'sine'; o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(65, t + 0.16);
+              gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(0.22, t + 0.012); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+              o.connect(gn); gn.connect(master); o.start(t); o.stop(t + 0.25);
+            },
+            blitz: function () {
+              if (!A.an) return;
+              var t = ac.currentTime, src = ac.createBufferSource(), fl = ac.createBiquadFilter(), gn = ac.createGain();
+              src.buffer = buf; fl.type = 'highpass'; fl.frequency.value = 3000;
+              gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(0.06, t + 0.005); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+              src.connect(fl); fl.connect(gn); gn.connect(master); src.start(t); src.stop(t + 0.15);
+            },
+            ruf: function () {
+              if (!A.an) return;
+              var t = ac.currentTime, o = ac.createOscillator(), gn = ac.createGain();
+              o.type = 'triangle'; o.frequency.setValueAtTime(620, t); o.frequency.linearRampToValueAtTime(760, t + 0.12);
+              gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(0.035, t + 0.03); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+              o.connect(gn); gn.connect(master); o.start(t); o.stop(t + 0.3);
+            },
             wisch: function () {
               if (!A.an) return;
               var t = ac.currentTime, src = ac.createBufferSource(), fl = ac.createBiquadFilter(), gn = ac.createGain();
@@ -1329,23 +1464,65 @@
       };
     },
     preview: function (el) {
-      function bild(nadel, rot, warten) {
-        return '<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="svh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f9fd8"/><stop offset="1" stop-color="#e4f2f8"/></linearGradient><linearGradient id="svd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a4a52"/><stop offset="1" stop-color="#151c20"/></linearGradient></defs>' +
-          '<rect width="400" height="110" fill="url(#svh)"/><path d="M0 110 L40 74 L80 96 L130 56 L170 92 L220 66 L270 96 L320 60 L370 90 L400 76 V110Z" fill="#8fb2c8"/><path d="M130 56 l-9 11 h18z M320 60 l-8 10 h16z" fill="#fff"/><path d="M0 110 Q100 96 200 106 T400 102 V114 H0Z" fill="#86b07a"/>' +
-          '<rect y="110" width="400" height="190" fill="#86c468"/><path d="M0 110 H180 L60 200 H0Z" fill="#cdb868"/><path d="M188 110 L212 110 L330 200 L70 200 Z" fill="#686e74"/><path d="M199 116 h2 l1 8 h-4z M197 140 h5 l2 14 h-8z M194 176 h10 l2 22 h-14z" fill="#eef1f3"/>' +
-          '<circle cx="60" cy="98" r="15" fill="#3f8a44"/><rect x="58" y="104" width="5" height="12" fill="#6e4c2e"/>' +
-          (rot !== null ? '<rect x="258" y="96" width="4" height="40" fill="#5f6a72"/><rect x="250" y="66" width="20" height="40" rx="4" fill="#1b2125"/><circle cx="260" cy="76" r="6" fill="' + (rot ? '#ff3b30' : '#3a444b') + '"/><circle cx="260" cy="96" r="6" fill="' + (rot ? '#3a444b' : '#30d158') + '"/>' : '') +
-          '<rect x="0" y="0" width="400" height="8" fill="#20282d"/><rect x="152" y="10" width="96" height="26" rx="6" fill="#14191c"/><rect x="156" y="13" width="88" height="20" rx="4" fill="#b9dcef"/>' +
-          '<path d="M0 214 Q200 186 400 214 V300 H0Z" fill="url(#svd)"/><rect x="96" y="214" width="208" height="68" rx="14" fill="#0d1316"/>' +
-          '<circle cx="152" cy="250" r="28" fill="#162026" stroke="#5e6a72" stroke-width="2"/><path d="M135 240 A20 20 0 0 1 166 236" stroke="#2ead6b" stroke-width="6" fill="none"/><line x1="152" y1="250" x2="' + nadel + '" y2="232" stroke="#ff9f0a" stroke-width="3" stroke-linecap="round"/>' +
+      // Vorschau: Cockpit-Blick bei Tag, Ball auf der Fahrbahn, Abend im Regen mit spiegelnder Straße, Blitzer
+      function szene(o) {
+        var nacht = !!o.nacht, regen = !!o.regen;
+        var h1 = nacht ? '#0b1222' : regen ? '#7a8692' : '#4f9fd8', h2 = nacht ? '#2a3550' : regen ? '#c3cad0' : '#e4f2f8';
+        var feld = nacht ? '#1b2a22' : regen ? '#5f7a4c' : '#86c468', strasse = nacht ? '#1d2228' : regen ? '#3c4349' : '#686e74';
+        var svg = '<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs>' +
+          '<linearGradient id="pvh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + h1 + '"/><stop offset="1" stop-color="' + h2 + '"/></linearGradient>' +
+          '<linearGradient id="pvd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f3d45"/><stop offset="1" stop-color="#11171b"/></linearGradient>' +
+          '<radialGradient id="pvg"><stop offset="0" stop-color="#fff3d6" stop-opacity="1"/><stop offset="1" stop-color="#ffd59a" stop-opacity="0"/></radialGradient>' +
+          '<linearGradient id="pvs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe2b0" stop-opacity=".9"/><stop offset="1" stop-color="#ffe2b0" stop-opacity="0"/></linearGradient></defs>' +
+          '<rect width="400" height="112" fill="url(#pvh)"/>' +
+          (nacht ? '<circle cx="320" cy="34" r="9" fill="#eef1e6"/><circle cx="80" cy="26" r="1.2" fill="#fff"/><circle cx="150" cy="40" r="1" fill="#fff"/><circle cx="250" cy="22" r="1.2" fill="#fff"/>' : regen ? '' : '<circle cx="110" cy="34" r="14" fill="#fff6d0"/>') +
+          '<path d="M0 112 L50 80 L95 100 L140 70 L190 98 L240 74 L300 102 L350 78 L400 96 V112Z" fill="' + (nacht ? '#1d2840' : regen ? '#8794a0' : '#9fbcd0') + '"/>' +
+          '<rect y="110" width="400" height="104" fill="' + feld + '"/>' +
+          '<path d="M186 110 L214 110 L340 214 L60 214 Z" fill="' + strasse + '"/>' +
+          '<path d="M199 114 h2 l1 8 h-4z M197 134 h6 l2 14 h-10z M193 166 h14 l3 24 h-20z" fill="' + (nacht ? '#9aa3aa' : '#eef1f3') + '"/>' +
+          '<path d="M186 110 L60 214 h8 L189 110z M214 110 L340 214 h-8 L211 110z" fill="' + (nacht ? '#7d868c' : '#f3f5f6') + '"/>';
+        // Bäume im Herbst
+        [[40, 96, 16, '#d4572a'], [80, 100, 12, '#e0862c'], [330, 98, 15, '#c4561b'], [368, 104, 12, '#f2b544']].forEach(function (b) {
+          svg += '<rect x="' + (b[0] - 2) + '" y="' + (b[1] + 6) + '" width="4" height="12" fill="#4a3222"/><circle cx="' + b[0] + '" cy="' + b[1] + '" r="' + b[2] + '" fill="' + (nacht ? '#2a1d14' : b[3]) + '"/>';
+        });
+        if (nacht) {
+          // Laterne, Gegenverkehr und Spiegelungen auf nasser Straße
+          svg += '<rect x="266" y="62" width="3" height="52" fill="#3a4248"/><path d="M267 64 q0 -6 12 -6 h8" stroke="#3a4248" stroke-width="3" fill="none"/><circle cx="286" cy="60" r="22" fill="url(#pvg)" opacity=".8"/>' +
+            '<rect x="281" y="114" width="10" height="70" fill="url(#pvs)" opacity=".7"/>' +
+            '<circle cx="186" cy="118" r="9" fill="url(#pvg)"/><circle cx="196" cy="118" r="9" fill="url(#pvg)"/>' +
+            '<rect x="183" y="121" width="5" height="70" fill="url(#pvs)"/><rect x="194" y="121" width="5" height="70" fill="url(#pvs)"/>' +
+            '<path d="M150 214 L194 128 L206 128 L250 214Z" fill="#fff1d0" opacity=".16"/>';
+        }
+        if (regen) {
+          var tr = '';
+          for (var k = 0; k < 26; k++) { var x = (k * 53) % 380 + 10, y = (k * 37) % 190 + 14; tr += '<line x1="' + x + '" y1="' + y + '" x2="' + (x - 3) + '" y2="' + (y + 12) + '" stroke="#dfe7ee" stroke-opacity=".45" stroke-width="1"/>'; }
+          for (var d = 0; d < 14; d++) { var dx = (d * 71) % 360 + 20, dy = (d * 29) % 160 + 20; tr += '<circle cx="' + dx + '" cy="' + dy + '" r="' + (2 + d % 3) + '" fill="#e8f0f6" fill-opacity=".25" stroke="#fff" stroke-opacity=".5" stroke-width=".8"/>'; }
+          svg += tr + '<path d="M120 214 L250 92" stroke="#0d1114" stroke-width="3.5" stroke-linecap="round"/><path d="M230 214 L360 100" stroke="#0d1114" stroke-width="3.5" stroke-linecap="round"/>';
+        }
+        if (o.ball) svg += '<circle cx="' + o.ball + '" cy="178" r="10" fill="#e8504a"/><path d="M' + (o.ball - 10) + ' 178 a10 10 0 0 0 20 0" fill="#fff"/><circle cx="' + o.ball + '" cy="178" r="10" fill="none" stroke="#26333c" stroke-width="1.5"/>';
+        if (o.kind) svg += '<g transform="translate(' + o.kind + ' 150)"><circle cx="0" cy="0" r="6" fill="#f0c9a0"/><rect x="-6" y="6" width="12" height="16" rx="4" fill="#f2c03a"/><path d="M-4 22 l-4 12 M4 22 l5 12" stroke="#2b6cb0" stroke-width="4" stroke-linecap="round"/></g>';
+        if (o.blitzer) svg += '<rect x="292" y="120" width="4" height="52" fill="#6b757c"/><rect x="280" y="96" width="28" height="30" rx="4" fill="#b8c0c5" stroke="#4b555b" stroke-width="2"/><circle cx="289" cy="108" r="5" fill="#2d3a44"/><rect x="280" y="118" width="28" height="4" fill="#d32f2f"/>' + (o.blitz ? '<circle cx="289" cy="108" r="60" fill="#fff" opacity=".55"/><rect width="400" height="300" fill="#fff" opacity=".35"/>' : '');
+        // Cockpit
+        var nadel = o.nadel || 160, zu = !!o.zuSchnell;
+        svg += '<rect x="0" y="0" width="400" height="8" fill="#20282d"/><path d="M0 0 h26 q-14 100 -18 214 h-8z M400 0 h-26 q14 100 18 214 h8z" fill="#20282d"/>' +
+          '<rect x="150" y="10" width="100" height="26" rx="6" fill="#14191c"/><rect x="154" y="13" width="92" height="20" rx="4" fill="' + (nacht ? '#1c2636' : '#b9dcef') + '"/>' +
+          '<path d="M0 214 Q200 188 400 214 V300 H0Z" fill="url(#pvd)"/><rect x="96" y="216" width="208" height="68" rx="14" fill="#0d1316"/>' +
+          '<circle cx="152" cy="252" r="28" fill="#162026" stroke="#5e6a72" stroke-width="2"/><path d="M135 242 A20 20 0 0 1 166 238" stroke="#2ead6b" stroke-width="6" fill="none"/>' +
+          '<line x1="152" y1="252" x2="' + nadel + '" y2="232" stroke="' + (zu ? '#ff453a' : '#ff9f0a') + '" stroke-width="3" stroke-linecap="round"/>' +
           '<rect x="198" y="236" width="90" height="6" rx="3" fill="#1BA8B5"/><rect x="198" y="254" width="70" height="6" rx="3" fill="#f4d35e"/>' +
-          (warten ? '<text x="200" y="60" text-anchor="middle" font-size="15" font-weight="800" fill="#fff" stroke="#1e2a33" stroke-width="3" paint-order="stroke" font-family="-apple-system,sans-serif">Warten …</text>' : '') + '</svg>';
+          (nacht ? '<path d="M206 272 h8 M206 276 h8" stroke="#30d158" stroke-width="2"/><path d="M216 270 a4 4 0 0 1 0 8z" fill="#30d158"/>' : '') +
+          '<rect x="14" y="230" width="66" height="40" rx="8" fill="#0d1316"/><text x="47" y="246" text-anchor="middle" font-size="10" font-weight="700" fill="#cfd8dd" font-family="-apple-system,sans-serif">Ziel 50</text><text x="47" y="262" text-anchor="middle" font-size="10" font-weight="700" fill="#7fe3ec" font-family="-apple-system,sans-serif">Punkte ' + (o.punkte || 0) + '</text>' +
+          (zu ? '<rect x="120" y="180" width="160" height="22" rx="11" fill="#c81e1e"/><text x="200" y="195" text-anchor="middle" font-size="11" font-weight="800" fill="#fff" font-family="-apple-system,sans-serif">Geschwindigkeit zu hoch</text>' : '') +
+          '</svg>';
+        return svg;
       }
       return HT.beispiel(el, [
-        { svg: bild(160, null, false), text: 'Zeiger im grünen Band halten (↑ Gas, ↓ Bremse)', dauer: 1800 },
-        { svg: bild(150, true, false), text: 'Rote Ampel: anhalten', dauer: 1400 },
-        { svg: bild(134, true, true), text: 'Stehen und warten …', dauer: 1300 },
-        { svg: bild(160, false, false), text: 'Grün: weiterfahren', dauer: 1500 }
+        { svg: szene({ nadel: 160, punkte: 10 }), text: 'Tempo im grünen Band: Pluspunkte', dauer: 1600 },
+        { svg: szene({ nadel: 160, punkte: 10, ball: 300 }), text: 'Ein Ball rollt auf die Straße', dauer: 900 },
+        { svg: szene({ nadel: 146, punkte: 10, ball: 236, kind: 330 }), text: 'Sofort bremsen, ein Kind folgt', dauer: 1300 },
+        { svg: szene({ nacht: true, regen: true, nadel: 158, punkte: 20 }), text: 'Abends im Regen: Licht an, die Straße spiegelt', dauer: 1900 },
+        { svg: szene({ regen: true, nadel: 176, punkte: 20, zuSchnell: true, blitzer: true }), text: 'Zu schnell: Warnung', dauer: 1100 },
+        { svg: szene({ regen: true, nadel: 176, punkte: 15, zuSchnell: true, blitzer: true, blitz: true }), text: 'Blitzer: minus 5 Punkte', dauer: 700 }
       ]);
     }
   });

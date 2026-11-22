@@ -5,7 +5,7 @@
   var HT = window.HT;
   var levels = HT.stufen(12, function (t, i) {
     return {
-      abweichungsrate: Math.round(HT.lerp(0.16, 0.05, t) * 100) / 100,
+      abweichungsrate: Math.round(HT.lerp(0.3, 0.15, t) * 100) / 100, // häufiger als klassische Vigilanzaufgaben: mehr Reaktionen, aber weiterhin die Minderheit
       unauffaelligkeit: i <= 4 ? 1 : i <= 8 ? 2 : 3,
       tempoPxS: HT.lerpInt(110, 170, t),
       abstandPx: HT.lerpInt(230, 190, t)
@@ -78,6 +78,8 @@
           frame = Z.frame(function (dt) {
             var dx = p.tempoPxS * (p.tempo === 'schnell' ? 1.45 : 1) * dt;
             weg += dx;
+            // Das Band läuft sichtbar mit derselben Geschwindigkeit wie die Pakete
+            band.style.backgroundPosition = (weg % 36).toFixed(2) + 'px 0';
             pakete.forEach(function (q) {
               q.x += dx;
               // ohne Runden und auf der Grafikkarte: gleichmäßige, ruckelfreie Bewegung, dazu leichte Bewegungsunschärfe

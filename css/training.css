@@ -25,7 +25,7 @@
 .tk-zurueck { display: none; align-items: center; gap: .35rem; height: 46px; padding: 0 1rem 0 .7rem; margin-right: .9rem; border-radius: 14px; border: 1px solid var(--linie); background: var(--karte); color: var(--text); font-weight: 600; font-size: .95rem; box-shadow: var(--schatten-1); cursor: pointer; flex: none; position: relative; z-index: 31; }
 .tk-zurueck:hover { background: var(--grund-2); }
 .tk-zurueck .ic { width: 20px; height: 20px; }
-.training.mit-schirm:not(.patientenmodus) .tk-zurueck { display: inline-flex; }
+.training.mit-schirm:not(.patientenmodus) .tk-zurueck, .training.patientenmodus .tk-zurueck { display: inline-flex; }
 .tk-abzeichen-uebung { background: var(--warnung); color: #fff; font-weight: 800; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; padding: .2rem .55rem; border-radius: 6px; margin-left: .6rem; }
 
 .training-buehne { flex: 1; position: relative; overflow: hidden; margin: 0 1.2rem 1.2rem; border-radius: 22px; background: var(--karte); box-shadow: var(--schatten-1); border: 1px solid var(--linie); }

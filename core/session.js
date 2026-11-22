@@ -163,7 +163,9 @@
     D.punkt = HT.el('div', { class: 'tk-punkt' });
     D.name = HT.el('div', { class: 'tk-name' });
     D.unter = HT.el('div', { class: 'tk-unter' });
-    D.zurueck = HT.el('button', { class: 'tk-zurueck', type: 'button', title: 'Zurück', 'aria-label': 'Zurück', html: HT.icon('zurueck') + '<span>Zurück</span>' });
+    // Im Patientenmodus heißt der Knopf „Menü“ und ist immer sichtbar (auch während einer Übung), damit niemand im Training festsitzt
+    var zLabel = Z.patientenmodus ? 'Menü' : 'Zurück';
+    D.zurueck = HT.el('button', { class: 'tk-zurueck', type: 'button', title: Z.patientenmodus ? 'Zurück zur Übersicht' : 'Zurück', 'aria-label': zLabel, html: HT.icon('zurueck') + '<span>' + zLabel + '</span>' });
     D.zurueck.addEventListener('click', zurueckAusTraining);
     kopf.appendChild(D.zurueck);
     kopf.appendChild(HT.el('div', { class: 'tk-modul' }, [D.punkt, HT.el('div', { style: { minWidth: 0 } }, [D.name, D.unter])]));
@@ -693,7 +695,7 @@
     abbauen();
     HT.audio.stumm();
     if (war.probe) { HT.app.neuZeichnen(); return; }
-    if (war.patientenmodus && war.patient && (war.vorgabe || war.opt.nachricht)) { var pat = S.finde('patients', war.patient.id) || war.patient; setTimeout(function () { HT.vorgaben.patientUebersicht(pat); }, 30); return; }
+    if (war.patientenmodus && war.patient) { var pat = S.finde('patients', war.patient.id) || war.patient; setTimeout(function () { HT.vorgaben.patientUebersicht(pat); }, 30); return; }
     if (war.patientenmodus || !HT.auth.aktuell) location.hash = '#/patientenstart';
     else if (war.opt.vonArbeitsplatz) location.hash = '#/arbeitsplatz';
     else if (war.patient) location.hash = '#/patient/' + war.patient.id + '/verlauf';
@@ -703,6 +705,14 @@
   /* Zurück-Knopf auf den Zwischenbildschirmen (nicht während eines laufenden Moduls) */
   function zurueckAusTraining() {
     if (!Z || Z.beendet) return;
+    if (Z.patientenmodus) {
+      var lief = !!(Z.inst && !Z.pausiert);
+      if (lief) pauseAn();
+      UI.bestaetigen('Ihre bisherigen Ergebnisse bleiben gespeichert. Danach sehen Sie wieder Ihre Übersicht.', { titel: 'Zurück zur Übersicht?', ja: 'Zur Übersicht' }).then(function (ok) {
+        if (ok) { Z.pausiert = false; sitzungBeenden(); } else if (lief) pauseAus();
+      });
+      return;
+    }
     var nichtsGespeichert = Z.probe || !(Z.sitzung && Z.sitzung.ergebnisse && Z.sitzung.ergebnisse.length) && !S.alle('runs', function (r) { return r.sessionId === Z.sitzung.id; }).length;
     if (nichtsGespeichert) { HT.audio.stumm(); instanzStoppen(); clearInterval(Z.uhr); Z.beendet = true; if (!Z.probe && Z.sitzung) { Z.sitzung.status = 'abgebrochen'; Z.sitzung.ende = Date.now(); } verlassen(); return; }
     UI.bestaetigen('Die bisherigen Ergebnisse dieser Sitzung bleiben gespeichert.', { titel: 'Training beenden?', ja: 'Beenden' }).then(function (ok) { if (ok) sitzungBeenden(); });
@@ -793,6 +803,7 @@
     k.appendChild(weiter);
     if (Z.modul) k.appendChild(UI.knopf('Anleitung noch einmal ansehen', { art: 'voll', icon: 'info', klick: function () { anleitungOverlay(schleier); } }));
     if (Z.patientenmodus) {
+      k.appendChild(UI.knopf('Zurück zur Übersicht', { art: 'gross voll', icon: 'zurueck', klick: function () { schleier.remove(); Z.pausiert = false; sitzungBeenden(); } }));
       k.appendChild(UI.knopf('Therapeut: Sitzung verwalten', { art: 'gross voll', icon: 'schloss', klick: function () { schleier.remove(); Z.pausiert = false; therapeutZugang(); } }));
     } else {
       if (Z.inst && !Z.uebung && Z.modul) {

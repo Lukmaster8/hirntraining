@@ -1,7 +1,7 @@
 /* Hirntraining – Offline-Speicher (Service Worker). Automatisch erzeugt von tools/offline_liste.py – nicht von Hand ändern.
  * Wirkt nur in der Online-Version (https, z. B. GitHub Pages): Nach dem ersten Öffnen läuft das Programm
  * auch ohne Internet. Die Patientendaten liegen davon unabhängig im Speicher des jeweiligen Geräts. */
-var VERSION = 'ht-087d934afd';
+var VERSION = 'ht-0dc0cc9368';
 var DATEIEN = [
  "./",
  "index.html",
