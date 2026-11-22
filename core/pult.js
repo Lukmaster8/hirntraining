@@ -469,7 +469,8 @@
 
     /* Tasten anlernen */
     function lernen() {
-      var rollen = ROLLEN.slice(), index = -1, basis = null, rauschen = {}, phase = 'ruhe', neu = {}, kandidat = null;
+      // Nur die 10 Haupttasten abfragen; Ziffern und kleine OK-Tasten senden Standardtasten und gehen ohne Anlernen
+      var rollen = ROLLEN.filter(function (r) { return !r.klein && r.farbe !== 'fuss'; }), index = -1, basis = null, rauschen = {}, phase = 'ruhe', neu = {}, kandidat = null;
       var box = HT.el('div', { class: 'pult-lernen' });
       var titel = HT.el('h3');
       var text = HT.el('p');
@@ -529,6 +530,8 @@
         var id = rollen[index].id, alt = konfig().tasten || {}, belegt = null;
         Object.keys(neu).forEach(function (r) { if (r !== id && neu[r].key === ev.code) belegt = r; });
         if (!belegt) Object.keys(alt).forEach(function (r) { if (r !== id && !neu[r] && alt[r].key === ev.code) belegt = r; });
+        // Gleicher Code wie eine Taste mit derselben Funktion (z. B. Gelb links/rechts): einfach übernehmen
+        if (belegt && P.aktionVon(belegt) === P.aktionVon(id)) belegt = null;
         if (belegt) {
           var rn = (ROLLEN.filter(function (x) { return x.id === belegt; })[0] || { name: belegt }).name;
           text.textContent = 'Diese Taste (' + ev.code + ') ist schon für „' + rn + '“ belegt. Bitte die gesuchte Taste drücken oder „Überspringen“.';

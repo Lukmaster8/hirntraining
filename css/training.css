@@ -415,3 +415,6 @@ html.leicht .pult-hinweis-training i { animation: none; }
 .tk-wiederholen { width: calc(46px * var(--bildschirm, 1)); height: calc(46px * var(--bildschirm, 1)); border-radius: calc(14px * var(--bildschirm, 1)); border: 1px solid var(--linie); background: var(--karte); display: inline-flex; align-items: center; justify-content: center; margin-left: .5rem; color: var(--akzent); flex: none; }
 .tk-wiederholen .ic { width: calc(22px * var(--bildschirm, 1)); height: calc(22px * var(--bildschirm, 1)); }
 .tk-wiederholen:hover { background: var(--grund-2); }
+
+/* „Übung überspringen“ während der Probeaufgaben */
+.uebung-skip { position: absolute; right: 1rem; bottom: 1rem; z-index: 30; opacity: .92; }

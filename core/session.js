@@ -94,7 +94,7 @@
     SE.starten({ patientId: patientId, planId: planId, einstufung: true, eintraege: plan.eintraege.map(function (e) { return { modulId: e.modulId, dauerMin: 3, startLevel: 1, parameterOverrides: HT.zusammen(e.parameterOverrides || {}, { dauerDurchgangSek: 40 }) }; }) });
   };
 
-  function befindenAktiv() { return !Z.probe && !!Z.patient && S.einstellungen().befinden !== false && ((Z.patient.einstellungen || {}).selbsteinschaetzung !== false); }
+  function befindenAktiv() { return !Z.probe && !Z.screening && !!Z.patient && S.einstellungen().befinden !== false && ((Z.patient.einstellungen || {}).selbsteinschaetzung !== false); }
 
   /* Befindlichkeit mit Smiley-Skala (1 = sehr schlecht … 5 = sehr gut) */
   var SMILEY_FARBEN = ['#E25C5C', '#EE8A3A', '#F2B630', '#8CC152', '#2EAD6B'];
@@ -267,7 +267,7 @@
     D.punkt.style.background = kat.farbe;
     D.punkt.innerHTML = HT.icon(kat.icon);
     D.name.textContent = modul.name;
-    D.unter.innerHTML = HT.esc(unter || ('Modul ' + (Z.index + 1) + ' von ' + Z.eintraege.length)) + (Z.uebung ? '<span class="tk-abzeichen-uebung">Übung</span>' : '');
+    D.unter.innerHTML = HT.esc(unter || ((Z.screening ? 'Test ' : 'Modul ') + (Z.index + 1) + ' von ' + Z.eintraege.length)) + (Z.uebung ? '<span class="tk-abzeichen-uebung">Übung</span>' : '');
   }
   function levelAnzeigen(l, max) {
     D.level.textContent = 'Level ' + l + (max ? ' / ' + max : '');
@@ -293,9 +293,10 @@
     Z.modul = { def: m, eintrag: e, zustand: zustand, startLevel: zustand.aktuellesLevel, durchgang: 0, anzahl: anzahl, dgSek: dgSek, runs: [] };
     Z.uebung = false;
     kopfSetzen(m);
-    D.level.style.visibility = '';
+    D.level.style.visibility = Z.screening ? 'hidden' : '';
     levelAnzeigen(zustand.aktuellesLevel, m.levels.length);
-    fortschritt(Z.index / Z.eintraege.length, 'Modul ' + (Z.index + 1) + ' von ' + Z.eintraege.length, '');
+    fortschritt(Z.index / Z.eintraege.length, (Z.screening ? 'Test ' : 'Modul ') + (Z.index + 1) + ' von ' + Z.eintraege.length, '');
+    if (Z.screening) { screeningAnleitung(); return; }
     anleitung();
   }
 
@@ -335,6 +336,81 @@
     setTimeout(function () { los.focus(); }, 80);
   }
 
+  /* ===================== Screening: eigener, standardisierter Ablauf =====================
+   * Anders als im Training: feste Parameter (kein Level, keine Anpassung), Anleitung wird immer gleich vorgelesen,
+   * Pflicht-Übung mit Bestehenskriterium, im Test keine Rückmeldung (keine Töne, Häkchen, Sterne, Serien), Pause nur
+   * zum Abbrechen, keine Befindensabfrage, zwischen den Tests nur neutrale Hinweise, am Ende Auswertung mit
+   * Vergleich zum eigenen ersten Screening und Trainingsempfehlung (keine Normwerte vorhanden). */
+  var STILL = (function () { var o = Object.create(HT.audio); o.richtig = o.falsch = function () {}; return o; })();
+  function screeningAnleitung(wiederholt) {
+    var m = Z.modul.def, kat = HT.kategorie(m.kategorie);
+    var k = HT.el('div', { class: 't-karte screening-karte', style: { maxWidth: '760px', textAlign: 'left' } });
+    k.appendChild(HT.el('div', { class: 't-kat', style: { color: kat.farbe }, html: '<i style="background:' + kat.farbe + '"></i>Screening · Test ' + (Z.index + 1) + ' von ' + Z.eintraege.length }));
+    k.appendChild(HT.el('h1', null, m.name));
+    k.appendChild(HT.el('p', { class: 't-text' }, m.anleitung));
+    k.appendChild(tastenHinweise(m));
+    k.appendChild(HT.el('p', { class: 'gedimmt' }, wiederholt ? 'Die Übung wird noch einmal gemacht. Danach beginnt der Test.' : 'Zuerst eine kurze Übung mit Rückmeldung. Danach folgt der eigentliche Test ohne Rückmeldung (etwa ' + Math.max(1, Math.round(Z.modul.dgSek / 60)) + ' Min.).'));
+    var kn = HT.el('div', { class: 't-knoepfe' });
+    var los = UI.knopf('Übung beginnen', { art: 'primaer gross', icon: 'play', klick: function () { HT.audio.stumm(); uebungStarten(); } });
+    kn.appendChild(los);
+    kn.appendChild(UI.knopf('Vorlesen', { art: 'gross', icon: 'ton', klick: function () { HT.audio.stumm(); var a = HT.audio.sprache; HT.audio.sprache = true; HT.audio.sprechen(m.anleitung); HT.audio.sprache = a; } }));
+    k.appendChild(kn);
+    schirm(k);
+    // Standardisierung: die Anleitung wird immer vorgelesen (unabhängig von der Sprachausgabe-Einstellung)
+    var a0 = HT.audio.sprache; HT.audio.sprache = true; HT.audio.sprechen(m.anleitung); HT.audio.sprache = a0;
+    setTimeout(function () { los.focus(); }, 80);
+  }
+  function screeningUebungFertig() {
+    if (!Z.uebung) return;
+    var richtig = Z.ereignisse.filter(function (e) { return e.korrekt && e.zaehlt !== false; }).length;
+    instanzStoppen(); Z.uebung = false;
+    Z.modul.uebungVersuche = (Z.modul.uebungVersuche || 0) + 1;
+    // Bestehenskriterium: mindestens eine richtige Reaktion; höchstens zwei Übungsdurchläufe
+    if (!richtig && Z.modul.uebungVersuche < 2) { screeningAnleitung(true); return; }
+    var k = HT.el('div', { class: 't-karte' });
+    k.appendChild(HT.el('div', { class: 't-gross-icon', html: HT.icon('ziel') }));
+    k.appendChild(HT.el('h1', null, richtig ? 'Übung bestanden' : 'Übung beendet'));
+    k.appendChild(HT.el('p', { class: 't-unter' }, 'Jetzt beginnt der Test. Während des Tests gibt es keine Rückmeldung. Arbeiten Sie so schnell und so genau wie möglich.'));
+    var kn = HT.el('div', { class: 't-knoepfe' });
+    var b = UI.knopf('Test starten', { art: 'primaer gross', icon: 'play', klick: function () { countdown(durchgangStarten); } });
+    kn.appendChild(b); k.appendChild(kn);
+    schirm(k);
+    setTimeout(function () { b.focus(); }, 60);
+  }
+  function screeningZwischen() {
+    var naechster = Z.eintraege[Z.index + 1] && HT.Module.map[Z.eintraege[Z.index + 1].modulId];
+    var k = HT.el('div', { class: 't-karte' });
+    k.appendChild(HT.el('div', { class: 't-gross-icon', html: HT.icon('haken') }));
+    k.appendChild(HT.el('h1', null, 'Test ' + (Z.index + 1) + ' von ' + Z.eintraege.length + ' abgeschlossen'));
+    k.appendChild(HT.el('p', { class: 't-unter' }, naechster ? 'Kurz durchatmen. Als Nächstes: ' + naechster.name + '.' : 'Alle Tests sind geschafft.'));
+    var kn = HT.el('div', { class: 't-knoepfe' });
+    var b = UI.knopf(naechster ? 'Nächster Test' : 'Screening abschließen', { art: 'primaer gross', icon: 'play', klick: function () {
+      Z.index++; Z.modulGestartet = false; Z.sitzung.index = Z.index;
+      if (!Z.probe) S.put('sessions', Z.sitzung);
+      naechstesModul();
+    } });
+    kn.appendChild(b); k.appendChild(kn);
+    schirm(k);
+    setTimeout(function () { b.focus(); }, 60);
+  }
+  function screeningAbschluss() {
+    var pat = Z.patient;
+    D.name.textContent = 'Screening abgeschlossen';
+    fortschritt(1, 'Screening abgeschlossen', '');
+    var k = HT.el('div', { class: 't-karte', style: { maxWidth: '680px' } });
+    k.appendChild(HT.el('div', { class: 't-gross-icon gruen', html: HT.icon('haken') }));
+    k.appendChild(HT.el('h1', null, 'Screening abgeschlossen'));
+    k.appendChild(HT.el('p', { class: 't-unter' }, 'Vielen Dank. Die Auswertung (Kennwerte, Vergleich mit früheren Screenings und Trainingsempfehlung) ist für die Therapeutin bzw. den Therapeuten.'));
+    var kn = HT.el('div', { class: 't-knoepfe' });
+    kn.appendChild(UI.knopf('Auswertung öffnen', { art: 'primaer gross', icon: 'diagramm', klick: function () {
+      verlassen();
+      if (pat && HT.auth.aktuell) setTimeout(function () { location.hash = '#/screening/' + pat.id; }, 60);
+    } }));
+    k.appendChild(kn);
+    schirm(k);
+    HT.audio.sprechen('Vielen Dank fürs Mitmachen.', { nurAufnahme: true });
+  }
+
   function anleitung(erzwingen) {
     if (!erzwingen && !anleitungNoetig()) { kurzstart(); return; }
     var m = Z.modul.def, kat = HT.kategorie(m.kategorie);
@@ -369,6 +445,7 @@
 
   function countdown(weiter) {
     var n = 3;
+    HT.audio.stumm(); // laufende Ansage (Anleitung) sofort beenden, sobald das Modul startet
     function schritt() {
       if (Z.beendet) return;
       if (n === 0) { schirm(null); weiter(); return; }
@@ -393,21 +470,21 @@
     var zaehler = 0;
     var t0 = HT.zeit.jetzt();
     var ctx = {
-      level: level, params: params, modul: m, audio: HT.audio, uebung: uebung,
+      level: level, params: params, modul: m, audio: (Z.screening && !uebung) ? STILL : HT.audio, uebung: uebung, screening: !!Z.screening,
       patientSettings: pe,
       patient: Z.patient ? { betroffeneSeite: Z.patient.betroffeneSeite || 'keine', gesichtsfeld: Z.patient.gesichtsfeld || 'frei', haendigkeit: Z.patient.haendigkeit } : { betroffeneSeite: 'keine', gesichtsfeld: 'frei' },
       zeit: HT.zeit, eingabe: HT.eingabe, container: D.container,
       // Bühnengröße: einheit = 1 % der kürzeren Seite (Reize ≥ 18 einheit, Text ≥ 32 px, Antwortknöpfe ≥ 64 px)
       buehne: (function () { var b = D.container.clientWidth || 800, h = D.container.clientHeight || 600; return { b: b, h: h, einheit: Math.min(b, h) / 100 }; })(),
       jetzt: function () { return HT.zeit.jetzt(); },
-      feedback: function (richtig, x, y, o) { HT.feedback(D.container, richtig, x, y, o); },
+      feedback: function (richtig, x, y, o) { if (Z.screening && !uebung) return; HT.feedback(D.container, richtig, x, y, o); }, // Screening: keine Rückmeldung im Test
       onEvent: function (ev) {
         if (Z.pausiert || Z.beendet) return;
         ev.zeit = Math.round(HT.zeit.jetzt() - t0);
         Z.ereignisse.push(ev);
         if (ev.zaehlt !== false) zaehler++;
         // Serienzähler: dezent oben „5 richtig in Folge!“ (nicht in der Übung)
-        if (ev.zaehlt !== false && !uebung) { if (ev.korrekt) { Z.serie = (Z.serie || 0) + 1; if (Z.serie % 5 === 0) serieZeigen(Z.serie); } else Z.serie = 0; }
+        if (ev.zaehlt !== false && !uebung && !Z.screening) { if (ev.korrekt) { Z.serie = (Z.serie || 0) + 1; if (Z.serie % 5 === 0) serieZeigen(Z.serie); } else Z.serie = 0; }
         if (uebung && zaehler >= 3) setTimeout(function () { if (Z.uebung) beiEnde(); }, 700);
       },
       onFinish: function () { if (!Z.beendet) setTimeout(beiEnde, 600); }
@@ -469,11 +546,23 @@
     clearInterval(Z.uhr);
   }
 
+  function uebungEntfernen() { if (D.uebungSkip && D.uebungSkip.parentNode) D.uebungSkip.parentNode.removeChild(D.uebungSkip); D.uebungSkip = null; }
   function uebungStarten() {
     schirm(null);
+    HT.audio.stumm();
     Z.uebungGemacht[Z.modul.def.id] = true;
     fortschritt(0, 'Übung', '3 Probeaufgaben');
+    // Die Übung (Tutorial) lässt sich jederzeit überspringen → direkt ins Modul
+    uebungEntfernen();
+    if (Z.screening) { instanzStarten(true, screeningUebungFertig); return; }
+    D.uebungSkip = UI.knopf('Übung überspringen', { art: 'gross', icon: 'weiter', klick: function () {
+      if (!Z.uebung) return;
+      uebungEntfernen(); instanzStoppen(); Z.uebung = false; countdown(durchgangStarten);
+    } });
+    D.uebungSkip.classList.add('uebung-skip');
+    D.buehne.appendChild(D.uebungSkip);
     instanzStarten(true, function () {
+      uebungEntfernen();
       if (!Z.uebung) return;
       instanzStoppen();
       Z.uebung = false;
@@ -630,6 +719,7 @@
     var M = Z.modul;
     var zs = HT.results.zusammenfassung(M.runs);
     Z.ergebnisse.push({ modul: M.def, zs: zs, startLevel: M.startLevel, endLevel: M.zustand.aktuellesLevel });
+    if (Z.screening) { screeningZwischen(); return; }
     if (Z.nonstop && Z.index + 1 < Z.eintraege.length && !Z.einstufung) {
       Z.index++; Z.modulGestartet = false; Z.sitzung.index = Z.index;
       if (!Z.probe) S.put('sessions', Z.sitzung);
@@ -725,6 +815,7 @@
     Z.sitzung.status = 'abgeschlossen';
     Z.sitzung.ende = Date.now();
     if (!Z.probe) S.put('sessions', Z.sitzung);
+    if (Z.screening) { screeningAbschluss(); return; }
     kopfSetzen(Z.eintraege.length ? HT.Module.map[Z.eintraege[Z.eintraege.length - 1].modulId] : { kategorie: 'aufmerksamkeit', name: '' }, 'Sitzung beendet');
     D.name.textContent = 'Sitzung abgeschlossen';
     fortschritt(1, 'Geschafft!', '');
@@ -875,23 +966,45 @@
         '<div><span>Sitzungsdauer</span><b>' + HT.dauer((Date.now() - Z.sitzungsStart) / 1000) + '</b></div>' +
         '<div><span>Effektive Trainingszeit (Modul)</span><b>' + HT.dauer(effektiv) + '</b></div>' }));
     }
-    var weiter = UI.knopf(HT.t('fortsetzen'), { art: 'primaer gross voll', icon: 'play', klick: function () { schleier.remove(); pauseAus(); } });
+    var levelVorher = Z.modul && Z.modul.zustand ? Z.modul.zustand.aktuellesLevel : null;
+    var weiter = UI.knopf(HT.t('fortsetzen'), { art: 'primaer gross voll', icon: 'play', klick: function () {
+      schleier.remove();
+      var M1 = Z.modul;
+      // Level im Pausenmenü geändert → sofort übernehmen: Durchgang mit den neuen Parametern neu aufbauen
+      if (M1 && Z.inst && !Z.uebung && levelVorher !== null && M1.zustand.aktuellesLevel !== levelVorher) {
+        Z.pausiert = false;
+        if (!Z.probe && Z.patient) S.put('moduleState', M1.zustand);
+        Z.ereignisse = []; instanzStoppen(); durchgangStarten();
+        UI.toast('Level ' + M1.zustand.aktuellesLevel + ' übernommen', 'ok');
+        return;
+      }
+      pauseAus();
+    } });
     k.appendChild(weiter);
     if (Z.modul) k.appendChild(UI.knopf('Anleitung noch einmal ansehen', { art: 'voll', icon: 'info', klick: function () { anleitungOverlay(schleier); } }));
     if (Z.patientenmodus) {
       k.appendChild(UI.knopf('Zurück zur Übersicht', { art: 'gross voll', icon: 'zurueck', klick: function () { schleier.remove(); Z.pausiert = false; sitzungBeenden(); } }));
       k.appendChild(UI.knopf('Therapeut: Sitzung verwalten', { art: 'gross voll', icon: 'schloss', klick: function () { schleier.remove(); Z.pausiert = false; therapeutZugang(); } }));
     } else {
-      if (Z.inst && !Z.uebung && Z.modul) {
+      if (Z.inst && !Z.uebung && Z.modul && !Z.screening) {
         var M = Z.modul;
         var lz = HT.el('div', { class: 'pause-level' });
-        var wert = HT.el('strong', null, 'Level ' + M.zustand.aktuellesLevel);
+        var wert = HT.el('strong', null, 'Level ' + M.zustand.aktuellesLevel + ' / ' + M.def.levels.length);
+        var paramText = HT.el('div', { class: 'klein gedimmt pause-param' });
+        var paramMalen = function () {
+          var pp = HT.Module.parameter(M.def, M.zustand.aktuellesLevel, M.eintrag.parameterOverrides), lab = M.def.levelLabels || {};
+          paramText.textContent = Object.keys(lab).filter(function (k2) { return pp[k2] !== undefined; }).slice(0, 4)
+            .map(function (k2) { return lab[k2] + ': ' + (typeof pp[k2] === 'boolean' ? (pp[k2] ? 'ja' : 'nein') : pp[k2]); }).join(' · ');
+        };
         var setz = function (d) {
           M.zustand.aktuellesLevel = HT.klemmen(M.zustand.aktuellesLevel + d, 1, M.def.levels.length);
           M.zustand.hochSerie = 0;
-          wert.textContent = 'Level ' + M.zustand.aktuellesLevel;
+          wert.textContent = 'Level ' + M.zustand.aktuellesLevel + ' / ' + M.def.levels.length;
+          paramMalen();
+          weiter.textContent = M.zustand.aktuellesLevel !== levelVorher ? 'Mit Level ' + M.zustand.aktuellesLevel + ' fortsetzen' : HT.t('fortsetzen');
         };
-        lz.appendChild(HT.el('div', null, [HT.el('div', { class: 'klein gedimmt' }, 'Level manuell setzen'), wert]));
+        paramMalen();
+        lz.appendChild(HT.el('div', null, [HT.el('div', { class: 'klein gedimmt' }, 'Schwierigkeit (wird sofort übernommen)'), wert, paramText]));
         lz.appendChild(HT.el('div', { class: 'knopf-gruppe' }, [UI.iconKnopf('minus', 'Leichter', function () { setz(-1); }, 'rand'), UI.iconKnopf('plus', 'Schwerer', function () { setz(1); }, 'rand')]));
         k.appendChild(lz);
         var neu = HT.el('div', { class: 'knopf-paar' });
@@ -911,9 +1024,10 @@
         pe.appendChild(UI.knopf('Ergebnisse', { art: 'voll', icon: 'diagramm', klick: function () { ergebnisseImTraining(M); } }));
         k.appendChild(pe);
       }
-      if (Z.eintraege.length > 1) k.appendChild(UI.knopf(HT.t('modul_ueberspringen'), { art: 'voll', icon: 'weiter', klick: function () { schleier.remove(); Z.pausiert = false; modulUeberspringen(); } }));
-      if (!Z.probe && Z.plan) k.appendChild(UI.knopf('Unterbrechen (später fortsetzen)', { art: 'voll', icon: 'pause', klick: function () { schleier.remove(); sitzungUnterbrechen(); } }));
-      k.appendChild(UI.knopf(Z.probe ? 'Beenden' : HT.t('sitzung_beenden'), { art: 'gefahr voll', icon: 'stopp', klick: function () { schleier.remove(); sitzungBeenden(); } }));
+      if (Z.eintraege.length > 1 && !Z.screening) k.appendChild(UI.knopf(HT.t('modul_ueberspringen'), { art: 'voll', icon: 'weiter', klick: function () { schleier.remove(); Z.pausiert = false; modulUeberspringen(); } }));
+      if (!Z.probe && Z.plan && !Z.screening) k.appendChild(UI.knopf('Unterbrechen (später fortsetzen)', { art: 'voll', icon: 'pause', klick: function () { schleier.remove(); sitzungUnterbrechen(); } }));
+      if (Z.screening) k.appendChild(HT.el('p', { class: 'klein gedimmt' }, 'Screening: standardisierter Ablauf – Level und Parameter sind fest. Ein abgebrochener Test wird nicht gewertet.'));
+      k.appendChild(UI.knopf(Z.probe ? 'Beenden' : Z.screening ? 'Screening abbrechen' : HT.t('sitzung_beenden'), { art: 'gefahr voll', icon: 'stopp', klick: function () { schleier.remove(); sitzungBeenden(); } }));
     }
     schleier.appendChild(k);
     D.buehne.appendChild(schleier);

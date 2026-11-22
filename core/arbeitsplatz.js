@@ -119,6 +119,7 @@
     schalter('Therapeuten', 'personen', 'Therapeuten anlegen, bearbeiten und den aktuellen Therapeuten wählen.', therapeutenListe);
     schalter('Klienten', 'person', 'Klienten aufnehmen, bearbeiten, suchen, exportieren/importieren und auswählen.', klientenFenster);
     schalter('Module', 'raster', 'Trainingsmodule und eigene Trainingseinheiten verwalten, Standardparameter festlegen.', moduleFenster);
+    schalter('Bibliothek', 'buch', 'Modulbibliothek: alle Module mit Vorschau-Animationen, Beschreibung und Leveltabelle.', function () { location.hash = '#/module'; });
     schalter('Parameter', 'zahnrad', 'Trainingsparameter des gewählten Moduls für den aktuellen Klienten anpassen.', function () { parameterFenster(); });
     schalter('Ergebnisse', 'diagramm', 'Verlaufsdaten, Sitzungsanalyse, Berichte und Exporte des aktuellen Klienten.', function () { var k = AP.klient(); if (!k) { UI.toast('Bitte zuerst einen Klienten wählen.', 'fehler'); return; } location.hash = '#/patient/' + k.id + '/verlauf'; });
     leiste.appendChild(HT.el('div', { class: 'ap-abstand' }));

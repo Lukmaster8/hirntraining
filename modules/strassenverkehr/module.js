@@ -420,39 +420,50 @@
    * ===================================================================== */
   var levels = HT.stufen(16, function (t, i) {
     return {
-      band: HT.lerpInt(16, 6, t),
-      schilder: i >= 2, ampeln: i >= 4, fuss: i >= 5, stopps: i >= 6, hindernis: i >= 7, bahn: i >= 8, werbung: i >= 9,
-      blinker: i >= 10, autoBremse: i < 13, blinkerTon: i < 13, kontrollen: i >= 12, stau: i >= 14, polizei: i >= 9,
+      // Grünes Band: von (Limit − band) bis Limit + 3 km/h. Innerorts gilt 50, auf der Landstraße 80 oder 100.
+      band: HT.lerpInt(12, 5, t),
+      schilder: true, ampeln: i >= 3, fuss: i >= 2, stopps: i >= 5, hindernis: true, bahn: i >= 7, werbung: i >= 6,
+      landTempo100: i >= 4, polizei: i >= 9,
       abstandMin: HT.lerpInt(240, 130, t), abstandMax: HT.lerpInt(360, 190, t),
       reaktionSek: Math.round(HT.lerp(3.2, 1.6, t) * 10) / 10, schildGross: i < 7
     };
   });
   var AUTOBAHNEN = ['A2', 'A7', 'A37'];
 
+  // Strecke aus Abschnitten: Ortschaft (50, Ampeln, Zebrastreifen, Menschen und spielende Kinder) und Landstraße
+  // (80 oder 100, Wild, Bahnübergang). Jeder Abschnitt beginnt mit seinem Temposchild.
   function streckeBauen(p, dauerSek) {
-    var meter = (50 / 3.6) * Math.max(45, dauerSek) * 0.8, events = [], s = 160, limit = 50, katalog = [];
-    if (p.schilder) { katalog.push('schild'); katalog.push('schild'); } if (p.ampeln) katalog.push('ampel'); if (p.fuss) katalog.push('fuss'); if (p.stopps) katalog.push('stop');
-    if (p.hindernis) katalog.push('hindernis'); if (p.bahn) katalog.push('bahn'); if (p.werbung) katalog.push('werbung'); if (p.blinker) katalog.push('blinker'); if (p.polizei) katalog.push('polizei');
-    var n = 0;
-    while (s < meter - 80 && n < 28) {
-      var typ = katalog.length ? katalog[n % katalog.length] : null;
-      n++;
-      if (!typ) break;
-      var e = { typ: typ, s: s, erledigt: false, minV: 999, stehZeit: 0 };
-      if (typ === 'schild') { var neu = limit <= 40 ? HT.zufall.wahl([50, 70]) : HT.zufall.wahl([30, 50, 70, 80]); if (neu === limit) neu = limit > 50 ? 30 : 70; e.neu = neu; e.runter = neu < limit; limit = neu; }
-      else if (typ === 'ampel') e.rot = HT.zufall.chance(0.65);
-      else if (typ === 'fuss') e.person = HT.zufall.chance(0.6);
-      else if (typ === 'bahn') e.zu = HT.zufall.chance(0.55);
-      else if (typ === 'blinker') e.seite = HT.zufall.wahl(['links', 'rechts']);
-      else if (typ === 'polizei') e.blau = true;
-      else if (typ === 'hindernis') e.art = HT.zufall.wahl(['person', 'kind', 'ball', 'kind', 'reh', 'hund']);
-      e.farbe = HT.zufall.int(0, 3);
-      events.push(e);
-      // Nach manchen Temposchildern steht ein Blitzer am Straßenrand
-      if (typ === 'schild' && HT.zufall.chance(0.55)) events.push({ typ: 'blitzer', s: s + HT.zufall.int(55, 95), erledigt: false, minV: 999, stehZeit: 0 });
-      s += HT.zufall.int(p.abstandMin, p.abstandMax);
+    var meter = (66 / 3.6) * Math.max(45, dauerSek) * 0.85, events = [], zonen = [], s = 0, ort = true, limit = 50, nO = 0, nL = 0;
+    var ortKat = [], landKat = ['hindernis'];
+    if (p.fuss) ortKat.push('fuss'); ortKat.push('hindernis'); if (p.ampeln) ortKat.push('ampel'); ortKat.push('hindernis'); if (p.stopps) ortKat.push('stop');
+    if (p.bahn) landKat.push('bahn'); if (p.werbung) landKat.push('werbung'); if (p.polizei) landKat.push('polizei'); landKat.push('hindernis');
+    function neuesE(typ, pos) { return { typ: typ, s: pos, erledigt: false, minV: 999, stehZeit: 0, farbe: HT.zufall.int(0, 3) }; }
+    while (s < meter || zonen.length < 2) {
+      var len = ort ? HT.zufall.int(300, 440) : HT.zufall.int(560, 860);
+      var neu = ort ? 50 : (p.landTempo100 && HT.zufall.chance(0.5) ? 100 : 80);
+      if (s > 0) {
+        var sch = neuesE('schild', s); sch.neu = neu; sch.runter = neu < limit; sch.ortsschild = ort; events.push(sch);
+        if (HT.zufall.chance(0.5)) events.push(neuesE('blitzer', s + HT.zufall.int(110, 180)));
+      }
+      limit = neu;
+      zonen.push({ von: s, bis: s + len, ort: ort, limit: neu });
+      var pos = s + (s > 0 ? 110 : 150);
+      while (pos < s + len - 80) {
+        var kat = ort ? ortKat : landKat, typ = kat[(ort ? nO++ : nL++) % kat.length], e = neuesE(typ, pos);
+        if (typ === 'ampel') e.rot = HT.zufall.chance(0.6);
+        else if (typ === 'fuss') e.person = HT.zufall.chance(0.65);
+        else if (typ === 'bahn') e.zu = HT.zufall.chance(0.55);
+        else if (typ === 'polizei') e.blau = true;
+        else if (typ === 'hindernis') e.art = ort ? HT.zufall.wahl(['person', 'ball', 'kind', 'person', 'ball']) : HT.zufall.wahl(['reh', 'person', 'hund', 'reh']);
+        events.push(e);
+        // Ball rollt auf die Straße – kurz danach läuft ein Kind hinterher (typische Gefahr in der Ortschaft)
+        if (typ === 'hindernis' && e.art === 'ball') { var k = neuesE('hindernis', pos + 8); k.art = 'kind'; k.folgt = true; events.push(k); }
+        pos += Math.round(HT.zufall.int(p.abstandMin, p.abstandMax) * (ort ? 0.75 : 1.25));
+      }
+      s += len; ort = !ort;
     }
-    return { laenge: Math.max(meter, s + 40), events: events };
+    events.sort(function (x, y) { return x.s - y.s; });
+    return { laenge: s, events: events, zonen: zonen };
   }
 
   /* Tacho im Cockpit-Stil mit grünem Band */
@@ -462,10 +473,10 @@
     g.fillStyle = hg; g.beginPath(); g.arc(x, y, r + 8, 0, Math.PI * 2); g.fill();
     var rg = g.createLinearGradient(0, y - r - 8, 0, y + r + 8); rg.addColorStop(0, '#c8d2d8'); rg.addColorStop(1, '#5e6a72');
     g.strokeStyle = rg; g.lineWidth = 3; g.stroke();
-    var a0 = Math.PI * 0.75, a1 = Math.PI * 2.25, max = 120;
+    var a0 = Math.PI * 0.75, a1 = Math.PI * 2.25, max = 140;
     function w(km) { return a0 + (a1 - a0) * HT.klemmen(km, 0, max) / max; }
     g.lineWidth = r * 0.1; g.strokeStyle = 'rgba(255,255,255,.08)'; g.beginPath(); g.arc(x, y, r * 0.84, a0, a1); g.stroke();
-    g.strokeStyle = '#2ead6b'; g.shadowColor = 'rgba(46,173,107,.8)'; g.shadowBlur = 10; g.beginPath(); g.arc(x, y, r * 0.84, w(soll - band), w(soll + band)); g.stroke(); g.shadowBlur = 0;
+    g.strokeStyle = '#2ead6b'; g.shadowColor = 'rgba(46,173,107,.8)'; g.shadowBlur = 10; g.beginPath(); g.arc(x, y, r * 0.84, w(soll - band), w(soll + 3)); g.stroke(); g.shadowBlur = 0;
     g.fillStyle = '#dfe6ea'; g.font = '600 ' + Math.round(r * 0.14) + 'px -apple-system, Helvetica, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
     for (var k = 0; k <= max; k += 10) {
       var a = w(k), lang = k % 20 === 0;
@@ -473,7 +484,7 @@
       g.beginPath(); g.moveTo(x + Math.cos(a) * r * 0.72, y + Math.sin(a) * r * 0.72); g.lineTo(x + Math.cos(a) * r * (lang ? 0.6 : 0.65), y + Math.sin(a) * r * (lang ? 0.6 : 0.65)); g.stroke();
       if (lang) g.fillText(String(k), x + Math.cos(a) * r * 0.47, y + Math.sin(a) * r * 0.47);
     }
-    var an = w(v), zuSchnell = v > soll + band;
+    var an = w(v), zuSchnell = v > soll + 3;
     g.strokeStyle = zuSchnell ? '#ff453a' : '#ff9f0a'; g.lineWidth = Math.max(3, r * 0.04); g.lineCap = 'round';
     g.shadowColor = 'rgba(255,159,10,.6)'; g.shadowBlur = 6;
     g.beginPath(); g.moveTo(x - Math.cos(an) * r * 0.12, y - Math.sin(an) * r * 0.12); g.lineTo(x + Math.cos(an) * r * 0.76, y + Math.sin(an) * r * 0.76); g.stroke();
@@ -506,13 +517,12 @@
   HT.registerModule({
     id: 'strassenverkehr', name: 'Straßenverkehr', kategorie: 'aufmerksamkeit', symbol: 'weiter',
     ziel: 'Tempo halten und gleichzeitig auf echte Störungen und eine zweite Aufgabe achten',
-    beschreibung: 'Cockpit-Fahrt für geteilte Aufmerksamkeit auf einer Landstraße mit Kurven, Feldern, Wäldern und Ortschaften. Zu Beginn wird Tag-, Abend- oder Nachtfahrt gewählt; die Fahrt beginnt bei schönem Wetter, nach 30 bis 60 Sekunden zieht Herbstregen auf: nasse, spiegelnde Straße, Tropfen auf der Scheibe, Scheibenwischer laufen automatisch. Die Spur hält das Auto, mit Pfeil links und rechts lässt sich leicht ausweichen. Pfeil hoch beschleunigt sanft, Pfeil runter bremst. Der Tachozeiger soll im grünen Band bleiben. Niedrigere Limits gelten schon vor dem Schild, höhere erst danach. Angehalten wird bei roter Ampel, Fußgänger am Übergang, Stoppschild, geschlossener Schranke und Blaulicht im Spiegel. Plötzlich laufen Menschen oder Kinder auf die Fahrbahn, ein Ball rollt über die Straße oder ein Tier steht im Weg: bremsen oder ausweichen. Wer einen Menschen anfährt, beendet die Fahrt. Fünf Sekunden im grünen Band bringen 10 Punkte, fünf Sekunden zu schnell kosten 5 Punkte; Blitzer am Straßenrand blitzen bei zu hohem Tempo. L schaltet das Abblendlicht, F das Fernlicht; bei Fernlicht gibt der Gegenverkehr Lichthupe. Parallel kommen Abbiegen, Kontrollleuchten und eine Durchsage. Leere Übergänge, grüne Ampeln und Werbetafeln verlangen keine Taste.',
-    anleitung: 'Pfeil nach oben ist Gas, Pfeil nach unten ist Bremse. Halten Sie den Zeiger im grünen Bereich. Vor einem langsameren Schild schon abbremsen, nach einem schnelleren Schild erst beschleunigen. Halten Sie nur an, wenn wirklich etwas auf der Straße ist. Läuft ein Mensch oder Kind auf die Straße oder rollt ein Ball heran, sofort bremsen. Einem Tier können Sie auch mit Pfeil links oder rechts ausweichen. Fünf Sekunden im grünen Bereich bringen 10 Punkte, zu schnell kostet 5 Punkte. Achten Sie auf Blitzer. Bei einer Abbiege-Ansage zählt links oder rechts als Abbiegen. Leuchtet eine Lampe im Cockpit, drücken Sie OK. Die Plustaste nur bei der genannten Autobahn. Im Dunkeln schaltet L das Licht ein, F das Fernlicht. Bei Gegenverkehr abblenden.',
-    tasten: ['hoch', 'runter', 'links', 'rechts', 'ok', 'ja'], levels: levels,
+    beschreibung: 'Cockpit-Fahrt für geteilte Aufmerksamkeit durch Ortschaften und über Landstraßen mit Kurven, Feldern und Wäldern. Innerorts gilt 50 km/h, auf der Landstraße 80 oder 100 km/h – jeweils angezeigt durch Schilder. Pfeil hoch ist Gas, Pfeil runter Bremse, mit Pfeil links und rechts lässt sich ausweichen. Wer schneller als erlaubt fährt, sieht sofort die Warnung „Achtung, zu schnell“. In Ortschaften laufen Menschen über die Straße, Bälle rollen auf die Fahrbahn und Kinder rennen hinterher; auf der Landstraße steht Wild im Weg. Angehalten wird bei roter Ampel, Fußgängern am Zebrastreifen, Stoppschild, geschlossener Schranke und Blaulicht. Wer einen Menschen anfährt, beendet die Fahrt. Fünf Sekunden im grünen Band bringen 10 Punkte, zu schnell kostet Punkte, Blitzer blitzen. Tag-, Abend- oder Nachtfahrt mit Regen, Licht (L) und Fernlicht (F).',
+    anleitung: 'Pfeil nach oben ist Gas, Pfeil nach unten ist Bremse. Im Ort gilt 50, auf der Landstraße 80 oder 100. Halten Sie den Zeiger im grünen Bereich. Fahren Sie zu schnell, erscheint eine rote Warnung. Läuft ein Mensch auf die Straße oder rollt ein Ball heran, sofort bremsen – oft rennt ein Kind hinterher. Einem Tier können Sie mit Pfeil links oder rechts ausweichen. Bei roter Ampel, Zebrastreifen mit Fußgänger, Stoppschild und geschlossener Schranke anhalten. Im Dunkeln schaltet L das Licht ein, F das Fernlicht.',
+    tasten: ['hoch', 'runter', 'links', 'rechts'], levels: levels,
     levelLabels: {
-      band: 'Grünes Band (± km/h)', schilder: 'Temposchilder', ampeln: 'Ampeln', fuss: 'Fußgänger', stopps: 'Stoppschilder',
-      hindernis: 'Hindernisse', bahn: 'Bahnübergang', werbung: 'Werbetafeln', blinker: 'Abbiegen', autoBremse: 'Auto bremst vor Kreuzung',
-      blinkerTon: 'Abbiegen als Ansage', kontrollen: 'Kontrollleuchten', stau: 'Durchsage', polizei: 'Polizei im Spiegel', reaktionSek: 'Reaktionsfenster (s)'
+      band: 'Grünes Band unter dem Limit (km/h)', ampeln: 'Ampeln', fuss: 'Fußgänger am Zebrastreifen', stopps: 'Stoppschilder',
+      landTempo100: 'Landstraße auch 100', bahn: 'Bahnübergang', werbung: 'Werbetafeln', polizei: 'Polizei im Spiegel', reaktionSek: 'Reaktionsfenster (s)'
     },
     parameterSchema: {
       dauerDurchgangSek: { typ: 'zahl', label: 'Dauer eines Durchgangs (Sek.)', min: 45, max: 240, schritt: 15, standard: 90 },
@@ -562,7 +572,7 @@
       var LM = null, lg = null, lgK = null, HGR = null, blaetter = [], wischT = 0, PUF = null, pufG = null, DPR = 1, leuchten = [], SR = { x: 0, y: 0, w: 0, h: 0 }, aktD = 0, aktA = 1;
       // Leistungsmodus: weniger Effekte (keine Bewegungsunschärfe, Pixeldichte 1, weniger Regen/Laub, kürzere Sicht)
       var leichtModus = !!(HT.leicht && HT.leicht()), bildzeitSumme = 0, bildzeitN = 0;
-      var punkte = 0, punktAnim = [], warnAn = false, blitzZeit = -9, blitzE = null, huepfer = -9, waldF = 0;
+      var punkte = 0, punktAnim = [], warnAn = false, warnTonBei = 0, blitzZeit = -9, blitzE = null, huepfer = -9, waldF = 0;
       var striche = [], tropfen = [], tropfenRest = 0, wischAlt = 0.05, wischZyklus = -1, ton = null, pauseUhr = null;
 
       function haltenAn(el, key) {
@@ -577,7 +587,8 @@
       }
       haltenAn(kGas, 'gas'); haltenAn(kBremse, 'bremse'); haltenAn(kLinks, 'links'); haltenAn(kRechts, 'rechts');
       HT.tap(kLinks, function () { reagiere('links'); }); HT.tap(kRechts, function () { reagiere('rechts'); });
-      HT.tap(kOk, function () { reagiere('ok'); }); HT.tap(kPlus, function () { reagiere('ja'); });
+      // Nur Fahren, Tempo und Hindernisse: keine Kontrollleuchten, Durchsagen oder Abbiege-Tasten mehr
+      kOk.style.display = 'none'; kPlus.style.display = 'none';
       HT.tap(kLicht, function () { lichtSchalten(licht === 0 ? 1 : licht === 1 ? 2 : 0); });
 
       function lichtSchalten(n) {
@@ -690,7 +701,7 @@
           if (e.typ === 'blitzer') {
             if (ds < 0) {
               e.erledigt = true;
-              if (v > soll + p.band) {
+              if (v > soll + 3) {
                 blitzZeit = uhr; blitzE = e; punkteAendern(-5); if (ton) ton.blitz();
                 zaehle({ korrekt: false, reiz: 'blitzer ' + soll, reaktion: Math.round(v) + '', typ: 'tempo' });
                 meldung('Geblitzt! ' + Math.round(v) + ' statt ' + soll + ' km/h. Minus 5 Punkte.');
@@ -762,7 +773,7 @@
         if (!e.runter && ds < 0) soll = e.neu;
         if (ds < -2 && !e.erledigt) {
           e.erledigt = true;
-          if (e.runter && v > e.neu + p.band) { tempoZahl++; punkteAendern(-5); zaehle({ korrekt: false, reiz: 'schild ' + e.neu, reaktion: Math.round(v) + '', typ: 'tempo' }); ctx.audio.falsch(); meldung('Vor dem Schild auf ' + e.neu + ' kommen.'); }
+          if (e.runter && v > e.neu + 5) { tempoZahl++; punkteAendern(-5); zaehle({ korrekt: false, reiz: 'schild ' + e.neu, reaktion: Math.round(v) + '', typ: 'tempo' }); ctx.audio.falsch(); meldung('Vor dem Schild auf ' + e.neu + ' kommen.'); }
           else zaehle({ korrekt: true, reiz: 'schild ' + e.neu, reaktion: Math.round(v) + '', typ: 'tempo' });
         }
       }
@@ -788,8 +799,9 @@
       }
       // Tempo: 5 s im grünen Band = +10 Punkte; 5 s zu schnell = −5 Punkte. Solange zu schnell, erscheint eine Warnung.
       function tempoPruefen(dt) {
-        if (v > soll + p.band) {
-          if (!warnAn) { warnAn = true; if (HT.audio.ton) HT.audio.ton(880, 0.12, 'sine', 0, 0.07); }
+        if (v > soll + 3) {
+          if (!warnAn) { warnAn = true; warnTonBei = 0; meldung('Achtung, zu schnell! Hier gilt ' + soll + ' km/h.'); }
+          if (uhr > warnTonBei && HT.audio.ton) { HT.audio.ton(880, 0.12, 'sine', 0, 0.08); warnTonBei = uhr + 1.6; }
           tempoUeber += dt;
         } else { warnAn = false; tempoUeber = 0; }
         if (tempoUeber >= 5) {
@@ -798,13 +810,13 @@
           meldung('Geschwindigkeit zu hoch: minus 5 Punkte. Ziel ist ' + soll + ' km/h.');
           if (tempoZahl >= 20) ende('Zwanzigmal zu schnell. Der Durchgang endet.');
         }
-        if (v > 8 && Math.abs(v - soll) <= p.band) seitHalt += dt; else seitHalt = 0;
+        if (v > 8 && v >= soll - p.band && v <= soll + 3) seitHalt += dt; else seitHalt = 0;
         if (seitHalt >= 5) { seitHalt = 0; punkteAendern(10); zaehle({ korrekt: true, reiz: 'tempo ' + soll, reaktion: Math.round(v) + '', typ: 'tempo' }); }
       }
 
       /* =================== Welt für die Darstellung =================== */
       // MJS = Meter je Segment: kleiner Wert = mehr Bewegung im Bild je km/h (50 km/h wirken zügiger)
-      var SEG = 200, STRASSE = 2000, M = 570, MJS = 1.1, SICHT = leichtModus ? 190 : 270, KTIEFE = 1 / Math.tan(50 * Math.PI / 180), KAMERA_H = 1050;
+      var SEG = 200, STRASSE = 2000, M = 570, MJS = 0.85, SICHT = leichtModus ? 190 : 270, KTIEFE = 1 / Math.tan(50 * Math.PI / 180), KAMERA_H = 1050;
       var FELDER = HERBST ? [[150, 140, 70], [170, 122, 62], [124, 118, 64], [196, 158, 84], [142, 102, 70], [118, 128, 66]] : [[118, 178, 92], [104, 164, 80], [206, 184, 104], [226, 204, 92], [150, 120, 86], [132, 188, 98]];
       var TROCKEN = [104, 110, 116], NASS = [54, 59, 65];
       tageszeitSetzen(TZ);
@@ -813,7 +825,7 @@
         var anzahl = Math.ceil((plan.laenge + 500) / MJS) + SICHT, i = 0, feldL = FELDER[0], feldR = FELDER[1], rest = 0;
         // Bereiche um Ereignisse herum gerade halten, damit Schilder gut zu sehen sind; Ortschaften um einige Ereignisse
         var ruhig = {}, ort = {};
-        plan.events.forEach(function (e, k) { var c = Math.round(e.s / MJS); for (var j = c - 95; j < c + 10; j++) ruhig[j] = true; if (e.typ === 'ampel' || e.typ === 'fuss' || e.typ === 'stop') for (j = c - 160; j < c + 120; j++) ort[j] = true; });
+        plan.events.forEach(function (e, k) { var c = Math.round(e.s / MJS); for (var j = c - 95; j < c + 10; j++) ruhig[j] = true; }); (plan.zonen || []).forEach(function (z) { if (z.ort) for (var j = Math.round(z.von / MJS) - 20; j < Math.round(z.bis / MJS); j++) ort[j] = true; });
         while (i < anzahl) {
           var kurve = Math.random() < 0.4 ? 0 : (Math.random() < 0.5 ? -1 : 1) * (1.2 + Math.random() * 2.8), laenge = 90 + Math.floor(Math.random() * 140), ein = Math.floor(laenge * 0.3);
           for (var j = 0; j < laenge && i < anzahl; j++, i++) {
@@ -976,12 +988,12 @@
       }
       // Bewegungsunschärfe: das Bild leicht vergrößert vom Fluchtpunkt aus überblenden (Mitte bleibt scharf)
       function unschaerfe() {
-        if (v < 12 || !PUF || leichtModus) return;
-        var st = Math.min(1, (v - 12) / 55), cx = W / 2 * DPR, cy = horizont * DPR;
+        if (v < 10 || !PUF) return;
+        var st = Math.min(1, (v - 10) / 45), cx = W / 2 * DPR, cy = horizont * DPR, stufen = leichtModus ? 2 : 4;
         pufG.drawImage(cvs, 0, 0);
         g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
         g.beginPath(); g.rect(0, (horizont - H * 0.06) * DPR, cvs.width, cvs.height); g.clip();
-        for (var i = 1; i <= 3; i++) { var z = 1 + 0.015 * st * i; g.globalAlpha = 0.42 * st / (i + 0.3); g.drawImage(PUF, cx - cx * z, cy - cy * z, cvs.width * z, cvs.height * z); }
+        for (var i = 1; i <= stufen; i++) { var z = 1 + 0.021 * st * i; g.globalAlpha = 0.48 * st / (i + 0.2); g.drawImage(PUF, cx - cx * z, cy - cy * z, cvs.width * z, cvs.height * z); }
         g.restore();
       }
       // Herbst: Blätter taumeln von den Bäumen, drehen und wenden sich und fliegen beim Fahren am Auto vorbei
@@ -1271,8 +1283,6 @@
         balken(bx, ky + kh * 0.55, bb, bh, zeit, zuSpaet ? ['#c9302c', '#ff6b5e'] : ['#d9a520', '#f4d35e'], 'Zeit', Math.max(0, Math.round((p.dauerDurchgangSek || 90) - uhr)) + ' s');
         // Kontrollleuchten und Blinker
         var symR = Math.min(kh * 0.08, bb * 0.06);
-        lampeSymbol(g, bx + bb * 0.06, ky + kh * 0.82, symR, 'tanken', !!(lampe && lampe.art === 'tanken' && !lampe.erledigt));
-        lampeSymbol(g, bx + bb * 0.22, ky + kh * 0.82, symR, 'oel', !!(lampe && lampe.art === 'oel' && !lampe.erledigt));
         lichtSymbol(g, bx + bb * 0.39, ky + kh * 0.82, symR, false, licht >= 1);
         lichtSymbol(g, bx + bb * 0.55, ky + kh * 0.82, symR, true, licht === 2);
         var bl = blinkerAktiv(), blink = Math.floor(uhr * 3) % 2;
@@ -1304,16 +1314,21 @@
           g.globalAlpha = 1 - at / 1.6; g.fillStyle = an2.n > 0 ? '#5fe08e' : '#ff6b5e';
           passText((an2.n > 0 ? '+' : '−') + Math.abs(an2.n), lbx + lbb * 0.8, lby - at * 40, lbb, lbh * 0.36); g.globalAlpha = 1;
         }
-        // Warnung, solange zu schnell gefahren wird
-        if (warnAn && Math.floor(uhr * 2.5) % 2 === 0) {
-          var wb = Math.min(W * 0.42, 360), wh = Math.max(34, H * 0.055), wx = W / 2 - wb / 2, wy = dt0 - wh - H * 0.03;
-          g.fillStyle = 'rgba(200,30,30,.92)'; rrect(g, wx, wy, wb, wh, wh / 2); g.fill();
-          g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 2; rrect(g, wx, wy, wb, wh, wh / 2); g.stroke();
-          var ts = wh * 0.62, tx = wx + wh * 0.62, ty = wy + wh / 2;
-          g.fillStyle = '#ffd60a'; g.beginPath(); g.moveTo(tx, ty - ts * 0.5); g.lineTo(tx + ts * 0.55, ty + ts * 0.45); g.lineTo(tx - ts * 0.55, ty + ts * 0.45); g.closePath(); g.fill();
-          g.fillStyle = '#1b1b1b'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '900 ' + Math.round(ts * 0.7) + 'px -apple-system, Helvetica, sans-serif'; g.fillText('!', tx, ty + ts * 0.08);
-          g.fillStyle = '#fff'; passText('Geschwindigkeit zu hoch', wx + wb / 2 + wh * 0.3, ty, wb - wh * 1.6, wh * 0.46);
-        }
+        warnungZeichnen();
+      }
+      // Warnung „Achtung, zu schnell“: oben in der Scheibe, gut sichtbar, pulsiert, solange das Limit überschritten ist
+      function warnungZeichnen() {
+        if (!warnAn) return;
+        var puls = 0.78 + 0.22 * Math.sin(uhr * 7);
+        var wb = Math.min(W * 0.62, 560), wh = Math.max(44, H * 0.075), wx = W / 2 - wb / 2, wy = H * 0.2;
+        g.save(); g.globalAlpha = puls;
+        g.fillStyle = 'rgba(206,28,28,.95)'; rrect(g, wx, wy, wb, wh, wh / 2); g.fill();
+        g.strokeStyle = '#fff'; g.lineWidth = 3; rrect(g, wx, wy, wb, wh, wh / 2); g.stroke();
+        var ts = wh * 0.66, tx = wx + wh * 0.66, ty = wy + wh / 2;
+        g.fillStyle = '#ffd60a'; g.beginPath(); g.moveTo(tx, ty - ts * 0.52); g.lineTo(tx + ts * 0.58, ty + ts * 0.46); g.lineTo(tx - ts * 0.58, ty + ts * 0.46); g.closePath(); g.fill();
+        g.fillStyle = '#1b1b1b'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '900 ' + Math.round(ts * 0.72) + 'px -apple-system, Helvetica, sans-serif'; g.fillText('!', tx, ty + ts * 0.08);
+        g.fillStyle = '#fff'; passText('Achtung, zu schnell! ' + Math.round(v) + ' statt ' + soll + ' km/h', wx + wb / 2 + wh * 0.3, ty, wb - wh * 1.7, wh * 0.44);
+        g.restore();
       }
       function passText(text, x, y, maxB, gr) {
         var f = Math.round(gr); g.font = '700 ' + f + 'px -apple-system, Helvetica, sans-serif';
@@ -1330,6 +1345,7 @@
         g.fillStyle = 'rgba(13,19,22,.75)'; rrect(g, 14, 14, Math.min(320, W * 0.4), 70, 12); g.fill();
         balken(28, 40, Math.min(290, W * 0.36), 8, weg, ['#1BA8B5', '#4fd2dc'], 'Weg', Math.max(0, Math.round(plan.laenge - s)) + ' m');
         balken(28, 68, Math.min(290, W * 0.36), 8, zeit, zeit > weg + 0.08 ? ['#c9302c', '#ff6b5e'] : ['#d9a520', '#f4d35e'], 'Zeit', Math.max(0, Math.round((p.dauerDurchgangSek || 90) - uhr)) + ' s');
+        warnungZeichnen();
       }
 
       function schritt(dt) {
@@ -1341,11 +1357,12 @@
         regenI += (regenZiel - regenI) * Math.min(1, dt * 0.12);
         var nassZiel = Math.min(1, regenI * 1.5); nass += (nassZiel - nass) * Math.min(1, dt * (nassZiel > nass ? 0.25 : 0.03));
         var gas = halten.gas || tasten.hoch || uhr < gasBis, bremse = halten.bremse || tasten.runter || uhr < bremseBis;
-        // Weich ansprechende Pedale; die Beschleunigung nimmt mit dem Tempo ab (0 auf 50 in etwa 7 s), ohne Gas rollt der Wagen langsam aus
+        // Weich ansprechende Pedale; die Beschleunigung nimmt mit dem Tempo ab
         gasP += ((gas && !bremse ? 1 : 0) - gasP) * Math.min(1, dt * 4.5);
         bremsP += ((bremse ? 1 : 0) - bremsP) * Math.min(1, dt * 9);
-        v += (gasP * 9.5 * (1 - v / 150) - bremsP * 34 - 1.1 - v * 0.016) * dt;
-        if (v < 0) v = 0; if (v > 130) v = 130;
+        // 0 → 50 km/h in etwa 4,5 s, 50 → 100 in etwa 7 s; ohne Gas rollt der Wagen aus, Bremse kräftig
+        v += (gasP * 14 * (1 - v / 185) - bremsP * 36 - 0.8 - v * 0.008) * dt;
+        if (v < 0) v = 0; if (v > 150) v = 150;
         s += (v / 3.6) * dt;
         // Leichtes Lenken zum Ausweichen; ohne Taste führt der Spurhalter zurück in die Spurmitte
         var lenk = ((halten.rechts || tasten.rechts) ? 1 : 0) - ((halten.links || tasten.links) ? 1 : 0);
