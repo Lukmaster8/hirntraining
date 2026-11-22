@@ -82,7 +82,7 @@
       f.el.insertBefore(HT.el('div', { class: 'feld-label', style: { gridColumn: '1 / -1', marginBottom: '-.4rem' } }, 'Formulierungshilfen – antippen zum Übernehmen:'), f.inputs.titel.inp.parentNode);
       f.el.insertBefore(hilfe, f.inputs.titel.inp.parentNode);
       hilfeZeigen();
-      return UI.dialog({ titel: neu ? 'Neues Therapieziel' : 'Therapieziel bearbeiten', inhalt: f.el, breit: true, knoepfe: [{ text: HT.t('abbrechen'), wert: null }, { text: HT.t('speichern'), art: 'primaer', aktion: function () {
+      return UI.dialog({ fokusFeld: true, titel: neu ? 'Neues Therapieziel' : 'Therapieziel bearbeiten', inhalt: f.el, breit: true, knoepfe: [{ text: HT.t('abbrechen'), wert: null }, { text: HT.t('speichern'), art: 'primaer', aktion: function () {
         if (!f.pruefen()) return false;
         var w = f.werte();
         var obj = HT.zusammen(z, w);

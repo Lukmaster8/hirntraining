@@ -40,7 +40,7 @@
       }
       function laden(liste, regal, zettel) {
         HT.leeren(zone);
-        var oben = HT.el('div', { style: { display: 'flex', gap: '1.2rem', alignItems: 'flex-start', width: '100%', justifyContent: 'center', flexWrap: 'wrap' } });
+        var oben = HT.el('div', { class: 'ht-reihe-m', style: { display: 'flex', alignItems: 'flex-start', width: '100%', justifyContent: 'center', flexWrap: 'wrap' } });
         if (zettel) oben.appendChild(HT.el('div', { html: zettel }));
         var r = HT.el('div', { class: 'ek-regal', style: { gridTemplateColumns: 'repeat(' + (container.clientWidth < 600 ? 3 : p.regal <= 12 ? 4 : 5) + ', minmax(0, 1fr))', maxWidth: zettel ? '640px' : '860px' } });
         var wagen = [];

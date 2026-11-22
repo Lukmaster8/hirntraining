@@ -1,0 +1,52 @@
+HIRNTRAINING – START AUF DEM iMAC (2012, macOS High Sierra) UND AM iPAD
+=====================================================================
+
+1) AUF DEN iMAC KOPIEREN
+   - Den ganzen Ordner „Hirntraining“ (z. B. per USB-Stick) auf den Schreibtisch des iMac kopieren.
+   - Ein Internet ist nicht nötig. Es wird nichts installiert.
+
+2) STARTEN
+   - Doppelklick auf „Hirntraining starten“ (das Programm-Symbol mit dem Gehirn) im Ordner.
+     Es öffnet index.html in Google Chrome (falls installiert), sonst in Safari.
+   - Schreibtisch-Verknüpfung: „Hirntraining starten“ mit gedrückter cmd- und alt-Taste auf den
+     Schreibtisch ziehen (dann entsteht ein Alias), oder rechte Maustaste → „Alias erzeugen“ und den
+     Alias auf den Schreibtisch legen. Ins Dock ziehen geht auch.
+   - Falls macOS beim ersten Start warnt („nicht verifizierter Entwickler“): rechte Maustaste auf
+     „Hirntraining starten“ → „Öffnen“ → „Öffnen“. Das ist nur einmal nötig.
+   - Alternativ: index.html direkt mit Chrome oder Safari öffnen.
+
+3) REHACOM-PULT (USB-A)
+   - Das HASOMED-RehaCom-Pult einfach in einen USB-A-Anschluss des iMac stecken. Ein Treiber ist nicht nötig.
+   - Das Pult meldet sich wie eine Tastatur. Sobald eine Pult-Taste gedrückt wird, zeigt das Programm
+     „RehaCom-Pult erkannt“.
+   - Ohne Einrichtung gelten sofort: Pfeiltasten, grüne OK-Tasten, Zifferntasten, Gelb „+“ = Anleitung
+     noch einmal vorlesen, Rot „−“ = Pause. (Belegungsprofil „Ja/Nein“: Gelb = Ja, Rot = Nein.)
+   - Zum genauen Anlernen jeder Taste: oben auf „Pult“ klicken → „Tasten einrichten“.
+   - Am iPad: Pult über einen USB-Adapter (USB-A auf Lightning/USB-C) anschließen. Es funktioniert dort genauso
+     als Tastatur.
+
+4) AM iPAD
+   - Am iPad lassen sich lokale HTML-Dateien nicht starten. Dort die Online-Fassung in Safari öffnen:
+     https://lukmaster8.github.io/hirntraining/
+   - Teilen-Symbol → „Zum Home-Bildschirm“. Danach liegt ein Hirntraining-Symbol auf dem Home-Bildschirm,
+     und das Programm läuft auch ohne Internet.
+   - Die Online-Fassung enthält nur das Programm, keine Patientendaten. Die Daten bleiben auf dem iPad.
+
+5) WO WERDEN DIE DATEN GESPEICHERT?
+   - Patientendaten, Pläne und Ergebnisse liegen NICHT im Ordner „Hirntraining“, sondern im Speicher
+     des Browsers auf genau diesem Gerät (iMac: im Benutzerprofil von Chrome bzw. Safari; iPad: in Safari).
+   - Sie werden VERSCHLÜSSELT gespeichert (AES-256). Geöffnet werden sie nur nach der Anmeldung mit
+     Therapeuten-PIN. Beim Abmelden oder Schließen sind sie wieder gesperrt.
+   - Chrome und Safari haben jeweils einen eigenen Speicher. Immer denselben Browser verwenden.
+   - Datensicherung: Verwaltung → Sicherung → „Sicherung erstellen“. Die Datei (.htsich, mit Passwort
+     verschlüsselt) landet im Ordner „Downloads“. Bitte regelmäßig auf einen USB-Stick kopieren.
+     Damit lassen sich die Daten auch auf ein anderes Gerät übertragen (Sicherung → „Wiederherstellen“).
+   - Den Ordner „Hirntraining“ kann man jederzeit durch eine neue Version ersetzen. Die Daten bleiben
+     erhalten, solange derselbe Browser auf demselben Benutzerkonto genutzt wird.
+
+6) SICHERHEIT – EMPFEHLUNGEN
+   - Am iMac ein Benutzerpasswort setzen und FileVault einschalten
+     (Systemeinstellungen → Sicherheit → FileVault).
+   - Therapeuten-PINs mit 6 oder mehr Ziffern verwenden.
+   - Das Programm sperrt sich nach einigen Minuten ohne Bedienung (Einstellung unter Verwaltung → Datenschutz).
+   - Sicherungsdateien nie unverschlüsselt weitergeben und nicht in Cloud-Ordner legen.

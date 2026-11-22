@@ -59,3 +59,13 @@ Jedes Modul lässt sich in der Bibliothek über **Ausprobieren** auf jedem Level
 
 ## Therapeutische Zusatzdaten
 `data/modulinfo.js` enthält je Modul Indikation, ICF-Kodes, Therapiehinweise und Alltagsbezug (`HT.modulInfo(id)`). Für ein neues Modul dort einen Eintrag ergänzen.
+
+## Pult, Eingaben und Bühne (Stand 22.11.2026)
+* **Pult-Aktionen** (`core/pult.js`): `ok`, `ja`, `nein`, `hoch`, `runter`, `links`, `rechts`, `anleitung` (wie „+“), `pause` (wie „−“). Tastatur-Modus über `ev.code` (immer verfügbar), WebHID nur für Joystick. Profile `klassisch`/`janein` in `einstellungen().pult.profil`. Sitzungs-API: `HT.session.anleitungWiederholen()`, `HT.session.pauseOeffnen()`, `HT.session.modulLaeuft()`.
+* **`eingaben: ['ja','nein']`** im Modul: Gelb/Rot werden während des Moduls automatisch Ja/Nein; im Training erscheint der Ja/Nein-Hinweis. **`wiederholung: true`**: gehaltene Pfeil-Pulttasten wiederholen (400 ms, dann alle 150 ms).
+* **`ctx.buehne = { b, h, einheit }`** (einheit = 1 % der kürzeren Bühnenseite). Richtwerte: Reize ≥ 18 einheit, Text ≥ 32 px, Antwortknöpfe ≥ 64 px.
+* **Leistungsmodus** (`HT.leistung`, `HT.leicht()`): beim Start 30 Bilder messen; mittlere Bildzeit > 22 ms → `html.leicht` (keine großen Schatten, keine Deko-Animation, Vorschau nur bei Hover). Einstellung *Darstellung: Automatisch | Schön | Leicht*. `html.ruhig` = Animationen reduzieren.
+* **Bewegungsunschärfe**: `HT.bewegungsUnschaerfe.canvas(ctx, vx, vy, zeichne)` und `.element(el)` (SVG-Filter, nicht in Safari, nicht bei „Bewegung reduzieren“).
+* **Screening** (`core/screening.js`): Sitzung mit `screening: { id }` → feste Parameter, ein Durchgang je Test, kein adaptives Level; Runs tragen `screening` und `screeningTest`. Versteckte Module (`versteckt: true`, z. B. `gesichtsfeld-check`) erscheinen nicht in Listen.
+* **Datenschutz** (`core/sicherheit.js`): `HT.krypto` (PBKDF2, AES-GCM, JS-Ersatz für SHA-256/PBKDF2), `HT.audit(aktion, patient)`, `HT.sperre`. Store `audit` (IndexedDB-Version 2, Migration über `onupgradeneeded`).
+* **ES2017-Prüfung**: `npx acorn --ecma2017 --silent <datei>` für jede geänderte JS-Datei. Gesamttest: `python3 tools/test_alle_module.py` (Playwright, Chromium + WebKit).

@@ -31,8 +31,9 @@
       var p = ctx.params, Z = HT.zeit, aus = [];
       var zone = HT.m.neu(container, 'm-zentrum');
       var anw = HT.m.neu(zone, 'm-anweisung', p.regel === 'wiederholung' ? 'Reagieren, wenn derselbe Ton <b>zweimal hintereinander</b> kommt' : 'Reagieren beim <b>hohen</b> Ton');
-      var lsp = HT.m.neu(zone, 'm-symbol', lautsprecher(false), { width: '220px', height: '220px', cursor: 'pointer' });
-      var info = HT.m.neu(zone, 'm-anweisung', '', { marginTop: '1rem', fontSize: '1rem' });
+      var lg = Math.round(Math.max(220, 30 * (ctx.buehne ? ctx.buehne.einheit : 7)));
+      var lsp = HT.m.neu(zone, 'm-symbol', lautsprecher(false), { width: lg + 'px', height: lg + 'px', cursor: 'pointer' });
+      var info = HT.m.neu(zone, 'm-anweisung', '', { marginTop: '1rem', fontSize: '1.3rem' });
       var tief = 440, hoch = 440 * Math.pow(2, p.halbtoene / 12), mitte = 440 * Math.pow(2, (p.halbtoene / 2) / 12);
       var vorher = null, aktuell = null, timer = null;
       function ton() {

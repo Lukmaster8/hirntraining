@@ -1,0 +1,17 @@
+#!/bin/bash
+# Startet Hirntraining (index.html) im Browser – ohne Internet, ohne Installation.
+# Sucht den Programmordner: neben diesem Starter, sonst auf dem Schreibtisch, in Dokumente oder Programme.
+APP="$(cd "$(dirname "$0")/../.." && pwd)"
+for D in "$(dirname "$APP")" "$HOME/Desktop/Hirntraining" "$HOME/Schreibtisch/Hirntraining" "$HOME/Documents/Hirntraining" "/Applications/Hirntraining" "/Users/Shared/Hirntraining"; do
+  if [ -f "$D/index.html" ]; then F="$D/index.html"; break; fi
+done
+if [ -z "$F" ]; then
+  osascript -e 'display dialog "Der Ordner „Hirntraining“ wurde nicht gefunden. Bitte den Ordner auf den Schreibtisch legen." buttons {"OK"} with icon caution' >/dev/null 2>&1
+  exit 1
+fi
+# Chrome bevorzugt (Pult per USB-HID möglich), sonst Safari / Standardbrowser
+if [ -d "/Applications/Google Chrome.app" ] || [ -d "$HOME/Applications/Google Chrome.app" ]; then
+  open -a "Google Chrome" "$F"
+else
+  open "$F"
+fi

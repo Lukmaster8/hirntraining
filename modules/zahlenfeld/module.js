@@ -21,7 +21,8 @@
         if (p.wechsel) { for (var k = 0; folge.length < n; k++) { folge.push(String(k + 1)); if (folge.length < n) folge.push(BUCHST[k]); } }
         else for (var j = 1; j <= n; j++) folge.push(String(j));
         var anz = HT.m.neu(zone, 'm-anweisung', 'Suchen Sie: <b>' + folge[0] + '</b>');
-        var gr = Math.max(34, Math.min(76, Math.floor(Math.min(container.clientWidth - 40, container.clientHeight - 110) / p.raster) - 8));
+        var eh = ctx.buehne ? ctx.buehne.einheit : Math.min(container.clientWidth, container.clientHeight) / 100;
+        var gr = Math.max(48, Math.min(Math.round(18 * eh), Math.floor(Math.min(container.clientWidth - 40, container.clientHeight - 130) / p.raster) - 8));
         var feld = HT.el('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(' + p.raster + ', ' + gr + 'px)', gap: '8px' } });
         var idx = 0, t = Z.jetzt();
         HT.zufall.mischen(folge).forEach(function (z, pos) {

@@ -15,6 +15,7 @@
     tasten: [], levels: levels,
     levelLabels: { kategorien: 'Oberbegriffe', material: 'Material', aehnlich: 'Ähnliche Oberbegriffe', zeitlimitSek: 'Zeitlimit (s)' },
     create: function (container, ctx) {
+      var kg = Math.round(Math.max(220, Math.min(30 * (ctx.buehne ? ctx.buehne.einheit : 7), 320)));
       var p = ctx.params, zaehler = 0, kats = null;
       function neueKategorien() {
         if (p.material === 'bilder' || p.material === 'gemischt') {
@@ -30,7 +31,7 @@
           if (!kats || zaehler++ % 8 === 0) kats = neueKategorien();
           var k = HT.zufall.wahl(kats), inhalt, reiz;
           var alsBild = k.bild && (p.material === 'bilder' || HT.zufall.chance(0.5));
-          if (alsBild) { var b = HT.zufall.wahl(HT.bilderVon(k.bild)); inhalt = '<div class="m-kachel" style="width:220px;height:220px">' + HT.bild(b) + '</div>'; reiz = b.name; }
+          if (alsBild) { var b = HT.zufall.wahl(HT.bilderVon(k.bild)); inhalt = '<div class="m-kachel" style="width:' + kg + 'px;height:' + kg + 'px">' + HT.bild(b) + '</div>'; reiz = b.name; }
           else {
             var woerter = HT.data.wortKategorien[k.name] || [];
             if (k.bild && !woerter.length) woerter = HT.bilderVon(k.bild).map(function (x) { return x.name; });

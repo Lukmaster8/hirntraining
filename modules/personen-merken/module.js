@@ -27,7 +27,7 @@
           var x = leute[i++];
           HT.m.neu(zone, 'm-anweisung', 'Person ' + i + ' von ' + leute.length);
           var info = '<div class="m-wort" style="font-size:2rem">' + HT.esc(x.name) + '</div>' + (p.merkmale >= 2 ? '<div style="font-size:1.3rem;margin-top:.6rem">arbeitet ' + HT.esc(x.beruf) + '</div>' : '') + (p.merkmale >= 3 ? '<div style="font-size:1.1rem;color:var(--text-2)">wohnt in ' + HT.esc(x.ort) + '</div>' : '');
-          HT.m.neu(zone, '', '<div style="display:flex;align-items:center;gap:1.4rem;flex-wrap:wrap;justify-content:center">' + gesicht(x.m, 200) + '<div style="text-align:center">' + info + '</div></div>');
+          HT.m.neu(zone, '', '<div class="ht-reihe" style="display:flex;align-items:center;flex-wrap:wrap;justify-content:center">' + gesicht(x.m, 200) + '<div style="text-align:center">' + info + '</div></div>');
           Z.nach(p.zeigeMs, zeigen);
         })();
       }

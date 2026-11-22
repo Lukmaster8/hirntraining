@@ -69,10 +69,17 @@
     ersatzStimme: false,
     _aktuell: null,
     aufnahmeVorhanden: function (text) { return !!(window.HT && HT.SPRACHAUDIO && HT.SPRACHAUDIO[String(text || '').trim()]); },
+    /* Zentrale Ansage: immer nur eine gleichzeitig (vorherige wird beendet), Lautstärke aus den Einstellungen,
+     * die letzte Ansage bleibt für „Ansage wiederholen“ gemerkt. Fehlt eine Datei oder ist sie defekt, wird ohne Absturz
+     * die Systemstimme genommen (sofern erlaubt) bzw. still weitergemacht; opt.danach wird in jedem Fall aufgerufen. */
+    letzteAnsage: null,
+    wiederholen: function () { if (A.letzteAnsage) return A.sprechen(A.letzteAnsage.text, A.letzteAnsage.opt); return false; },
     sprechen: function (text, opt) {
       opt = opt || {};
       if (!A.an || !A.sprache) return false;
       var schluessel = String(text || '').trim();
+      if (!schluessel) return false;
+      A.letzteAnsage = { text: schluessel, opt: { nurAufnahme: opt.nurAufnahme, element: opt.element } };
       var datei = window.HT && HT.SPRACHAUDIO && HT.SPRACHAUDIO[schluessel];
       if (datei) {
         try {
@@ -82,13 +89,27 @@
           A._aktuell = el;
           var mit = A.mitlesen(schluessel, opt.element, HT.SPRACHZEITEN && HT.SPRACHZEITEN[datei]);
           mit.audio(el);
-          el.addEventListener('ended', function () { mit.ende(); if (A._aktuell === el) A._aktuell = null; if (opt.danach) opt.danach(); });
+          var fertig = false;
+          var abschluss = function () { if (fertig) return; fertig = true; mit.ende(); if (A._aktuell === el) A._aktuell = null; if (opt.danach) opt.danach(); };
+          el.addEventListener('ended', abschluss);
+          el.addEventListener('error', function () {
+            // Datei fehlt oder ist defekt: Ersatzstimme oder still weiter – nie abstürzen
+            mit.ende(); if (A._aktuell === el) A._aktuell = null;
+            if (fertig) return; fertig = true;
+            if (!opt.nurAufnahme && A.ersatzStimme && A._systemstimme(text, opt)) return;
+            if (opt.danach) opt.danach();
+          });
           var pr = el.play();
           if (pr && pr.catch) pr.catch(function () { mit.ende(); /* Wiedergabe ohne Nutzeraktion blockiert */ });
           return true;
         } catch (e) { /* weiter mit Ersatz */ }
       }
       if (opt.nurAufnahme || !A.ersatzStimme) return false;
+      return A._systemstimme(text, opt);
+    },
+    _systemstimme: function (text, opt) {
+      opt = opt || {};
+      var schluessel = String(text || '').trim();
       if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) return false;
       try {
         A.stumm();

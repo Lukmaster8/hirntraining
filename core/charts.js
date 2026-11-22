@@ -22,7 +22,7 @@
     var c = HT.el('canvas');
     var tip = HT.el('div', { class: 'diagramm-tooltip' });
     wurzel.appendChild(c); wurzel.appendChild(tip);
-    var dpr = window.devicePixelRatio || 1;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var breite = Math.max(260, wurzel.clientWidth || 600);
     c.width = breite * dpr; c.height = hoehe * dpr;
     c.style.height = hoehe + 'px';

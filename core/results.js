@@ -229,7 +229,11 @@
     var alt = HT.$('.lv-druck'); if (alt) alt.remove();
     var halter = HT.el('div', { class: 'lv-druck', html: html });
     app.appendChild(halter);
-    setTimeout(function () { window.print(); setTimeout(function () { halter.remove(); }, 800); }, 150);
+    document.body.classList.add('lv-druck-aktiv');
+    HT.audit('Bericht drucken (Levelverlauf)', p);
+    var nachDruck = function () { document.body.classList.remove('lv-druck-aktiv'); halter.remove(); window.removeEventListener('afterprint', nachDruck); };
+    window.addEventListener('afterprint', nachDruck);
+    setTimeout(function () { window.print(); setTimeout(function () { if (document.body.classList.contains('lv-druck-aktiv')) nachDruck(); }, 1500); }, 150);
   }
 
   /* ---------- Selbsteinschätzung: Befinden vor/nach im Zeitverlauf + Vergleich mit der Leistung ---------- */

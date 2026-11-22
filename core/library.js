@@ -24,7 +24,8 @@
     }
     if (immer) requestAnimationFrame(an);
     else if (window.IntersectionObserver) {
-      // Animation läuft automatisch, sobald die Karte sichtbar ist (und stoppt außerhalb des Bildschirms)
+      // Animation läuft automatisch, sobald die Karte sichtbar ist (und stoppt außerhalb des Bildschirms) –
+      // auch im Leicht-Modus: es laufen nur die sichtbaren Karten, die Bildwechsel sind sparsam (SVG-Einzelbilder)
       sichtbarkeit().observe(v);
       v._an = an; v._aus = aus;
       // zusätzlich sofort starten, falls die Karte schon sichtbar ist (unabhängig vom Beobachter)
@@ -88,6 +89,38 @@
   document.addEventListener('scroll', popVerbergen, true);
   HT.vorschauVerbergen = popVerbergen;
 
+  /* Vorladen im Hintergrund (nach Programmstart und Anmeldung): jede Vorschau-Animation wird einmal unsichtbar
+   * aufgebaut (Grafiken, Schriften, Bilder landen im Zwischenspeicher), danach werden die Ansagen vorgepuffert.
+   * Läuft in kleinen Schritten in Leerlaufzeiten, damit die Bedienung nicht stockt. Beim Öffnen ist dann alles sofort da. */
+  var vorgeladen = false, audioPuffer = [];
+  function leerlauf(fn) { if (window.requestIdleCallback) window.requestIdleCallback(fn, { timeout: 400 }); else setTimeout(fn, 25); }
+  HT.vorladen = function () {
+    if (vorgeladen || !HT.Module || !HT.Module.liste.length) return;
+    vorgeladen = true;
+    var box = HT.el('div', { class: 'vorlade-box', 'aria-hidden': 'true' });
+    document.body.appendChild(box);
+    var liste = HT.Module.liste.filter(function (m) { return m.preview; }), i = 0;
+    function naechstes() {
+      if (HT.session && HT.session.laeuft) { setTimeout(naechstes, 1500); return; } // während eines Trainings nichts tun
+      if (i >= liste.length) { if (box.parentNode) box.parentNode.removeChild(box); leerlauf(audioVorladen); return; }
+      var m = liste[i++], innen = HT.el('div', { class: 'm-voll' }), stop = null;
+      box.appendChild(innen);
+      try { stop = m.preview(innen); } catch (e) { stop = null; }
+      setTimeout(function () { try { if (typeof stop === 'function') stop(); } catch (e) { /* egal */ } HT.leeren(box); leerlauf(naechstes); }, 80);
+    }
+    function audioVorladen() {
+      if (!HT.SPRACHAUDIO || !window.Audio) return;
+      var gesehen = {}, dateien = Object.keys(HT.SPRACHAUDIO).map(function (k) { return HT.SPRACHAUDIO[k]; })
+        .filter(function (d) { if (gesehen[d]) return false; gesehen[d] = true; return !/\/(wortlisten|lesetraining)\//.test(d); });
+      var j = 0;
+      (function weiter() {
+        for (var n = 0; n < 6 && j < dateien.length; n++, j++) { try { var a = new Audio(); a.preload = 'auto'; a.src = dateien[j]; audioPuffer.push(a); } catch (e) { /* egal */ } }
+        if (j < dateien.length) leerlauf(weiter);
+      })();
+    }
+    leerlauf(naechstes);
+  };
+
   /* Karte „Therapeutische Einordnung“ (auch in der Patientenakte genutzt) */
   HT.therapieKarte = function (id) {
     var info = HT.modulInfo(id);
@@ -110,7 +143,7 @@
   HT.route('/module', function (param, w) {
     if (beobachter) { beobachter.disconnect(); }
     var inaktiv = HT.kopie(S.einstellungen().moduleInaktiv || {});
-    w.appendChild(UI.seite(HT.t('nav_module'), HT.Module.liste.length + ' Trainingsmodule in ' + HT.KATEGORIEN.length + ' Bereichen · Die Vorschau zeigt, wie jedes Modul funktioniert'));
+    w.appendChild(UI.seite(HT.t('nav_module'), HT.Module.liste.filter(function (m) { return !m.versteckt; }).length + ' Trainingsmodule in ' + HT.KATEGORIEN.length + ' Bereichen · Die Vorschau zeigt, wie jedes Modul funktioniert'));
     var leiste = HT.el('div', { class: 'werkzeugleiste' });
     var such = HT.el('div', { class: 'suchfeld', html: HT.icon('suche') });
     var inp = HT.el('input', { type: 'search', placeholder: 'Modul suchen …' });
@@ -160,7 +193,7 @@
       var t = inp.value.toLowerCase();
       try { localStorage.setItem('ht-modulsort', sortSel.value); } catch (e) { /* egal */ }
       if (sortSel.value !== 'kategorie') {
-        var mods = HT.Module.liste.filter(function (m) { return (!katSel.value || m.kategorie === katSel.value) && (!t || (m.name + ' ' + m.ziel + ' ' + m.beschreibung + ' ' + HT.modulKuerzel(m)).toLowerCase().indexOf(t) >= 0); });
+        var mods = HT.Module.liste.filter(function (m) { return !m.versteckt && (!katSel.value || m.kategorie === katSel.value) && (!t || (m.name + ' ' + m.ziel + ' ' + m.beschreibung + ' ' + HT.modulKuerzel(m)).toLowerCase().indexOf(t) >= 0); });
         mods.sort(sortSel.value === 'nutzung' ? function (a, b) { return (nutzung[b.id] || 0) - (nutzung[a.id] || 0) || a.name.localeCompare(b.name); } : function (a, b) { return a.name.localeCompare(b.name); });
         var g0 = HT.el('div', { class: 'raster raster-auto' });
         mods.forEach(function (m) { g0.appendChild(karteBauen(m)); });
@@ -170,9 +203,9 @@
       }
       HT.KATEGORIEN.forEach(function (kat) {
         if (katSel.value && katSel.value !== kat.id) return;
-        var mods = HT.Module.liste.filter(function (m) { return m.kategorie === kat.id && (!t || (m.name + ' ' + m.ziel + ' ' + m.beschreibung).toLowerCase().indexOf(t) >= 0); });
+        var mods = HT.Module.liste.filter(function (m) { return !m.versteckt && m.kategorie === kat.id && (!t || (m.name + ' ' + m.ziel + ' ' + m.beschreibung).toLowerCase().indexOf(t) >= 0); });
         if (!mods.length) return;
-        bereich.appendChild(HT.el('div', { class: 'kategorie-kopf', html: '<div class="kategorie-punkt" style="background:' + kat.farbe + '">' + HT.icon(kat.icon) + '</div><h2>' + HT.esc(kat.name) + '</h2>' + UI.abzeichen(mods.length + ' Module').outerHTML }));
+        bereich.appendChild(HT.el('div', { class: 'kategorie-kopf', html: '<div class="kategorie-illu">' + (HT.illustration ? HT.illustration(kat.id) : '') + '</div><h2>' + HT.esc(kat.name) + '</h2>' + UI.abzeichen(mods.length + ' Module').outerHTML }));
         var g = HT.el('div', { class: 'raster raster-auto' });
         mods.forEach(function (m) { g.appendChild(karteBauen(m)); });
         bereich.appendChild(g);

@@ -91,7 +91,7 @@
     w.appendChild(HT.el('div', { class: 'brotkrumen', html: '<a href="#/patienten">Patienten</a> / <a href="#/patient/' + p.id + '/berichte">' + HT.esc(HT.patienten.anzeigename(p)) + '</a> / Bericht' }));
     w.appendChild(UI.seite('Bericht', null, [
       UI.knopf('Zurück', { icon: 'links', klick: function () { location.hash = '#/patient/' + p.id + '/berichte'; } }),
-      UI.knopf('Drucken / PDF', { art: 'primaer', icon: 'drucker', klick: function () { window.print(); } })
+      UI.knopf('Drucken / PDF', { art: 'primaer', icon: 'drucker', klick: function () { HT.audit('Bericht drucken', p); window.print(); } })
     ]));
     var layout = HT.el('div', { class: 'bericht-layout' });
     var optionen = UI.karte('Optionen', null, { klasse: 'bericht-optionen', icon: 'filter' });

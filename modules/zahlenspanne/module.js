@@ -15,7 +15,8 @@
     levelLabels: { laenge: 'Länge', tempoMs: 'Tempo (ms)', rueckwaerts: 'Rückwärts' },
     parameterSchema: {
       richtung: { typ: 'auswahl', label: 'Richtung', standard: 'level', optionen: [{ wert: 'level', label: 'Nach Level' }, { wert: 'vorwaerts', label: 'Immer vorwärts' }, { wert: 'rueckwaerts', label: 'Immer rückwärts' }] },
-      vorlesen: { typ: 'schalter', label: 'Ziffern vorlesen (falls Systemstimme vorhanden)', standard: false }
+      vorlesen: { typ: 'schalter', label: 'Ziffern vorlesen (falls Systemstimme vorhanden)', standard: false },
+      spanneTest: { typ: 'schalter', label: 'Spannentest (Länge passt sich an, für das Screening)', standard: false }
     },
     create: function (container, ctx) {
       var p = ctx.params, Z = HT.zeit, aus = null;
@@ -25,7 +26,7 @@
       var anzeige = HT.m.neu(zone, 'm-text-gross', '', { fontSize: '7rem', minHeight: '9rem', display: 'flex', alignItems: 'center' });
       var eingabeEl = HT.m.neu(zone, 'm-eingabe-anzeige');
       var block = HT.m.neu(zone, 'm-ziffernblock');
-      var folge = [], eingabe = '', phase = 'zeigen', start = 0;
+      var folge = [], eingabe = '', phase = 'zeigen', start = 0, laenge = p.spanneTest ? 3 : p.laenge, fehlerInFolge = 0;
       ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', 'OK'].forEach(function (z) {
         var b = HT.el('button', { type: 'button', class: z === 'OK' ? 'ok' : '' }, z);
         HT.tap(b, function () { taste(z); });
@@ -34,9 +35,9 @@
       function sichtbar(eing) { eingabeEl.style.display = eing ? '' : 'none'; block.style.display = eing ? '' : 'none'; anzeige.style.display = eing ? 'none' : ''; }
       function runde() {
         phase = 'zeigen'; eingabe = ''; eingabeEl.textContent = '';
-        folge = []; for (var i = 0; i < p.laenge; i++) { var z; do { z = HT.zufall.int(0, 9); } while (i && z === folge[i - 1]); folge.push(z); }
+        folge = []; for (var i = 0; i < laenge; i++) { var z; do { z = HT.zufall.int(0, 9); } while (i && z === folge[i - 1]); folge.push(z); }
         sichtbar(false);
-        anw.innerHTML = 'Merken Sie sich <b>' + p.laenge + ' Ziffern</b>';
+        anw.innerHTML = 'Merken Sie sich <b>' + laenge + ' Ziffern</b>';
         anzeige.textContent = '';
         var k = 0;
         (function zeige() {
@@ -66,7 +67,8 @@
         phase = 'ende';
         var soll = (rueck ? folge.slice().reverse() : folge).join('');
         var ok = eingabe === soll;
-        ctx.onEvent({ korrekt: ok, reiz: folge.join(''), reaktion: eingabe, rtMs: (Z.jetzt() - start) / folge.length });
+        ctx.onEvent({ korrekt: ok, reiz: folge.join(''), reaktion: eingabe, rtMs: (Z.jetzt() - start) / folge.length, typ: rueck ? 'rueckwaerts' : 'vorwaerts' });
+        if (p.spanneTest) { if (ok) { laenge = Math.min(9, laenge + 1); fehlerInFolge = 0; } else if (++fehlerInFolge >= 2) { laenge = Math.max(2, laenge - 1); fehlerInFolge = 0; } }
         ctx.feedback(ok);
         if (!ok) anw.innerHTML = 'Richtig wäre: <b>' + soll + '</b>';
         Z.nach(ok ? 1000 : 2000, runde);

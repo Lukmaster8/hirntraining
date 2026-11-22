@@ -560,6 +560,8 @@
       }
       var licht = 0, quer = 0, querV = 0, gasP = 0, bremsP = 0, ruck = -9, blendung = 0, blendHinweisBis = 0, lichtHinweisBis = 7, letztDt = 0;
       var LM = null, lg = null, lgK = null, HGR = null, blaetter = [], wischT = 0, PUF = null, pufG = null, DPR = 1, leuchten = [], SR = { x: 0, y: 0, w: 0, h: 0 }, aktD = 0, aktA = 1;
+      // Leistungsmodus: weniger Effekte (keine Bewegungsunschärfe, Pixeldichte 1, weniger Regen/Laub, kürzere Sicht)
+      var leichtModus = !!(HT.leicht && HT.leicht()), bildzeitSumme = 0, bildzeitN = 0;
       var punkte = 0, punktAnim = [], warnAn = false, blitzZeit = -9, blitzE = null, huepfer = -9, waldF = 0;
       var striche = [], tropfen = [], tropfenRest = 0, wischAlt = 0.05, wischZyklus = -1, ton = null, pauseUhr = null;
 
@@ -802,7 +804,7 @@
 
       /* =================== Welt für die Darstellung =================== */
       // MJS = Meter je Segment: kleiner Wert = mehr Bewegung im Bild je km/h (50 km/h wirken zügiger)
-      var SEG = 200, STRASSE = 2000, M = 570, MJS = 1.1, SICHT = 270, KTIEFE = 1 / Math.tan(50 * Math.PI / 180), KAMERA_H = 1050;
+      var SEG = 200, STRASSE = 2000, M = 570, MJS = 1.1, SICHT = leichtModus ? 190 : 270, KTIEFE = 1 / Math.tan(50 * Math.PI / 180), KAMERA_H = 1050;
       var FELDER = HERBST ? [[150, 140, 70], [170, 122, 62], [124, 118, 64], [196, 158, 84], [142, 102, 70], [118, 128, 66]] : [[118, 178, 92], [104, 164, 80], [206, 184, 104], [226, 204, 92], [150, 120, 86], [132, 188, 98]];
       var TROCKEN = [104, 110, 116], NASS = [54, 59, 65];
       tageszeitSetzen(TZ);
@@ -853,7 +855,7 @@
         var r = flaeche.getBoundingClientRect(), b = Math.max(320, Math.round(r.width || 0)), h = Math.max(240, Math.round(r.height || 0));
         if (b === W && h === H) return;
         W = b; H = h;
-        var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        var dpr = leichtModus ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
         cvs.width = Math.round(b * dpr); cvs.height = Math.round(h * dpr); DPR = dpr;
         g.setTransform(dpr, 0, 0, dpr, 0, 0); g.imageSmoothingQuality = 'high';
         // Lichtkarte in halber Auflösung: Umgebungslicht + Scheinwerfer, Laternen, Ampeln; wird mit dem Bild multipliziert
@@ -974,7 +976,7 @@
       }
       // Bewegungsunschärfe: das Bild leicht vergrößert vom Fluchtpunkt aus überblenden (Mitte bleibt scharf)
       function unschaerfe() {
-        if (v < 12 || !PUF) return;
+        if (v < 12 || !PUF || leichtModus) return;
         var st = Math.min(1, (v - 12) / 55), cx = W / 2 * DPR, cy = horizont * DPR;
         pufG.drawImage(cvs, 0, 0);
         g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
@@ -993,7 +995,7 @@
         // Laub fällt nur im Wald; beim Hinausfahren verschwinden die Blätter nach und nach
         var vorne = welt[Math.min(welt.length - 1, Math.floor(s / MJS) + 25)], ziel = vorne && vorne.wald && !vorne.ort ? 1 : 0;
         waldF += (ziel - waldF) * Math.min(1, dt * 0.7);
-        var unten = p.cockpit !== false ? dashTop : H, sk = W / 1280, n = Math.round(50 * waldF * (1 - regenI * 0.4)), i, b;
+        var unten = p.cockpit !== false ? dashTop : H, sk = W / 1280, n = Math.round((leichtModus ? 22 : 50) * waldF * (1 - regenI * 0.4)), i, b;
         if (blaetter.length < n && Math.random() < dt * 30) blaetter.push(neuesBlatt(false));
         var wind = Math.sin(uhr * 0.4) * 30 + Math.sin(uhr * 1.3) * 12, zoom = v * 0.0055 * dt;
         for (i = 0; i < blaetter.length; i++) {
@@ -1008,7 +1010,7 @@
       }
       // Regen: Regenstriche, Tropfen auf der Scheibe und Scheibenwischer
       function regenZeichnen(dt) {
-        var unten = p.cockpit !== false ? dashTop : H, drift = v / 130, i, r, anz = Math.round(190 * regenI), sk = W / 1280;
+        var unten = p.cockpit !== false ? dashTop : H, drift = v / 130, i, r, anz = Math.round((leichtModus ? 80 : 190) * regenI), sk = W / 1280;
         if (striche.length > anz) striche.length = anz;
         while (striche.length < anz) striche.push({ x: Math.random() * W, y: Math.random() * unten, l: 10 + Math.random() * 18, sp: 0.9 + Math.random() * 0.6 });
         g.strokeStyle = DUNKEL > 0.5 ? 'rgba(160,172,195,.3)' : 'rgba(225,232,240,.4)'; g.lineWidth = 1; g.beginPath();
@@ -1333,6 +1335,8 @@
       function schritt(dt) {
         if (fertig) return;
         masse(); letztDt = dt;
+        // Automatisch leichter werden, wenn der Rechner die Bilder nicht schafft (Mittel über 3 s > 24 ms)
+        if (!leichtModus && uhr > 2) { bildzeitSumme += dt; bildzeitN++; if (bildzeitSumme > 3) { if (bildzeitSumme / bildzeitN > 0.024) { leichtModus = true; SICHT = 190; W = 0; } bildzeitSumme = 0; bildzeitN = 0; } }
         if (uhr > regenWechselBei) { regenWechselBei = 1e9; regenZiel = regenZiel ? 0 : 1; meldung(regenZiel ? 'Es fängt an zu regnen. Die Scheibenwischer laufen automatisch.' : 'Der Regen hört auf. Die Straße bleibt noch eine Weile nass.'); }
         regenI += (regenZiel - regenI) * Math.min(1, dt * 0.12);
         var nassZiel = Math.min(1, regenI * 1.5); nass += (nassZiel - nass) * Math.min(1, dt * (nassZiel > nass ? 0.25 : 0.03));

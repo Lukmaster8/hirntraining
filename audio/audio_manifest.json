@@ -1,0 +1,3732 @@
+{
+ "stimme": "Helmut",
+ "modell": "eleven_multilingual_v2",
+ "format": "mp3_44100_128",
+ "einstellungen": {
+  "stability": 0.5,
+  "similarity_boost": 0.75
+ },
+ "hinweis": "Nur feste Programmtexte – keine Patientendaten. Vorhandene Aufnahmen (status „vorhanden“) werden nicht neu erzeugt.",
+ "eintraege": [
+  {
+   "id": "befinden-stimmung",
+   "text": "Wie fühlen Sie sich heute?",
+   "datei": "audio/befinden-stimmung.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js befindenAbfragen()",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 26
+  },
+  {
+   "id": "befinden-wach",
+   "text": "Wie wach fühlen Sie sich?",
+   "datei": "audio/befinden-wach.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js befindenAbfragen()",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 25
+  },
+  {
+   "id": "befinden-anstrengung",
+   "text": "Wie anstrengend war das Training?",
+   "datei": "audio/befinden-anstrengung.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js befindenAbfragen()",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 33
+  },
+  {
+   "id": "befinden-jetzt",
+   "text": "Wie fühlen Sie sich jetzt?",
+   "datei": "audio/befinden-jetzt.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js befindenAbfragen()",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 26
+  },
+  {
+   "id": "pause",
+   "text": "Zeit für eine kurze Pause!",
+   "datei": "audio/pause.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js pausenhinweis()",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 26
+  },
+  {
+   "id": "pause-text",
+   "text": "Schließen Sie kurz die Augen, atmen Sie tief durch und lockern Sie die Schultern.",
+   "datei": "assets/audio/allgemein/pause-text.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js pausenhinweis() (nach der Pausenansage)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 81
+  },
+  {
+   "id": "uebung-fertig",
+   "text": "Prima! Die Übung ist geschafft. Jetzt beginnt das Training.",
+   "datei": "audio/uebung-fertig.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js uebungStarten()",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 59
+  },
+  {
+   "id": "lob-1",
+   "text": "Hervorragend!",
+   "datei": "audio/lob-1.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js modulErgebnis() (Lob nach jedem Modul)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 13
+  },
+  {
+   "id": "lob-ausgezeichnet-gemacht",
+   "text": "Ausgezeichnet gemacht!",
+   "datei": "assets/audio/allgemein/lob-ausgezeichnet-gemacht.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js modulErgebnis() (Lob nach jedem Modul)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 22
+  },
+  {
+   "id": "lob-super-leistung",
+   "text": "Super Leistung!",
+   "datei": "assets/audio/allgemein/lob-super-leistung.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js modulErgebnis() (Lob nach jedem Modul)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 15
+  },
+  {
+   "id": "lob-spitze",
+   "text": "Spitze!",
+   "datei": "assets/audio/allgemein/lob-spitze.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js modulErgebnis() (Lob nach jedem Modul)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "lob-2",
+   "text": "Gut gemacht!",
+   "datei": "audio/lob-2.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js modulErgebnis() (Lob nach jedem Modul)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 12
+  },
+  {
+   "id": "lob-3",
+   "text": "Weiter so!",
+   "datei": "audio/lob-3.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js modulErgebnis() (Lob nach jedem Modul)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 10
+  },
+  {
+   "id": "lob-schoene-leistung",
+   "text": "Schöne Leistung!",
+   "datei": "assets/audio/allgemein/lob-schoene-leistung.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js modulErgebnis() (Lob nach jedem Modul)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 16
+  },
+  {
+   "id": "lob-das-war-gut",
+   "text": "Das war gut!",
+   "datei": "assets/audio/allgemein/lob-das-war-gut.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js modulErgebnis() (Lob nach jedem Modul)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 12
+  },
+  {
+   "id": "lob-4",
+   "text": "Dranbleiben – das wird!",
+   "datei": "audio/lob-4.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js modulErgebnis() (Lob nach jedem Modul)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 23
+  },
+  {
+   "id": "lob-guter-einsatz",
+   "text": "Guter Einsatz!",
+   "datei": "assets/audio/allgemein/lob-guter-einsatz.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js modulErgebnis() (Lob nach jedem Modul)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 14
+  },
+  {
+   "id": "lob-jeder-durchgang-trainiert",
+   "text": "Jeder Durchgang trainiert!",
+   "datei": "assets/audio/allgemein/lob-jeder-durchgang-trainiert.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js modulErgebnis() (Lob nach jedem Modul)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 26
+  },
+  {
+   "id": "lob-nicht-aufgeben",
+   "text": "Nicht aufgeben!",
+   "datei": "assets/audio/allgemein/lob-nicht-aufgeben.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js modulErgebnis() (Lob nach jedem Modul)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 15
+  },
+  {
+   "id": "sitzung-fertig",
+   "text": "Super – Sitzung geschafft!",
+   "datei": "audio/sitzung-fertig.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js abschluss()",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 26
+  },
+  {
+   "id": "verabschiedung",
+   "text": "Vielen Dank fürs Mitmachen. Bis zum nächsten Mal!",
+   "datei": "assets/audio/allgemein/verabschiedung.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js abschluss() im Patientenmodus",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 49
+  },
+  {
+   "id": "begruessung",
+   "text": "Schön, dass Sie da sind. Viel Freude beim Training!",
+   "datei": "assets/audio/allgemein/begruessung.mp3",
+   "modul": "allgemein",
+   "stelle": "core/vorgaben.js patientUebersicht()",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 51
+  },
+  {
+   "id": "nachricht",
+   "text": "Möchten Sie Ihrer Therapeutin oder Ihrem Therapeuten etwas mitteilen?",
+   "datei": "audio/nachricht.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js nachrichtAbfragen()",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 69
+  },
+  {
+   "id": "levelauf",
+   "text": "Sie sind eine Stufe aufgestiegen!",
+   "datei": "assets/audio/allgemein/levelauf.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js levelBanner()",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 33
+  },
+  {
+   "id": "levelab",
+   "text": "Wir machen jetzt etwas leichter weiter.",
+   "datei": "assets/audio/allgemein/levelab.mp3",
+   "modul": "allgemein",
+   "stelle": "core/session.js durchgangEnde() (Level gesenkt)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 39
+  },
+  {
+   "id": "fehlerfrei-hinweis",
+   "text": "Noch nicht ganz – schauen Sie noch einmal genau hin.",
+   "datei": "assets/audio/allgemein/fehlerfrei-hinweis.mp3",
+   "modul": "allgemein",
+   "stelle": "core/moduleApi.js HT.quiz (fehlerfreies Lernen)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 52
+  },
+  {
+   "id": "richtig",
+   "text": "Richtig!",
+   "datei": "assets/audio/allgemein/richtig.mp3",
+   "modul": "allgemein",
+   "stelle": "core/moduleApi.js HT.quiz (Korrektur gelungen)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "ziffer-0",
+   "text": "0",
+   "datei": "audio/ziffer-0.mp3",
+   "modul": "allgemein",
+   "stelle": "modules/zahlenspanne (Ziffern vorlesen)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 4,
+   "sprechtext": "Null"
+  },
+  {
+   "id": "ziffer-1",
+   "text": "1",
+   "datei": "audio/ziffer-1.mp3",
+   "modul": "allgemein",
+   "stelle": "modules/zahlenspanne (Ziffern vorlesen)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 4,
+   "sprechtext": "Eins"
+  },
+  {
+   "id": "ziffer-2",
+   "text": "2",
+   "datei": "audio/ziffer-2.mp3",
+   "modul": "allgemein",
+   "stelle": "modules/zahlenspanne (Ziffern vorlesen)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 4,
+   "sprechtext": "Zwei"
+  },
+  {
+   "id": "ziffer-3",
+   "text": "3",
+   "datei": "audio/ziffer-3.mp3",
+   "modul": "allgemein",
+   "stelle": "modules/zahlenspanne (Ziffern vorlesen)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 4,
+   "sprechtext": "Drei"
+  },
+  {
+   "id": "ziffer-4",
+   "text": "4",
+   "datei": "audio/ziffer-4.mp3",
+   "modul": "allgemein",
+   "stelle": "modules/zahlenspanne (Ziffern vorlesen)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 4,
+   "sprechtext": "Vier"
+  },
+  {
+   "id": "ziffer-5",
+   "text": "5",
+   "datei": "audio/ziffer-5.mp3",
+   "modul": "allgemein",
+   "stelle": "modules/zahlenspanne (Ziffern vorlesen)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 4,
+   "sprechtext": "Fünf"
+  },
+  {
+   "id": "ziffer-6",
+   "text": "6",
+   "datei": "audio/ziffer-6.mp3",
+   "modul": "allgemein",
+   "stelle": "modules/zahlenspanne (Ziffern vorlesen)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 5,
+   "sprechtext": "Sechs"
+  },
+  {
+   "id": "ziffer-7",
+   "text": "7",
+   "datei": "audio/ziffer-7.mp3",
+   "modul": "allgemein",
+   "stelle": "modules/zahlenspanne (Ziffern vorlesen)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 6,
+   "sprechtext": "Sieben"
+  },
+  {
+   "id": "ziffer-8",
+   "text": "8",
+   "datei": "audio/ziffer-8.mp3",
+   "modul": "allgemein",
+   "stelle": "modules/zahlenspanne (Ziffern vorlesen)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 4,
+   "sprechtext": "Acht"
+  },
+  {
+   "id": "ziffer-9",
+   "text": "9",
+   "datei": "audio/ziffer-9.mp3",
+   "modul": "allgemein",
+   "stelle": "modules/zahlenspanne (Ziffern vorlesen)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 4,
+   "sprechtext": "Neun"
+  },
+  {
+   "id": "anleitung-reaktion",
+   "text": "Schauen Sie auf das leere Quadrat. Sobald es sich GRÜN füllt, drücken Sie so schnell wie möglich die Leertaste oder tippen auf das Quadrat. Füllt es sich ROT, nicht reagieren!",
+   "datei": "assets/audio/reaktion/anleitung-reaktion.mp3",
+   "modul": "reaktion",
+   "stelle": "modules/reaktion/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt (Text geändert – alte Aufnahme passt nicht mehr)",
+   "zeichen": 175
+  },
+  {
+   "id": "anleitung-wahlreaktion",
+   "text": "Drücken Sie die Taste, die zum Reiz gehört. Pfeile zeigen die Richtung. Bei Symbolen tippen Sie unten das gleiche Bild. Ein graues Zeichen und ein mittlerer Ton gehören zu keiner Taste – dann nichts drücken. Ab Level 9: hoher Ton ist links, tiefer Ton ist rechts.",
+   "datei": "assets/audio/wahlreaktion/anleitung-wahlreaktion.mp3",
+   "modul": "wahlreaktion",
+   "stelle": "modules/wahlreaktion/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 263
+  },
+  {
+   "id": "anleitung-daueraufmerksamkeit",
+   "text": "Oben sehen Sie Ihr Zielsymbol. In der Mitte erscheinen nacheinander verschiedene Symbole. Drücken Sie nur dann die Leertaste oder tippen auf das Symbol, wenn Ihr Zielsymbol erscheint.",
+   "datei": "assets/audio/daueraufmerksamkeit/anleitung-daueraufmerksamkeit.mp3",
+   "modul": "daueraufmerksamkeit",
+   "stelle": "modules/daueraufmerksamkeit/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 183
+  },
+  {
+   "id": "anleitung-vigilanz",
+   "text": "Pakete fahren auf dem Band vorbei. Drücken Sie die Leertaste nur dann, wenn ein abweichendes Paket im türkisen Fenster ist. Vor dem Fenster und dahinter nicht drücken.",
+   "datei": "assets/audio/vigilanz/anleitung-vigilanz.mp3",
+   "modul": "vigilanz",
+   "stelle": "modules/vigilanz/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 167
+  },
+  {
+   "id": "anleitung-selektive-aufmerksamkeit",
+   "text": "Oben sehen Sie das gesuchte Symbol. Klicken oder tippen Sie im Feld darunter auf ALLE gleichen Symbole. Wenn Sie alle gefunden haben, tippen Sie auf „Fertig“.",
+   "datei": "assets/audio/selektive-aufmerksamkeit/anleitung-selektive-aufmerksamkeit.mp3",
+   "modul": "selektive-aufmerksamkeit",
+   "stelle": "modules/selektive-aufmerksamkeit/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 158
+  },
+  {
+   "id": "anleitung-geteilte-aufmerksamkeit",
+   "text": "Zwei Aufgaben zugleich. Wird ein Kreis VOLL, drücken Sie F oder tippen links auf „Kreis“. Ist der Kreis nur ein Ring, nichts drücken. Hören Sie einen HOHEN Ton, drücken Sie J oder tippen rechts auf „Ton“. Beim tiefen Ton nichts drücken.",
+   "datei": "assets/audio/geteilte-aufmerksamkeit/anleitung-geteilte-aufmerksamkeit.mp3",
+   "modul": "geteilte-aufmerksamkeit",
+   "stelle": "modules/geteilte-aufmerksamkeit/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 236
+  },
+  {
+   "id": "anleitung-hoeren",
+   "text": "Hören Sie genau hin. Drücken Sie die Leertaste oder tippen Sie auf den Lautsprecher nur beim HOHEN Ton. Der tiefe und der mittlere Ton zählen nicht.",
+   "datei": "assets/audio/hoeren/anleitung-hoeren.mp3",
+   "modul": "hoeren",
+   "stelle": "modules/hoeren/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 148
+  },
+  {
+   "id": "anleitung-strassenverkehr",
+   "text": "Pfeil nach oben ist Gas, Pfeil nach unten ist Bremse. Halten Sie den Zeiger im grünen Bereich. Vor einem langsameren Schild schon abbremsen, nach einem schnelleren Schild erst beschleunigen. Halten Sie nur an, wenn wirklich etwas auf der Straße ist. Läuft ein Mensch oder Kind auf die Straße oder rollt ein Ball heran, sofort bremsen. Einem Tier können Sie auch mit Pfeil links oder rechts ausweichen. Fünf Sekunden im grünen Bereich bringen 10 Punkte, zu schnell kostet 5 Punkte. Achten Sie auf Blitzer. Bei einer Abbiege-Ansage zählt links oder rechts als Abbiegen. Leuchtet eine Lampe im Cockpit, drücken Sie OK. Die Plustaste nur bei der genannten Autobahn. Im Dunkeln schaltet L das Licht ein, F das Fernlicht. Bei Gegenverkehr abblenden.",
+   "datei": "assets/audio/strassenverkehr/anleitung-strassenverkehr.mp3",
+   "modul": "strassenverkehr",
+   "stelle": "modules/strassenverkehr/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 743
+  },
+  {
+   "id": "anleitung-alarm-strasse",
+   "text": "Schauen Sie auf die Straße. Sobald ein Tier, ein Auto oder ein Gegenstand auf der Fahrbahn erscheint, drücken Sie so schnell wie möglich die Leertaste oder tippen auf das Bild. Ist die Straße leer, nichts drücken.",
+   "datei": "assets/audio/alarm-strasse/anleitung-alarm-strasse.mp3",
+   "modul": "alarm-strasse",
+   "stelle": "modules/alarm-strasse/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 213
+  },
+  {
+   "id": "anleitung-zahlenfeld",
+   "text": "Tippen Sie die Zahlen der Reihe nach an: 1, 2, 3 und so weiter. Wenn angezeigt, abwechselnd Zahl und Buchstabe: 1, A, 2, B …",
+   "datei": "assets/audio/zahlenfeld/anleitung-zahlenfeld.mp3",
+   "modul": "zahlenfeld",
+   "stelle": "modules/zahlenfeld/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 124
+  },
+  {
+   "id": "anleitung-regel-reaktion",
+   "text": "Oben steht die Regel. Drücken Sie nur bei dem Bild, das die Regel nennt, und halten Sie sich bei allen anderen zurück. Wechselt der Rahmen die Farbe, gilt eine neue Regel.",
+   "datei": "assets/audio/regel-reaktion/anleitung-regel-reaktion.mp3",
+   "modul": "regel-reaktion",
+   "stelle": "modules/regel-reaktion/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 171
+  },
+  {
+   "id": "anleitung-arbeitsgedaechtnis",
+   "text": "Merken Sie sich, in welcher Reihenfolge die Punkte auf dem Kreis aufleuchten. Tippen Sie danach dieselben Punkte in derselben Reihenfolge an. Wenn „rückwärts“ angezeigt wird, beginnen Sie mit dem zuletzt leuchtenden Punkt.",
+   "datei": "assets/audio/arbeitsgedaechtnis/anleitung-arbeitsgedaechtnis.mp3",
+   "modul": "arbeitsgedaechtnis",
+   "stelle": "modules/arbeitsgedaechtnis/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 222
+  },
+  {
+   "id": "anleitung-zahlenspanne",
+   "text": "Merken Sie sich die Ziffern, die nacheinander erscheinen. Geben Sie sie danach über den Ziffernblock oder die Tastatur ein und bestätigen Sie mit OK. Bei „rückwärts“ beginnen Sie mit der letzten Ziffer.",
+   "datei": "assets/audio/zahlenspanne/anleitung-zahlenspanne.mp3",
+   "modul": "zahlenspanne",
+   "stelle": "modules/zahlenspanne/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 202
+  },
+  {
+   "id": "anleitung-bilder-wiedererkennen",
+   "text": "Schauen Sie sich die Bilder genau an und merken Sie sie sich. Danach sehen Sie wieder Bilder: Tippen Sie auf „Bekannt“ (Taste J), wenn Sie es vorher gesehen haben, sonst auf „Neu“ (Taste N).",
+   "datei": "assets/audio/bilder-wiedererkennen/anleitung-bilder-wiedererkennen.mp3",
+   "modul": "bilder-wiedererkennen",
+   "stelle": "modules/bilder-wiedererkennen/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 190
+  },
+  {
+   "id": "anleitung-wortlisten",
+   "text": "Lesen Sie die Wörter und merken Sie sie sich. Danach erscheinen Wörter einzeln: Tippen Sie auf „Bekannt“ (J), wenn das Wort in der Liste war, sonst auf „Neu“ (N).",
+   "datei": "assets/audio/wortlisten/anleitung-wortlisten.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 162
+  },
+  {
+   "id": "anleitung-memory",
+   "text": "Decken Sie immer zwei Karten auf. Zeigen beide das gleiche Bild, bleiben sie offen liegen. Merken Sie sich, wo welche Bilder liegen, und finden Sie alle Paare.",
+   "datei": "assets/audio/memory/anleitung-memory.mp3",
+   "modul": "memory",
+   "stelle": "modules/memory/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 159
+  },
+  {
+   "id": "anleitung-wege-merken",
+   "text": "Beobachten Sie genau, welchen Weg der Punkt vom Haus zur Fahne nimmt. Gehen Sie danach denselben Weg: Tippen Sie nacheinander auf die Kreuzungen oder nutzen Sie die Pfeiltasten.",
+   "datei": "assets/audio/wege-merken/anleitung-wege-merken.mp3",
+   "modul": "wege-merken",
+   "stelle": "modules/wege-merken/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 177
+  },
+  {
+   "id": "anleitung-alltagsgedaechtnis",
+   "text": "Merken Sie sich die gezeigten Informationen gut. Danach werden Sie danach gefragt – wählen Sie die richtigen Antworten aus.",
+   "datei": "assets/audio/alltagsgedaechtnis/anleitung-alltagsgedaechtnis.mp3",
+   "modul": "alltagsgedaechtnis",
+   "stelle": "modules/alltagsgedaechtnis/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 123
+  },
+  {
+   "id": "anleitung-einkaufen",
+   "text": "Merken Sie sich den Einkaufszettel. Tippen Sie im Laden die Waren an, die auf dem Zettel stehen – sie kommen in den Wagen (nochmal tippen nimmt sie wieder heraus). Wenn alles im Wagen ist, tippen Sie auf „Zur Kasse“.",
+   "datei": "assets/audio/einkaufen/anleitung-einkaufen.mp3",
+   "modul": "einkaufen",
+   "stelle": "modules/einkaufen/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 216
+  },
+  {
+   "id": "anleitung-geschichten",
+   "text": "Lesen Sie die Geschichte aufmerksam und merken Sie sich möglichst viele Einzelheiten. Danach verschwindet der Text. Beantworten Sie dann die Fragen aus dem Gedächtnis.",
+   "datei": "assets/audio/geschichten/anleitung-geschichten.mp3",
+   "modul": "geschichten",
+   "stelle": "modules/geschichten/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 167
+  },
+  {
+   "id": "anleitung-wort-bild-paare",
+   "text": "Merken Sie sich, welcher Name zu welchem Gegenstand gehört. Stellen Sie sich dazu ein Bild vor. Danach tippen Sie zu jedem Gegenstand den richtigen Namen an (oder umgekehrt).",
+   "datei": "assets/audio/wort-bild-paare/anleitung-wort-bild-paare.mp3",
+   "modul": "wort-bild-paare",
+   "stelle": "modules/wort-bild-paare/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 174
+  },
+  {
+   "id": "anleitung-personen-merken",
+   "text": "Prägen Sie sich jede Person gut ein: Wie sieht sie aus, wie heißt sie, wo arbeitet sie? Danach sehen Sie die Gesichter wieder. Tippen Sie die richtigen Angaben an.",
+   "datei": "assets/audio/personen-merken/anleitung-personen-merken.mp3",
+   "modul": "personen-merken",
+   "stelle": "modules/personen-merken/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 163
+  },
+  {
+   "id": "anleitung-spielkarten",
+   "text": "Karten werden nacheinander aufgedeckt. Tippen Sie auf „Gleich“ (Taste J), wenn die Karte genau so aussieht wie die Karte davor (oder davor-davor, wenn angezeigt). Sonst auf „Anders“ (Taste N).",
+   "datei": "assets/audio/spielkarten/anleitung-spielkarten.mp3",
+   "modul": "spielkarten",
+   "stelle": "modules/spielkarten/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 192
+  },
+  {
+   "id": "anleitung-szenen-beobachten",
+   "text": "Schauen Sie sich die Szene genau an. Danach werden Ihnen Fragen dazu gestellt. Tippen Sie auf die richtige Antwort oder drücken Sie die Ziffer.",
+   "datei": "assets/audio/szenen-beobachten/anleitung-szenen-beobachten.mp3",
+   "modul": "szenen-beobachten",
+   "stelle": "modules/szenen-beobachten/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 143
+  },
+  {
+   "id": "anleitung-telefonnotiz",
+   "text": "Hören Sie die Nachricht aufmerksam an. Danach füllen Sie den Notizzettel aus. Die Nummer tippen Sie auf dem Ziffernblock ein.",
+   "datei": "assets/audio/telefonnotiz/anleitung-telefonnotiz.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 125
+  },
+  {
+   "id": "anleitung-visuelle-exploration",
+   "text": "Oben sehen Sie, was Sie suchen. Suchen Sie den ganzen Bildschirm in Ruhe ab – am besten Zeile für Zeile von links nach rechts – und tippen Sie jedes gesuchte Objekt an. Danach auf „Fertig“.",
+   "datei": "assets/audio/visuelle-exploration/anleitung-visuelle-exploration.mp3",
+   "modul": "visuelle-exploration",
+   "stelle": "modules/visuelle-exploration/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 189
+  },
+  {
+   "id": "anleitung-neglect-training",
+   "text": "Schauen Sie zuerst zur roten Linie am Rand. Beginnen Sie dort und suchen Sie dann Zeile für Zeile den ganzen Bildschirm nach den gesuchten Objekten ab. Tippen Sie jedes an.",
+   "datei": "assets/audio/neglect-training/anleitung-neglect-training.mp3",
+   "modul": "neglect-training",
+   "stelle": "modules/neglect-training/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 172
+  },
+  {
+   "id": "anleitung-gesichtsfeld",
+   "text": "Schauen Sie immer auf das Kreuz in der Mitte. Leuchtet am Rand ein Punkt auf, drücken Sie die Pfeiltaste dieser Seite (← oder →) oder tippen Sie auf diese Bildschirmhälfte. Wird das Kreuz ROT, drücken Sie die Leertaste.",
+   "datei": "assets/audio/gesichtsfeld/anleitung-gesichtsfeld.mp3",
+   "modul": "gesichtsfeld",
+   "stelle": "modules/gesichtsfeld/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 219
+  },
+  {
+   "id": "anleitung-gesichtsfeld-check",
+   "text": "Schauen Sie die ganze Zeit auf den Punkt in der Mitte. Wenn Sie irgendwo einen kurzen Lichtpunkt bemerken, drücken Sie sofort die Leertaste oder OK.",
+   "datei": "assets/audio/gesichtsfeld-check/anleitung-gesichtsfeld-check.mp3",
+   "modul": "gesichtsfeld-check",
+   "stelle": "modules/gesichtsfeld-check/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 148
+  },
+  {
+   "id": "anleitung-sakkaden",
+   "text": "Folgen Sie dem springenden Punkt mit den Augen. Tippen Sie ihn schnell an. In schwereren Stufen erscheint dort kurz ein Pfeil – geben Sie seine Richtung mit den Pfeiltasten an.",
+   "datei": "assets/audio/sakkaden/anleitung-sakkaden.mp3",
+   "modul": "sakkaden",
+   "stelle": "modules/sakkaden/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 176
+  },
+  {
+   "id": "anleitung-lesetraining",
+   "text": "Lesen Sie die ganze Zeile – vom ersten bis zum letzten Wort. Schauen Sie dabei bis an den roten Rand. Danach tippen Sie das Wort an, nach dem gefragt wird.",
+   "datei": "assets/audio/lesetraining/anleitung-lesetraining.mp3",
+   "modul": "lesetraining",
+   "stelle": "modules/lesetraining/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 155
+  },
+  {
+   "id": "anleitung-formen-unterscheiden",
+   "text": "Vergleichen Sie die Figuren genau. Tippen Sie auf die Figur, die anders ist – oder auf die Figur, die genau wie die Vorlage aussieht. In späteren Stufen: Linke Taste, wenn die Figur im Feld ist, rechte Taste, wenn nicht.",
+   "datei": "assets/audio/formen-unterscheiden/anleitung-formen-unterscheiden.mp3",
+   "modul": "formen-unterscheiden",
+   "stelle": "modules/formen-unterscheiden/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 220
+  },
+  {
+   "id": "anleitung-figur-grund",
+   "text": "Im großen Bild liegen mehrere Formen übereinander. Schauen Sie genau hin und tippen Sie unten auf die Form, die im Bild versteckt ist (oder – wenn gefragt – auf die Form, die NICHT im Bild ist).",
+   "datei": "assets/audio/figur-grund/anleitung-figur-grund.mp3",
+   "modul": "figur-grund",
+   "stelle": "modules/figur-grund/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 194
+  },
+  {
+   "id": "anleitung-richtungen",
+   "text": "Bei Pfeilen: Geben Sie an, wohin der Pfeil zeigt. Bei Figuren: Welche Hand hebt die Person – ihre LINKE oder ihre RECHTE? Denken Sie sich in die Person hinein. Antworten Sie mit den Pfeiltasten oder den Knöpfen.",
+   "datei": "assets/audio/richtungen/anleitung-richtungen.mp3",
+   "modul": "richtungen",
+   "stelle": "modules/richtungen/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 211
+  },
+  {
+   "id": "anleitung-rotation-2d",
+   "text": "Ist die rechte Figur dieselbe wie die linke, nur gedreht? Dann „Gleich“ (Taste J). Ist sie gespiegelt (wie im Spiegel), dann „Gespiegelt“ (Taste N).",
+   "datei": "assets/audio/rotation-2d/anleitung-rotation-2d.mp3",
+   "modul": "rotation-2d",
+   "stelle": "modules/rotation-2d/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 148
+  },
+  {
+   "id": "anleitung-rotation-3d",
+   "text": "Stellen Sie sich vor, Sie drehen den linken Körper. Kann er genauso aussehen wie der rechte? Dann „Gleich“ (Taste J). Ist der rechte ein Spiegelbild, dann „Gespiegelt“ (Taste N).",
+   "datei": "assets/audio/rotation-3d/anleitung-rotation-3d.mp3",
+   "modul": "rotation-3d",
+   "stelle": "modules/rotation-3d/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 178
+  },
+  {
+   "id": "anleitung-muster-nachbauen",
+   "text": "Bauen Sie das Muster der Vorlage im rechten Raster nach. Wählen Sie unten eine Farbe und tippen Sie die Felder an. Nochmal tippen löscht ein Feld. Wenn alles stimmt, tippen Sie auf „Fertig“.",
+   "datei": "assets/audio/muster-nachbauen/anleitung-muster-nachbauen.mp3",
+   "modul": "muster-nachbauen",
+   "stelle": "modules/muster-nachbauen/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 190
+  },
+  {
+   "id": "anleitung-raeume-erkunden",
+   "text": "Mit Pfeil hoch gehen Sie vorwärts, mit links und rechts drehen Sie sich. Steht die gesuchte Tür vor Ihnen, öffnen Sie sie mit OK.",
+   "datei": "assets/audio/raeume-erkunden/anleitung-raeume-erkunden.mp3",
+   "modul": "raeume-erkunden",
+   "stelle": "modules/raeume-erkunden/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 129
+  },
+  {
+   "id": "anleitung-reihen-fortsetzen",
+   "text": "Schauen Sie sich die Reihe an: Nach welcher Regel geht sie weiter? Bei den Bildern fehlt das fünfte Element. Tippen Sie unten auf das passende Element (oder Ziffer 1–4).",
+   "datei": "assets/audio/reihen-fortsetzen/anleitung-reihen-fortsetzen.mp3",
+   "modul": "reihen-fortsetzen",
+   "stelle": "modules/reihen-fortsetzen/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 169
+  },
+  {
+   "id": "anleitung-regeln-wechseln",
+   "text": "Legen Sie die Karte unten auf einen der vier Stapel oben. Ob es richtig war, sehen Sie an der Rückmeldung. Finden Sie heraus, nach welcher Regel sortiert wird – die Regel kann sich ändern!",
+   "datei": "assets/audio/regeln-wechseln/anleitung-regeln-wechseln.mp3",
+   "modul": "regeln-wechseln",
+   "stelle": "modules/regeln-wechseln/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 188
+  },
+  {
+   "id": "anleitung-turm",
+   "text": "Bringen Sie die Scheiben in die Anordnung der Vorlage oben. Tippen Sie zuerst auf den Stab, von dem Sie die oberste Scheibe nehmen, dann auf den Ziel-Stab. Größere Scheiben dürfen nicht auf kleinere. Versuchen Sie, mit wenig Zügen auszukommen.",
+   "datei": "assets/audio/turm/anleitung-turm.mp3",
+   "modul": "turm",
+   "stelle": "modules/turm/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 243
+  },
+  {
+   "id": "anleitung-handlungsplanung",
+   "text": "Oben steht, was erledigt werden soll. Tippen Sie die Schritte in der richtigen Reihenfolge an – was zuerst kommt, zuerst. Schritte, die nicht dazugehören, lassen Sie einfach weg.",
+   "datei": "assets/audio/handlungsplanung/anleitung-handlungsplanung.mp3",
+   "modul": "handlungsplanung",
+   "stelle": "modules/handlungsplanung/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 178
+  },
+  {
+   "id": "anleitung-tagesplanung",
+   "text": "Tippen Sie links auf eine Erledigung und dann rechts auf eine freie Uhrzeit. Beachten Sie die Bedingung jeder Erledigung. Wenn alles eingetragen ist, tippen Sie auf „Fertig“.",
+   "datei": "assets/audio/tagesplanung/anleitung-tagesplanung.mp3",
+   "modul": "tagesplanung",
+   "stelle": "modules/tagesplanung/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 174
+  },
+  {
+   "id": "anleitung-kategorisieren",
+   "text": "In der Mitte erscheint ein Bild oder Wort. Tippen Sie auf den Oberbegriff, zu dem es gehört (oder Ziffer 1–4).",
+   "datei": "audio/anleitung-kategorisieren.mp3",
+   "modul": "kategorisieren",
+   "stelle": "modules/kategorisieren/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 110
+  },
+  {
+   "id": "anleitung-buero",
+   "text": "Lesen Sie das Schreiben und tippen Sie auf die Abteilung, die dafür zuständig ist. Dringendes geht an die Geschäftsleitung. Kommt zwischendurch eine Zahlenfolge, merken Sie sie sich und wählen Sie sie danach aus. Dann bearbeiten Sie das Schreiben.",
+   "datei": "assets/audio/buero/anleitung-buero.mp3",
+   "modul": "buero",
+   "stelle": "modules/buero/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 247
+  },
+  {
+   "id": "anleitung-ausflug-planen",
+   "text": "Wählen Sie links ein Angebot und dann rechts eine Uhrzeit. Achten Sie auf die Bedingungen unten – sie werden grün, wenn sie erfüllt sind. Zum Schluss auf „Plan fertig“ tippen.",
+   "datei": "assets/audio/ausflug-planen/anleitung-ausflug-planen.mp3",
+   "modul": "ausflug-planen",
+   "stelle": "modules/ausflug-planen/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 175
+  },
+  {
+   "id": "anleitung-lager-bestellungen",
+   "text": "Lesen Sie den Auftrag links. Wählen Sie im Regal das richtige Fach, stellen Sie die Menge ein und legen Sie die Ware in den Korb. Zum Schluss auf „Auftrag fertig“ tippen.",
+   "datei": "assets/audio/lager-bestellungen/anleitung-lager-bestellungen.mp3",
+   "modul": "lager-bestellungen",
+   "stelle": "modules/lager-bestellungen/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 170
+  },
+  {
+   "id": "anleitung-rechnen-alltag",
+   "text": "Lesen Sie die Aufgabe und rechnen Sie in Ruhe. Tippen Sie dann auf das richtige Ergebnis (oder Ziffer 1–4).",
+   "datei": "audio/anleitung-rechnen-alltag.mp3",
+   "modul": "rechnen-alltag",
+   "stelle": "modules/rechnen-alltag/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 107
+  },
+  {
+   "id": "anleitung-uhrzeit",
+   "text": "Schauen Sie genau auf die Zeiger: Der kurze zeigt die Stunde, der lange (türkis) die Minuten. Tippen Sie auf die richtige Antwort.",
+   "datei": "assets/audio/uhrzeit/anleitung-uhrzeit.mp3",
+   "modul": "uhrzeit",
+   "stelle": "modules/uhrzeit/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 130
+  },
+  {
+   "id": "anleitung-zahlen-mengen",
+   "text": "Entscheiden Sie zügig: Wo sind mehr Punkte? Welche Zahl ist größer? Was ist das Ergebnis? Tippen Sie auf die richtige Antwort oder nutzen Sie die Pfeiltasten.",
+   "datei": "assets/audio/zahlen-mengen/anleitung-zahlen-mengen.mp3",
+   "modul": "zahlen-mengen",
+   "stelle": "modules/zahlen-mengen/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 158
+  },
+  {
+   "id": "anleitung-wortfindung",
+   "text": "Wie heißt der abgebildete Gegenstand? Tippen Sie auf das richtige Wort – oder setzen Sie das Wort aus den Buchstaben zusammen (auch per Tastatur). Mit „Hilfe“ sehen Sie den ersten Buchstaben.",
+   "datei": "assets/audio/wortfindung/anleitung-wortfindung.mp3",
+   "modul": "wortfindung",
+   "stelle": "modules/wortfindung/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 191
+  },
+  {
+   "id": "anleitung-wortsuche",
+   "text": "Finden Sie die Wörter aus der Liste im Gitter. Tippen Sie den ersten und dann den letzten Buchstaben eines Wortes an. Gefundene Wörter werden markiert.",
+   "datei": "assets/audio/wortsuche/anleitung-wortsuche.mp3",
+   "modul": "wortsuche",
+   "stelle": "modules/wortsuche/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 151
+  },
+  {
+   "id": "anleitung-textverstaendnis",
+   "text": "Lesen Sie den Text in Ruhe durch. Tippen Sie auf „Gelesen“, wenn Sie fertig sind. Beantworten Sie danach die Fragen zum Text.",
+   "datei": "assets/audio/textverstaendnis/anleitung-textverstaendnis.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 125
+  },
+  {
+   "id": "anleitung-denksport",
+   "text": "Lesen Sie die Frage in Ruhe. Tippen Sie auf die passende Antwort oder drücken Sie die Ziffer. Sie haben so viel Zeit, wie Sie brauchen.",
+   "datei": "assets/audio/denksport/anleitung-denksport.mp3",
+   "modul": "denksport",
+   "stelle": "modules/denksport/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 135
+  },
+  {
+   "id": "anleitung-zielklicken",
+   "text": "Tippen oder klicken Sie die farbigen Ziele an, bevor sie verschwinden. Treffen Sie möglichst genau in die Mitte.",
+   "datei": "audio/anleitung-zielklicken.mp3",
+   "modul": "zielklicken",
+   "stelle": "modules/zielklicken/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 112
+  },
+  {
+   "id": "anleitung-spur-nachfahren",
+   "text": "Setzen Sie Maus oder Finger auf den grünen Startpunkt und fahren Sie die Spur bis zur Zielfahne nach, ohne die Spur zu verlassen. Mit den Pfeiltasten geht es auch.",
+   "datei": "assets/audio/spur-nachfahren/anleitung-spur-nachfahren.mp3",
+   "modul": "spur-nachfahren",
+   "stelle": "modules/spur-nachfahren/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 163
+  },
+  {
+   "id": "anleitung-labyrinth",
+   "text": "Führen Sie den türkisen Punkt zum Ziel unten rechts. Nutzen Sie die Pfeiltasten oder ziehen Sie den Punkt mit Maus oder Finger durch die Gänge.",
+   "datei": "assets/audio/labyrinth/anleitung-labyrinth.mp3",
+   "modul": "labyrinth",
+   "stelle": "modules/labyrinth/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 143
+  },
+  {
+   "id": "anleitung-verfolgen",
+   "text": "Bleiben Sie mit der Maus oder dem Finger auf dem Ball und folgen Sie ihm. Der Ball leuchtet grün, solange Sie ihn treffen. Mit den Pfeiltasten können Sie den Zeiger ebenfalls steuern.",
+   "datei": "assets/audio/verfolgen/anleitung-verfolgen.mp3",
+   "modul": "verfolgen",
+   "stelle": "modules/verfolgen/module.js (anleitung; Anleitungsschirm, Taste +, Pult gelb)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 183
+  },
+  {
+   "id": "abbiegen-links",
+   "text": "links abbiegen",
+   "datei": "assets/audio/strassenverkehr/abbiegen-links.mp3",
+   "modul": "strassenverkehr",
+   "stelle": "modules/strassenverkehr/module.js blinkerOeffnen()",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 14
+  },
+  {
+   "id": "abbiegen-rechts",
+   "text": "rechts abbiegen",
+   "datei": "assets/audio/strassenverkehr/abbiegen-rechts.mp3",
+   "modul": "strassenverkehr",
+   "stelle": "modules/strassenverkehr/module.js blinkerOeffnen()",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 15
+  },
+  {
+   "id": "telefon-01",
+   "text": "Guten Tag, hier spricht Frau Berger. Es geht um Folgendes: Termin absagen. Bitte rufen Sie mich zurück unter 4, 7, 1, 2. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-01.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 133
+  },
+  {
+   "id": "telefon-02",
+   "text": "Guten Tag, hier spricht Herr Krämer. Es geht um Folgendes: Rezept abholen. Bitte rufen Sie mich zurück unter 3, 9, 5, 8. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-02.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 133
+  },
+  {
+   "id": "telefon-03",
+   "text": "Guten Tag, hier spricht Frau Lindner. Es geht um Folgendes: Rückruf wegen Rechnung. Bitte rufen Sie mich zurück unter 6, 2, 0, 4. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-03.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 142
+  },
+  {
+   "id": "telefon-04",
+   "text": "Guten Tag, hier spricht Herr Wolf. Es geht um Folgendes: Paket ist angekommen. Bitte rufen Sie mich zurück unter 5, 1, 7, 3. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-04.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 137
+  },
+  {
+   "id": "telefon-05",
+   "text": "Guten Tag, hier spricht Frau Sommer. Es geht um Folgendes: Termin verschieben. Bitte rufen Sie mich zurück unter 8, 4, 6, 1. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-05.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 137
+  },
+  {
+   "id": "telefon-06",
+   "text": "Guten Tag, hier spricht Herr Hoffmann. Es geht um Folgendes: Unterlagen fehlen. Bitte rufen Sie mich zurück unter 2, 8, 3, 9. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-06.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 138
+  },
+  {
+   "id": "telefon-07",
+   "text": "Guten Tag, hier spricht Frau Neumann. Es geht um Folgendes: Brille ist fertig. Bitte rufen Sie mich zurück unter 7, 3, 5, 0. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-07.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 137
+  },
+  {
+   "id": "telefon-08",
+   "text": "Guten Tag, hier spricht Herr Schäfer. Es geht um Folgendes: Auto ist repariert. Bitte rufen Sie mich zurück unter 9, 0, 2, 6. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-08.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 138
+  },
+  {
+   "id": "telefon-09",
+   "text": "Guten Tag, hier spricht Frau Keller von Praxis am Markt. Es geht um Folgendes: Termin bestätigen. Der Termin ist am Dienstag um 10 Uhr. Bitte rufen Sie mich zurück unter 3, 6, 1, 8, 4. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-09.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 197
+  },
+  {
+   "id": "telefon-10",
+   "text": "Guten Tag, hier spricht Herr Vogel von Autohaus Süd. Es geht um Folgendes: Inspektion fällig. Der Termin ist am Montag um 8 Uhr. Bitte rufen Sie mich zurück unter 5, 2, 9, 7, 1. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-10.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 190
+  },
+  {
+   "id": "telefon-11",
+   "text": "Guten Tag, hier spricht Frau Richter von Stadtbücherei. Es geht um Folgendes: Buch zurückgeben. Der Termin ist am Freitag um 14 Uhr. Bitte rufen Sie mich zurück unter 4, 8, 0, 3, 6. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-11.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 194
+  },
+  {
+   "id": "telefon-12",
+   "text": "Guten Tag, hier spricht Herr Braun von Gärtnerei Grün. Es geht um Folgendes: Pflanzen abholen. Der Termin ist am Mittwoch um 16 Uhr. Bitte rufen Sie mich zurück unter 7, 1, 4, 2, 9. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-12.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 194
+  },
+  {
+   "id": "telefon-13",
+   "text": "Guten Tag, hier spricht Frau Hartmann von Sparkasse. Es geht um Folgendes: neue Bankkarte. Der Termin ist am Donnerstag um 11 Uhr. Bitte rufen Sie mich zurück unter 6, 9, 3, 5, 2. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-13.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 192
+  },
+  {
+   "id": "telefon-14",
+   "text": "Guten Tag, hier spricht Herr Lange von Malerbetrieb Lange. Es geht um Folgendes: Angebot besprechen. Der Termin ist am Dienstag um 15 Uhr. Bitte rufen Sie mich zurück unter 2, 5, 8, 1, 7. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-14.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 200
+  },
+  {
+   "id": "telefon-15",
+   "text": "Guten Tag, hier spricht Frau Schulte von Zahnarztpraxis. Es geht um Folgendes: Kontrolltermin. Der Termin ist am Montag um 9 Uhr. Bitte rufen Sie mich zurück unter 8, 3, 6, 0, 4, 1. Am besten bis morgen Mittag. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-15.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 223
+  },
+  {
+   "id": "telefon-16",
+   "text": "Guten Tag, hier spricht Herr Kaiser von Hausverwaltung. Es geht um Folgendes: Heizung ablesen. Der Termin ist am Freitag um 13 Uhr. Bitte rufen Sie mich zurück unter 4, 0, 7, 2, 9, 5. Am besten bis heute Abend. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-16.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 223
+  },
+  {
+   "id": "telefon-17",
+   "text": "Guten Tag, hier spricht Frau Seidel von Reisebüro Sonne. Es geht um Folgendes: Reise buchen. Der Termin ist am Mittwoch um 10 Uhr. Bitte rufen Sie mich zurück unter 9, 1, 5, 3, 8, 2. Am besten bis Donnerstag. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-17.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 221
+  },
+  {
+   "id": "telefon-18",
+   "text": "Guten Tag, hier spricht Herr Engel von Elektro Engel. Es geht um Folgendes: Lampe montieren. Der Termin ist am Donnerstag um 17 Uhr. Bitte rufen Sie mich zurück unter 3, 7, 2, 6, 0, 8. Am besten bis morgen früh. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-18.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 224
+  },
+  {
+   "id": "telefon-19",
+   "text": "Guten Tag, hier spricht Frau Pohl von Physiotherapie Pohl. Es geht um Folgendes: neues Rezept mitbringen. Der Termin ist am Dienstag um 8 Uhr. Bitte rufen Sie mich zurück unter 5, 6, 9, 1, 4, 7. Am besten bis Freitag. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-19.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 230
+  },
+  {
+   "id": "telefon-20",
+   "text": "Guten Tag, hier spricht Herr Franke von Bäckerei Franke. Es geht um Folgendes: Torte bestellt. Der Termin ist am Samstag um 9 Uhr. Bitte rufen Sie mich zurück unter 2, 9, 4, 8, 3, 1. Am besten bis heute Mittag. Vielen Dank.",
+   "datei": "assets/audio/telefonnotiz/telefon-20.mp3",
+   "modul": "telefonnotiz",
+   "stelle": "modules/telefonnotiz/module.js (Nachricht, data/telefon.js)",
+   "gruppe": "pflicht",
+   "status": "fehlt",
+   "zeichen": 223
+  },
+  {
+   "id": "wort-001",
+   "text": "Hund",
+   "datei": "assets/audio/wortlisten/wort-001.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-002",
+   "text": "Katze",
+   "datei": "assets/audio/wortlisten/wort-002.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-003",
+   "text": "Pferd",
+   "datei": "assets/audio/wortlisten/wort-003.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-004",
+   "text": "Kuh",
+   "datei": "assets/audio/wortlisten/wort-004.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 3
+  },
+  {
+   "id": "wort-005",
+   "text": "Schaf",
+   "datei": "assets/audio/wortlisten/wort-005.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-006",
+   "text": "Ziege",
+   "datei": "assets/audio/wortlisten/wort-006.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-007",
+   "text": "Hase",
+   "datei": "assets/audio/wortlisten/wort-007.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-008",
+   "text": "Maus",
+   "datei": "assets/audio/wortlisten/wort-008.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-009",
+   "text": "Fuchs",
+   "datei": "assets/audio/wortlisten/wort-009.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-010",
+   "text": "Bär",
+   "datei": "assets/audio/wortlisten/wort-010.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 3
+  },
+  {
+   "id": "wort-011",
+   "text": "Wolf",
+   "datei": "assets/audio/wortlisten/wort-011.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-012",
+   "text": "Igel",
+   "datei": "assets/audio/wortlisten/wort-012.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-013",
+   "text": "Ente",
+   "datei": "assets/audio/wortlisten/wort-013.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-014",
+   "text": "Gans",
+   "datei": "assets/audio/wortlisten/wort-014.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-015",
+   "text": "Huhn",
+   "datei": "assets/audio/wortlisten/wort-015.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-016",
+   "text": "Adler",
+   "datei": "assets/audio/wortlisten/wort-016.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-017",
+   "text": "Eule",
+   "datei": "assets/audio/wortlisten/wort-017.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-018",
+   "text": "Fisch",
+   "datei": "assets/audio/wortlisten/wort-018.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-019",
+   "text": "Frosch",
+   "datei": "assets/audio/wortlisten/wort-019.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-020",
+   "text": "Schnecke",
+   "datei": "assets/audio/wortlisten/wort-020.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-021",
+   "text": "Löwe",
+   "datei": "assets/audio/wortlisten/wort-021.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-022",
+   "text": "Tiger",
+   "datei": "assets/audio/wortlisten/wort-022.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-023",
+   "text": "Affe",
+   "datei": "assets/audio/wortlisten/wort-023.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-024",
+   "text": "Elefant",
+   "datei": "assets/audio/wortlisten/wort-024.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-025",
+   "text": "Apfel",
+   "datei": "assets/audio/wortlisten/wort-025.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-026",
+   "text": "Birne",
+   "datei": "assets/audio/wortlisten/wort-026.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-027",
+   "text": "Banane",
+   "datei": "assets/audio/wortlisten/wort-027.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-028",
+   "text": "Kirsche",
+   "datei": "assets/audio/wortlisten/wort-028.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-029",
+   "text": "Pflaume",
+   "datei": "assets/audio/wortlisten/wort-029.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-030",
+   "text": "Erdbeere",
+   "datei": "assets/audio/wortlisten/wort-030.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-031",
+   "text": "Himbeere",
+   "datei": "assets/audio/wortlisten/wort-031.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-032",
+   "text": "Zitrone",
+   "datei": "assets/audio/wortlisten/wort-032.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-033",
+   "text": "Orange",
+   "datei": "assets/audio/wortlisten/wort-033.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-034",
+   "text": "Traube",
+   "datei": "assets/audio/wortlisten/wort-034.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-035",
+   "text": "Ananas",
+   "datei": "assets/audio/wortlisten/wort-035.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-036",
+   "text": "Melone",
+   "datei": "assets/audio/wortlisten/wort-036.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-037",
+   "text": "Pfirsich",
+   "datei": "assets/audio/wortlisten/wort-037.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-038",
+   "text": "Aprikose",
+   "datei": "assets/audio/wortlisten/wort-038.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-039",
+   "text": "Mango",
+   "datei": "assets/audio/wortlisten/wort-039.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-040",
+   "text": "Kiwi",
+   "datei": "assets/audio/wortlisten/wort-040.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-041",
+   "text": "Karotte",
+   "datei": "assets/audio/wortlisten/wort-041.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-042",
+   "text": "Tomate",
+   "datei": "assets/audio/wortlisten/wort-042.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-043",
+   "text": "Gurke",
+   "datei": "assets/audio/wortlisten/wort-043.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-044",
+   "text": "Paprika",
+   "datei": "assets/audio/wortlisten/wort-044.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-045",
+   "text": "Zwiebel",
+   "datei": "assets/audio/wortlisten/wort-045.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-046",
+   "text": "Kartoffel",
+   "datei": "assets/audio/wortlisten/wort-046.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 9
+  },
+  {
+   "id": "wort-047",
+   "text": "Salat",
+   "datei": "assets/audio/wortlisten/wort-047.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-048",
+   "text": "Spinat",
+   "datei": "assets/audio/wortlisten/wort-048.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-049",
+   "text": "Erbse",
+   "datei": "assets/audio/wortlisten/wort-049.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-050",
+   "text": "Bohne",
+   "datei": "assets/audio/wortlisten/wort-050.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-051",
+   "text": "Kohl",
+   "datei": "assets/audio/wortlisten/wort-051.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-052",
+   "text": "Lauch",
+   "datei": "assets/audio/wortlisten/wort-052.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-053",
+   "text": "Kürbis",
+   "datei": "assets/audio/wortlisten/wort-053.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-054",
+   "text": "Radieschen",
+   "datei": "assets/audio/wortlisten/wort-054.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 10
+  },
+  {
+   "id": "wort-055",
+   "text": "Sellerie",
+   "datei": "assets/audio/wortlisten/wort-055.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-056",
+   "text": "Brokkoli",
+   "datei": "assets/audio/wortlisten/wort-056.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-057",
+   "text": "Stuhl",
+   "datei": "assets/audio/wortlisten/wort-057.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-058",
+   "text": "Tisch",
+   "datei": "assets/audio/wortlisten/wort-058.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-059",
+   "text": "Bett",
+   "datei": "assets/audio/wortlisten/wort-059.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-060",
+   "text": "Schrank",
+   "datei": "assets/audio/wortlisten/wort-060.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-061",
+   "text": "Sofa",
+   "datei": "assets/audio/wortlisten/wort-061.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-062",
+   "text": "Sessel",
+   "datei": "assets/audio/wortlisten/wort-062.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-063",
+   "text": "Regal",
+   "datei": "assets/audio/wortlisten/wort-063.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-064",
+   "text": "Kommode",
+   "datei": "assets/audio/wortlisten/wort-064.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-065",
+   "text": "Hocker",
+   "datei": "assets/audio/wortlisten/wort-065.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-066",
+   "text": "Bank",
+   "datei": "assets/audio/wortlisten/wort-066.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-067",
+   "text": "Schreibtisch",
+   "datei": "assets/audio/wortlisten/wort-067.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 12
+  },
+  {
+   "id": "wort-068",
+   "text": "Vitrine",
+   "datei": "assets/audio/wortlisten/wort-068.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-069",
+   "text": "Truhe",
+   "datei": "assets/audio/wortlisten/wort-069.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-070",
+   "text": "Liege",
+   "datei": "assets/audio/wortlisten/wort-070.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-071",
+   "text": "Hose",
+   "datei": "assets/audio/wortlisten/wort-071.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-072",
+   "text": "Hemd",
+   "datei": "assets/audio/wortlisten/wort-072.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-073",
+   "text": "Bluse",
+   "datei": "assets/audio/wortlisten/wort-073.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-074",
+   "text": "Jacke",
+   "datei": "assets/audio/wortlisten/wort-074.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-075",
+   "text": "Mantel",
+   "datei": "assets/audio/wortlisten/wort-075.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-076",
+   "text": "Kleid",
+   "datei": "assets/audio/wortlisten/wort-076.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-077",
+   "text": "Rock",
+   "datei": "assets/audio/wortlisten/wort-077.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-078",
+   "text": "Pullover",
+   "datei": "assets/audio/wortlisten/wort-078.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-079",
+   "text": "Mütze",
+   "datei": "assets/audio/wortlisten/wort-079.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-080",
+   "text": "Schal",
+   "datei": "assets/audio/wortlisten/wort-080.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-081",
+   "text": "Socke",
+   "datei": "assets/audio/wortlisten/wort-081.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-082",
+   "text": "Schuh",
+   "datei": "assets/audio/wortlisten/wort-082.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-083",
+   "text": "Stiefel",
+   "datei": "assets/audio/wortlisten/wort-083.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-084",
+   "text": "Handschuh",
+   "datei": "assets/audio/wortlisten/wort-084.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 9
+  },
+  {
+   "id": "wort-085",
+   "text": "Gürtel",
+   "datei": "assets/audio/wortlisten/wort-085.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-086",
+   "text": "Krawatte",
+   "datei": "assets/audio/wortlisten/wort-086.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-087",
+   "text": "Hammer",
+   "datei": "assets/audio/wortlisten/wort-087.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-088",
+   "text": "Säge",
+   "datei": "assets/audio/wortlisten/wort-088.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-089",
+   "text": "Zange",
+   "datei": "assets/audio/wortlisten/wort-089.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-090",
+   "text": "Bohrer",
+   "datei": "assets/audio/wortlisten/wort-090.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-091",
+   "text": "Feile",
+   "datei": "assets/audio/wortlisten/wort-091.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-092",
+   "text": "Pinsel",
+   "datei": "assets/audio/wortlisten/wort-092.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-093",
+   "text": "Schaufel",
+   "datei": "assets/audio/wortlisten/wort-093.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-094",
+   "text": "Spaten",
+   "datei": "assets/audio/wortlisten/wort-094.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-095",
+   "text": "Hobel",
+   "datei": "assets/audio/wortlisten/wort-095.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-096",
+   "text": "Meißel",
+   "datei": "assets/audio/wortlisten/wort-096.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-097",
+   "text": "Schere",
+   "datei": "assets/audio/wortlisten/wort-097.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-098",
+   "text": "Axt",
+   "datei": "assets/audio/wortlisten/wort-098.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 3
+  },
+  {
+   "id": "wort-099",
+   "text": "Rechen",
+   "datei": "assets/audio/wortlisten/wort-099.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-100",
+   "text": "Nagel",
+   "datei": "assets/audio/wortlisten/wort-100.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-101",
+   "text": "Auto",
+   "datei": "assets/audio/wortlisten/wort-101.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-102",
+   "text": "Bus",
+   "datei": "assets/audio/wortlisten/wort-102.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 3
+  },
+  {
+   "id": "wort-103",
+   "text": "Zug",
+   "datei": "assets/audio/wortlisten/wort-103.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 3
+  },
+  {
+   "id": "wort-104",
+   "text": "Fahrrad",
+   "datei": "assets/audio/wortlisten/wort-104.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-105",
+   "text": "Roller",
+   "datei": "assets/audio/wortlisten/wort-105.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-106",
+   "text": "Schiff",
+   "datei": "assets/audio/wortlisten/wort-106.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-107",
+   "text": "Boot",
+   "datei": "assets/audio/wortlisten/wort-107.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-108",
+   "text": "Flugzeug",
+   "datei": "assets/audio/wortlisten/wort-108.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-109",
+   "text": "Traktor",
+   "datei": "assets/audio/wortlisten/wort-109.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-110",
+   "text": "Lastwagen",
+   "datei": "assets/audio/wortlisten/wort-110.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 9
+  },
+  {
+   "id": "wort-111",
+   "text": "Taxi",
+   "datei": "assets/audio/wortlisten/wort-111.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-112",
+   "text": "Motorrad",
+   "datei": "assets/audio/wortlisten/wort-112.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-113",
+   "text": "Kutsche",
+   "datei": "assets/audio/wortlisten/wort-113.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-114",
+   "text": "Rakete",
+   "datei": "assets/audio/wortlisten/wort-114.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-115",
+   "text": "Kopf",
+   "datei": "assets/audio/wortlisten/wort-115.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-116",
+   "text": "Hand",
+   "datei": "assets/audio/wortlisten/wort-116.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-117",
+   "text": "Fuß",
+   "datei": "assets/audio/wortlisten/wort-117.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 3
+  },
+  {
+   "id": "wort-118",
+   "text": "Arm",
+   "datei": "assets/audio/wortlisten/wort-118.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 3
+  },
+  {
+   "id": "wort-119",
+   "text": "Bein",
+   "datei": "assets/audio/wortlisten/wort-119.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-120",
+   "text": "Knie",
+   "datei": "assets/audio/wortlisten/wort-120.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-121",
+   "text": "Nase",
+   "datei": "assets/audio/wortlisten/wort-121.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-122",
+   "text": "Mund",
+   "datei": "assets/audio/wortlisten/wort-122.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-123",
+   "text": "Ohr",
+   "datei": "assets/audio/wortlisten/wort-123.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 3
+  },
+  {
+   "id": "wort-124",
+   "text": "Auge",
+   "datei": "assets/audio/wortlisten/wort-124.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-125",
+   "text": "Haar",
+   "datei": "assets/audio/wortlisten/wort-125.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-126",
+   "text": "Finger",
+   "datei": "assets/audio/wortlisten/wort-126.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-127",
+   "text": "Zahn",
+   "datei": "assets/audio/wortlisten/wort-127.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-128",
+   "text": "Schulter",
+   "datei": "assets/audio/wortlisten/wort-128.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-129",
+   "text": "Rücken",
+   "datei": "assets/audio/wortlisten/wort-129.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-130",
+   "text": "Bauch",
+   "datei": "assets/audio/wortlisten/wort-130.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-131",
+   "text": "Baum",
+   "datei": "assets/audio/wortlisten/wort-131.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-132",
+   "text": "Blume",
+   "datei": "assets/audio/wortlisten/wort-132.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-133",
+   "text": "Gras",
+   "datei": "assets/audio/wortlisten/wort-133.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-134",
+   "text": "Berg",
+   "datei": "assets/audio/wortlisten/wort-134.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-135",
+   "text": "Fluss",
+   "datei": "assets/audio/wortlisten/wort-135.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-136",
+   "text": "See",
+   "datei": "assets/audio/wortlisten/wort-136.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 3
+  },
+  {
+   "id": "wort-137",
+   "text": "Meer",
+   "datei": "assets/audio/wortlisten/wort-137.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-138",
+   "text": "Wald",
+   "datei": "assets/audio/wortlisten/wort-138.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-139",
+   "text": "Wiese",
+   "datei": "assets/audio/wortlisten/wort-139.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-140",
+   "text": "Stein",
+   "datei": "assets/audio/wortlisten/wort-140.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-141",
+   "text": "Sonne",
+   "datei": "assets/audio/wortlisten/wort-141.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-142",
+   "text": "Mond",
+   "datei": "assets/audio/wortlisten/wort-142.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-143",
+   "text": "Stern",
+   "datei": "assets/audio/wortlisten/wort-143.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-144",
+   "text": "Wolke",
+   "datei": "assets/audio/wortlisten/wort-144.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-145",
+   "text": "Regen",
+   "datei": "assets/audio/wortlisten/wort-145.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-146",
+   "text": "Schnee",
+   "datei": "assets/audio/wortlisten/wort-146.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-147",
+   "text": "Bäcker",
+   "datei": "assets/audio/wortlisten/wort-147.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-148",
+   "text": "Lehrer",
+   "datei": "assets/audio/wortlisten/wort-148.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-149",
+   "text": "Arzt",
+   "datei": "assets/audio/wortlisten/wort-149.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-150",
+   "text": "Koch",
+   "datei": "assets/audio/wortlisten/wort-150.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-151",
+   "text": "Maler",
+   "datei": "assets/audio/wortlisten/wort-151.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-152",
+   "text": "Gärtner",
+   "datei": "assets/audio/wortlisten/wort-152.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-153",
+   "text": "Bauer",
+   "datei": "assets/audio/wortlisten/wort-153.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-154",
+   "text": "Fischer",
+   "datei": "assets/audio/wortlisten/wort-154.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-155",
+   "text": "Pilot",
+   "datei": "assets/audio/wortlisten/wort-155.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-156",
+   "text": "Richter",
+   "datei": "assets/audio/wortlisten/wort-156.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-157",
+   "text": "Friseur",
+   "datei": "assets/audio/wortlisten/wort-157.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-158",
+   "text": "Tischler",
+   "datei": "assets/audio/wortlisten/wort-158.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-159",
+   "text": "Förster",
+   "datei": "assets/audio/wortlisten/wort-159.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-160",
+   "text": "Schneider",
+   "datei": "assets/audio/wortlisten/wort-160.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 9
+  },
+  {
+   "id": "wort-161",
+   "text": "Geige",
+   "datei": "assets/audio/wortlisten/wort-161.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-162",
+   "text": "Flöte",
+   "datei": "assets/audio/wortlisten/wort-162.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-163",
+   "text": "Trommel",
+   "datei": "assets/audio/wortlisten/wort-163.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-164",
+   "text": "Gitarre",
+   "datei": "assets/audio/wortlisten/wort-164.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-165",
+   "text": "Klavier",
+   "datei": "assets/audio/wortlisten/wort-165.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-166",
+   "text": "Trompete",
+   "datei": "assets/audio/wortlisten/wort-166.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-167",
+   "text": "Harfe",
+   "datei": "assets/audio/wortlisten/wort-167.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-168",
+   "text": "Orgel",
+   "datei": "assets/audio/wortlisten/wort-168.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-169",
+   "text": "Cello",
+   "datei": "assets/audio/wortlisten/wort-169.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-170",
+   "text": "Tuba",
+   "datei": "assets/audio/wortlisten/wort-170.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-171",
+   "text": "Harmonika",
+   "datei": "assets/audio/wortlisten/wort-171.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 9
+  },
+  {
+   "id": "wort-172",
+   "text": "Wasser",
+   "datei": "assets/audio/wortlisten/wort-172.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-173",
+   "text": "Saft",
+   "datei": "assets/audio/wortlisten/wort-173.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-174",
+   "text": "Milch",
+   "datei": "assets/audio/wortlisten/wort-174.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-175",
+   "text": "Kaffee",
+   "datei": "assets/audio/wortlisten/wort-175.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-176",
+   "text": "Tee",
+   "datei": "assets/audio/wortlisten/wort-176.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 3
+  },
+  {
+   "id": "wort-177",
+   "text": "Kakao",
+   "datei": "assets/audio/wortlisten/wort-177.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-178",
+   "text": "Limonade",
+   "datei": "assets/audio/wortlisten/wort-178.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-179",
+   "text": "Brühe",
+   "datei": "assets/audio/wortlisten/wort-179.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-180",
+   "text": "Sprudel",
+   "datei": "assets/audio/wortlisten/wort-180.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-181",
+   "text": "Schorle",
+   "datei": "assets/audio/wortlisten/wort-181.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-182",
+   "text": "Topf",
+   "datei": "assets/audio/wortlisten/wort-182.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-183",
+   "text": "Pfanne",
+   "datei": "assets/audio/wortlisten/wort-183.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-184",
+   "text": "Löffel",
+   "datei": "assets/audio/wortlisten/wort-184.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-185",
+   "text": "Gabel",
+   "datei": "assets/audio/wortlisten/wort-185.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-186",
+   "text": "Messer",
+   "datei": "assets/audio/wortlisten/wort-186.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-187",
+   "text": "Teller",
+   "datei": "assets/audio/wortlisten/wort-187.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-188",
+   "text": "Tasse",
+   "datei": "assets/audio/wortlisten/wort-188.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-189",
+   "text": "Schüssel",
+   "datei": "assets/audio/wortlisten/wort-189.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-190",
+   "text": "Kanne",
+   "datei": "assets/audio/wortlisten/wort-190.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-191",
+   "text": "Herd",
+   "datei": "assets/audio/wortlisten/wort-191.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-192",
+   "text": "Ofen",
+   "datei": "assets/audio/wortlisten/wort-192.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-193",
+   "text": "Sieb",
+   "datei": "assets/audio/wortlisten/wort-193.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-194",
+   "text": "Kelle",
+   "datei": "assets/audio/wortlisten/wort-194.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-195",
+   "text": "Dose",
+   "datei": "assets/audio/wortlisten/wort-195.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-196",
+   "text": "Haus",
+   "datei": "assets/audio/wortlisten/wort-196.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-197",
+   "text": "Kirche",
+   "datei": "assets/audio/wortlisten/wort-197.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-198",
+   "text": "Schule",
+   "datei": "assets/audio/wortlisten/wort-198.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-199",
+   "text": "Turm",
+   "datei": "assets/audio/wortlisten/wort-199.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-200",
+   "text": "Burg",
+   "datei": "assets/audio/wortlisten/wort-200.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-201",
+   "text": "Schloss",
+   "datei": "assets/audio/wortlisten/wort-201.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-202",
+   "text": "Hütte",
+   "datei": "assets/audio/wortlisten/wort-202.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-203",
+   "text": "Scheune",
+   "datei": "assets/audio/wortlisten/wort-203.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-204",
+   "text": "Brücke",
+   "datei": "assets/audio/wortlisten/wort-204.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-205",
+   "text": "Bahnhof",
+   "datei": "assets/audio/wortlisten/wort-205.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-206",
+   "text": "Rathaus",
+   "datei": "assets/audio/wortlisten/wort-206.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-207",
+   "text": "Mühle",
+   "datei": "assets/audio/wortlisten/wort-207.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-208",
+   "text": "Rot",
+   "datei": "assets/audio/wortlisten/wort-208.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 3
+  },
+  {
+   "id": "wort-209",
+   "text": "Blau",
+   "datei": "assets/audio/wortlisten/wort-209.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-210",
+   "text": "Grün",
+   "datei": "assets/audio/wortlisten/wort-210.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-211",
+   "text": "Gelb",
+   "datei": "assets/audio/wortlisten/wort-211.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-212",
+   "text": "Weiß",
+   "datei": "assets/audio/wortlisten/wort-212.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-213",
+   "text": "Schwarz",
+   "datei": "assets/audio/wortlisten/wort-213.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-214",
+   "text": "Braun",
+   "datei": "assets/audio/wortlisten/wort-214.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-215",
+   "text": "Grau",
+   "datei": "assets/audio/wortlisten/wort-215.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-216",
+   "text": "Rosa",
+   "datei": "assets/audio/wortlisten/wort-216.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-217",
+   "text": "Lila",
+   "datei": "assets/audio/wortlisten/wort-217.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-218",
+   "text": "Orange",
+   "datei": "assets/audio/wortlisten/wort-218.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-219",
+   "text": "Silber",
+   "datei": "assets/audio/wortlisten/wort-219.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-220",
+   "text": "Gewitter",
+   "datei": "assets/audio/wortlisten/wort-220.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-221",
+   "text": "Nebel",
+   "datei": "assets/audio/wortlisten/wort-221.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-222",
+   "text": "Hagel",
+   "datei": "assets/audio/wortlisten/wort-222.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-223",
+   "text": "Wind",
+   "datei": "assets/audio/wortlisten/wort-223.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-224",
+   "text": "Sturm",
+   "datei": "assets/audio/wortlisten/wort-224.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-225",
+   "text": "Frost",
+   "datei": "assets/audio/wortlisten/wort-225.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-226",
+   "text": "Tau",
+   "datei": "assets/audio/wortlisten/wort-226.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 3
+  },
+  {
+   "id": "wort-227",
+   "text": "Blitz",
+   "datei": "assets/audio/wortlisten/wort-227.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-228",
+   "text": "Donner",
+   "datei": "assets/audio/wortlisten/wort-228.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-229",
+   "text": "Glatteis",
+   "datei": "assets/audio/wortlisten/wort-229.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-230",
+   "text": "Ball",
+   "datei": "assets/audio/wortlisten/wort-230.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-231",
+   "text": "Puppe",
+   "datei": "assets/audio/wortlisten/wort-231.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-232",
+   "text": "Kreisel",
+   "datei": "assets/audio/wortlisten/wort-232.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-233",
+   "text": "Drachen",
+   "datei": "assets/audio/wortlisten/wort-233.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 7
+  },
+  {
+   "id": "wort-234",
+   "text": "Würfel",
+   "datei": "assets/audio/wortlisten/wort-234.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-235",
+   "text": "Murmel",
+   "datei": "assets/audio/wortlisten/wort-235.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 6
+  },
+  {
+   "id": "wort-236",
+   "text": "Teddy",
+   "datei": "assets/audio/wortlisten/wort-236.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 5
+  },
+  {
+   "id": "wort-237",
+   "text": "Bauklotz",
+   "datei": "assets/audio/wortlisten/wort-237.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "wort-238",
+   "text": "Seil",
+   "datei": "assets/audio/wortlisten/wort-238.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 4
+  },
+  {
+   "id": "wort-239",
+   "text": "Schaukel",
+   "datei": "assets/audio/wortlisten/wort-239.mp3",
+   "modul": "wortlisten",
+   "stelle": "modules/wortlisten/module.js (Wörter vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 8
+  },
+  {
+   "id": "text-01",
+   "text": "Am Samstag geht Frau Berger auf den Wochenmarkt. Sie kauft zwei Kilo Äpfel, einen Blumenkohl und frische Eier. Am Käsestand probiert sie einen milden Bergkäse.",
+   "datei": "assets/audio/textverstaendnis/text-01.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 159
+  },
+  {
+   "id": "text-02",
+   "text": "Bello ist ein brauner Hund mit weißen Pfoten. Jeden Morgen holt er die Zeitung vom Gartentor. Dafür bekommt er einen Hundekeks.",
+   "datei": "assets/audio/textverstaendnis/text-02.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 127
+  },
+  {
+   "id": "text-03",
+   "text": "Herr Lange trifft seine Schwester im Café am Brunnen. Er bestellt einen Kaffee und ein Stück Apfelkuchen. Seine Schwester trinkt lieber Tee.",
+   "datei": "assets/audio/textverstaendnis/text-03.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 140
+  },
+  {
+   "id": "text-04",
+   "text": "Im Frühling pflanzt Opa Karl Tomaten und Bohnen. Die Tomaten stellt er an die sonnige Hauswand. Jeden Abend gießt er die Pflanzen mit der grünen Gießkanne.",
+   "datei": "assets/audio/textverstaendnis/text-04.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 155
+  },
+  {
+   "id": "text-05",
+   "text": "Die Klasse 4b fährt mit dem Bus in den Zoo. Am besten gefallen den Kindern die Pinguine. Zum Mittagessen gibt es Brote auf einer großen Wiese.",
+   "datei": "assets/audio/textverstaendnis/text-05.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 142
+  },
+  {
+   "id": "text-06",
+   "text": "Seit letzter Woche wohnt im zweiten Stock ein neuer Nachbar. Er heißt Herr Öztürk und arbeitet als Busfahrer. Weil er früh anfangen muss, verlässt er das Haus schon um halb fünf. Am Wochenende repariert er gerne alte Fahrräder im Hof. Frau Schulz aus dem Erdgeschoss hat ihm bereits ihr altes Rad gebracht.",
+   "datei": "assets/audio/textverstaendnis/text-06.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 306
+  },
+  {
+   "id": "text-07",
+   "text": "Oma Hilde wird 80 Jahre alt. Die ganze Familie trifft sich am Sonntag um 15 Uhr in ihrem Lieblingsrestaurant am See. Ihr Enkel Tim bringt einen selbst gebackenen Schokoladenkuchen mit. Weil es regnet, sitzen alle drinnen statt auf der Terrasse. Am Ende singen alle ein Lied, und Oma Hilde ist sehr gerührt.",
+   "datei": "assets/audio/textverstaendnis/text-07.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 306
+  },
+  {
+   "id": "text-08",
+   "text": "Herr Weber hat seit drei Tagen Halsschmerzen. Er ruft in der Praxis an und bekommt einen Termin am Donnerstag um 9:30 Uhr. Im Wartezimmer liest er eine Zeitschrift über Gärten. Die Ärztin verschreibt ihm Lutschtabletten und rät ihm, viel warmen Tee zu trinken.",
+   "datei": "assets/audio/textverstaendnis/text-08.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 260
+  },
+  {
+   "id": "text-09",
+   "text": "Familie Kraus fährt mit dem Zug an die Ostsee. Der Zug fährt um 8:12 Uhr ab, doch er hat zwanzig Minuten Verspätung. In Hamburg müssen sie umsteigen. Die Kinder spielen unterwegs Karten, und der Vater löst ein Kreuzworträtsel. Am Nachmittag kommen sie endlich am Strand an.",
+   "datei": "assets/audio/textverstaendnis/text-09.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 273
+  },
+  {
+   "id": "text-10",
+   "text": "Lena zieht in ihre erste eigene Wohnung. Ihre Freunde helfen beim Tragen der Kisten. Das Sofa passt nicht durch die Tür und muss über den Balkon gehoben werden. Am Abend bestellen alle Pizza und sitzen müde, aber zufrieden zwischen den Kartons.",
+   "datei": "assets/audio/textverstaendnis/text-10.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 244
+  },
+  {
+   "id": "text-11",
+   "text": "Die Stadtbücherei hat dienstags und donnerstags bis 19 Uhr geöffnet, an den übrigen Werktagen nur bis 17 Uhr. Am Samstag öffnet sie von 10 bis 13 Uhr. Wer ein Buch länger als vier Wochen behält, zahlt pro Woche 50 Cent Gebühr. Frau Peters arbeitet bis 17:30 Uhr und möchte nach der Arbeit ein Buch zurückgeben, das sie vor fünf Wochen ausgeliehen hat.",
+   "datei": "assets/audio/textverstaendnis/text-11.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 351
+  },
+  {
+   "id": "text-12",
+   "text": "Für einen Rührkuchen braucht man 250 Gramm Mehl, 200 Gramm Zucker, 4 Eier und 250 Gramm Butter. Zuerst wird die weiche Butter mit dem Zucker schaumig gerührt. Danach kommen die Eier einzeln dazu, erst zum Schluss das Mehl. Der Teig wird bei 180 Grad etwa 50 Minuten gebacken. Herr Klein möchte nur einen halben Kuchen backen.",
+   "datei": "assets/audio/textverstaendnis/text-12.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 325
+  },
+  {
+   "id": "text-13",
+   "text": "Der Rundweg am Lindenberg ist neun Kilometer lang. Vom Parkplatz führt er zunächst drei Kilometer bergauf zur Aussichtshütte, wo es Getränke gibt. Danach geht es durch den Wald hinunter zum Mühlenteich. Wegen Bauarbeiten ist die Brücke am Teich bis Ende Mai gesperrt; Wanderer müssen einen Umweg von einem Kilometer nehmen. Familie Roth wandert Mitte April.",
+   "datei": "assets/audio/textverstaendnis/text-13.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 357
+  },
+  {
+   "id": "text-14",
+   "text": "Liebe Anna, ich komme morgen nicht wie geplant um 14 Uhr, sondern erst um 16 Uhr, weil mein Zahnarzttermin verschoben wurde. Könntest du bitte die Fotos vom Urlaub mitbringen? Den Kuchen besorge ich unterwegs beim Bäcker. Falls dir 16 Uhr nicht passt, ruf mich heute Abend an. Viele Grüße, Marta",
+   "datei": "assets/audio/textverstaendnis/text-14.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 295
+  },
+  {
+   "id": "text-15",
+   "text": "Die Wohnung in der Lindenstraße kostet 620 Euro Kaltmiete. Dazu kommen 140 Euro Nebenkosten im Monat. Die Kaution beträgt drei Kaltmieten und muss vor dem Einzug gezahlt werden. Haustiere sind nur nach Absprache mit dem Vermieter erlaubt. Herr Yilmaz möchte mit seiner Katze am 1. Juli einziehen.",
+   "datei": "assets/audio/textverstaendnis/text-15.mp3",
+   "modul": "textverstaendnis",
+   "stelle": "modules/textverstaendnis/module.js (Text vorlesen)",
+   "gruppe": "optional",
+   "status": "fehlt",
+   "zeichen": 296
+  }
+ ]
+}

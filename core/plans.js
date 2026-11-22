@@ -20,6 +20,10 @@
       module: ['rechnen-alltag', 'uhrzeit', 'wortfindung', 'textverstaendnis'] },
     { id: 'vl-visuomotorik', name: 'Visuomotorik', beschreibung: 'Zielgenauigkeit und Auge-Hand-Koordination',
       module: ['zielklicken', 'spur-nachfahren', 'labyrinth', 'verfolgen'] },
+    { id: 'vl-beruflich', name: 'Beruflich', beschreibung: 'Berufsnahe Aufgaben: Büro, Lager und Telefonnotizen',
+      module: ['buero', 'lager-bestellungen', 'telefonnotiz'] },
+    { id: 'vl-fruehphase', name: 'Frühphase / Aktivierung', beschreibung: 'Niedrigschwellige Aktivierung mit Erfolgserlebnissen',
+      module: ['denksport', 'reaktion', 'memory'], startLevel: 1 },
     { id: 'vl-einstieg', name: 'Einstieg gemischt', beschreibung: 'Kurzer Rundgang durch alle Bereiche',
       module: ['reaktion', 'memory', 'visuelle-exploration', 'reihen-fortsetzen', 'zielklicken'] }
   ];
@@ -31,7 +35,7 @@
         if (S.finde('templates', v.id)) return null;
         return S.put('templates', {
           id: v.id, name: v.name, beschreibung: v.beschreibung, standard: true, pauseMin: 1,
-          eintraege: v.module.map(function (m) { return { modulId: m, dauerMin: d, startLevel: 'auto', parameterOverrides: {} }; })
+          eintraege: v.module.map(function (m) { return { modulId: m, dauerMin: d, startLevel: v.startLevel || 'auto', parameterOverrides: {} }; })
         });
       }));
     },

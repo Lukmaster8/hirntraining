@@ -31,6 +31,7 @@
       return S.put('patients', p);
     },
     loeschen: function (p) {
+      HT.audit('löschen', p);
       var ops = [S.delete('patients', p.id)];
       S.alle('runs', function (r) { return r.patientId === p.id; }).forEach(function (r) { ops.push(S.delete('runs', r.id)); });
       S.alle('sessions', function (r) { return r.patientId === p.id; }).forEach(function (r) { ops.push(S.delete('sessions', r.id)); });
@@ -55,14 +56,26 @@
   P.exportieren = function (p) {
     var d = { format: 'hirntraining-patient', version: 1, erstellt: Date.now(), patient: HT.kopie(p) };
     ['plans', 'sessions', 'runs', 'moduleState'].forEach(function (st) { d[st] = HT.kopie(S.alle(st, function (x) { return x.patientId === p.id; })); });
-    HT.herunterladen('hirntraining-patient-' + (p.pseudonym || 'export') + '-' + HT.isoDatum(Date.now()) + '.json', JSON.stringify(d), 'application/json');
-    UI.toast('Patientendatei wurde heruntergeladen.', 'ok');
+    var name = 'hirntraining-patient-' + (p.pseudonym || 'export') + '-' + HT.isoDatum(Date.now());
+    if (!HT.krypto.verfuegbar) {
+      UI.bestaetigen('Dieser Browser kann nicht verschlüsseln (bitte Google Chrome verwenden). Trotzdem unverschlüsselt exportieren?', { gefahr: true, ja: 'Unverschlüsselt exportieren' }).then(function (ok) {
+        if (!ok) return;
+        HT.herunterladen(name + '.json', JSON.stringify(d), 'application/json'); HT.audit('export Patient (unverschlüsselt)', p);
+        UI.toast('Patientendatei wurde heruntergeladen.', 'ok');
+      });
+      return;
+    }
+    HT.krypto.passwortDialog({ titel: 'Patientendatei verschlüsseln' }).then(function (pw) {
+      if (!pw) return;
+      HT.krypto.verschluesseln(d, pw, { format: 'hirntraining-patient', erstellt: d.erstellt }).then(function (v) {
+        HT.herunterladen(name + '.htsich', JSON.stringify(v), 'application/octet-stream'); HT.audit('export Patient', p);
+        UI.toast('Verschlüsselte Patientendatei wurde heruntergeladen.', 'ok');
+      }, function (e) { UI.toast(e.message || 'Export fehlgeschlagen.', 'fehler'); });
+    });
   };
   P.importieren = function () {
-    HT.dateiLesen('.json,application/json').then(function (f) {
-      if (!f) return;
-      var d; try { d = JSON.parse(f.inhalt); } catch (e) { UI.toast('Datei nicht lesbar.', 'fehler'); return; }
-      if (!d || d.format !== 'hirntraining-patient') { UI.toast('Keine Hirntraining-Patientendatei.', 'fehler'); return; }
+    HT.sicherung.dateiOeffnen('hirntraining-patient').then(function (d) {
+      if (!d || !d.patient) return;
       var vorhanden = S.finde('patients', d.patient.id);
       UI.bestaetigen((vorhanden ? 'Patient „' + P.anzeigename(d.patient) + '“ existiert bereits und wird mit den Daten aus der Datei aktualisiert. ' : 'Patient „' + P.anzeigename(d.patient) + '“ wird übernommen. ') + (d.runs || []).length + ' Durchgänge, ' + (d.sessions || []).length + ' Sitzungen.', { titel: 'Patient importieren', ja: 'Importieren' }).then(function (ok) {
         if (!ok) return;
@@ -70,7 +83,7 @@
         if (!S.finde('therapists', p.therapeutId) && HT.auth.aktuell) p.therapeutId = HT.auth.aktuell.id;
         var ops = [S.put('patients', p)];
         ['plans', 'sessions', 'runs', 'moduleState'].forEach(function (st) { (d[st] || []).forEach(function (x) { ops.push(S.put(st, x)); }); });
-        Promise.all(ops).then(function () { UI.toast('Patient importiert.', 'ok'); location.hash = '#/patient/' + p.id + '/stammdaten'; });
+        Promise.all(ops).then(function () { HT.audit('import Patient', p); UI.toast('Patient importiert.', 'ok'); location.hash = '#/patient/' + p.id + '/stammdaten'; });
       });
     });
   };
@@ -293,6 +306,8 @@
       { name: 'kontrast', label: 'Hoher Kontrast im Training', typ: 'schalter', breit: true },
       { name: 'ton', label: 'Töne im Training', typ: 'schalter', breit: true },
       { name: 'tastenOverlay', label: 'Große Bildschirmtasten immer anzeigen', typ: 'schalter', breit: true },
+      { name: 'pultHinweis', label: 'Pult-Hinweis im Training (gerade sinnvolle Taste leuchtet)', typ: 'schalter', breit: true, standard: true },
+      { name: 'buehnenThema', label: 'Trainingsbühne', typ: 'auswahl', breit: true, standard: 'hell', optionen: [{ wert: 'hell', label: 'Hell' }, { wert: 'dunkel', label: 'Dunkel (blendfrei)' }, { wert: 'kontrast', label: 'Hoher Kontrast (schwarz/weiß/gelb)' }] },
       { typ: 'titel', label: 'Rückmeldung & Lernen' },
       { name: 'rueckmeldung', label: 'Rückmeldung nach jeder Antwort', typ: 'auswahl', breit: true, standard: 'voll', optionen: [{ wert: 'voll', label: 'Ton und Symbol (Haken/Kreuz)' }, { wert: 'visuell', label: 'Nur Symbol' }, { wert: 'ton', label: 'Nur Ton' }, { wert: 'keine', label: 'Keine Rückmeldung (z. B. bei Frustrationsneigung)' }] },
       { name: 'ohneFehlerton', label: 'Keinen Ton bei Fehlern (nur bei Erfolg)', typ: 'schalter', breit: true },

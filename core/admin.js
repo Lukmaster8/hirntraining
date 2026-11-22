@@ -6,22 +6,58 @@
 
   /* ===================== Datensicherung ===================== */
   var SI = HT.sicherung = {
+    /* Verschlüsselte Sicherung (.htsich, AES-GCM). Ohne crypto.subtle nur nach ausdrücklicher Bestätigung unverschlüsselt. */
     exportieren: function () {
-      return S.exportAll().then(function (d) {
-        HT.herunterladen('hirntraining-sicherung-' + HT.isoDatum(Date.now()) + '.json', JSON.stringify(d), 'application/json');
-        return S.einstellungenSpeichern({ letzterExport: Date.now() });
-      }).then(function () { UI.toast('Sicherung wurde heruntergeladen.', 'ok'); });
+      var datum = HT.isoDatum(Date.now());
+      if (!HT.krypto.verfuegbar) {
+        return UI.bestaetigen('Dieser Browser kann die Sicherung nicht verschlüsseln. Bitte möglichst Google Chrome verwenden. Trotzdem unverschlüsselt sichern? Die Datei enthält dann alle Patientendaten im Klartext.', { gefahr: true, ja: 'Unverschlüsselt sichern' }).then(function (ok) {
+          if (!ok) return;
+          return S.exportAll().then(function (d) {
+            HT.herunterladen('hirntraining-sicherung-' + datum + '.json', JSON.stringify(d), 'application/json');
+            HT.audit('export (unverschlüsselt)');
+            return S.einstellungenSpeichern({ letzterExport: Date.now() });
+          }).then(function () { UI.toast('Sicherung wurde heruntergeladen.', 'ok'); });
+        });
+      }
+      return HT.krypto.passwortDialog().then(function (pw) {
+        if (!pw) return;
+        return S.exportAll().then(function (d) {
+          return HT.krypto.verschluesseln(d, pw, { erstellt: d.erstellt, art: 'gesamt' });
+        }).then(function (v) {
+          HT.herunterladen('hirntraining-sicherung-' + datum + '.htsich', JSON.stringify(v), 'application/octet-stream');
+          HT.audit('export');
+          return S.einstellungenSpeichern({ letzterExport: Date.now() });
+        }).then(function () { UI.toast('Verschlüsselte Sicherung wurde heruntergeladen.', 'ok'); }, function (e) { UI.toast(e.message || 'Sicherung fehlgeschlagen.', 'fehler'); });
+      });
+    },
+    /* Datei lesen: v2 (verschlüsselt) → Passwort abfragen; v1 (Klartext) → mit Warnhinweis */
+    dateiOeffnen: function (format) {
+      return HT.dateiLesen('.htsich,.json,application/json').then(function (f) {
+        if (!f) return null;
+        var daten;
+        try { daten = JSON.parse(f.inhalt); } catch (e) { UI.toast('Die Datei konnte nicht gelesen werden.', 'fehler'); return null; }
+        if (!daten || (daten.format !== 'hirntraining-sicherung' && daten.format !== 'hirntraining-patient')) { UI.toast('Die Datei ist keine Hirntraining-Sicherung.', 'fehler'); return null; }
+        if (daten.version >= 2 && daten.daten && daten.kdf) {
+          var versuch = function () {
+            return HT.krypto.passwortDialog({ titel: 'Sicherung entschlüsseln', text: 'Bitte das Passwort eingeben, mit dem diese Sicherung erstellt wurde.', nurEinmal: true, ok: 'Entschlüsseln' }).then(function (pw) {
+              if (!pw) return null;
+              return HT.krypto.entschluesseln(daten, pw).catch(function (e) { UI.toast(e.message, 'fehler'); return versuch(); });
+            });
+          };
+          return versuch().then(function (inhalt) { return inhalt && inhalt.format === format ? inhalt : (inhalt ? (UI.toast('Die Datei passt nicht zu dieser Funktion.', 'fehler'), null) : null); });
+        }
+        if (daten.format !== format) { UI.toast('Die Datei passt nicht zu dieser Funktion.', 'fehler'); return null; }
+        return UI.bestaetigen('Achtung: Diese Datei ist eine ältere, unverschlüsselte Sicherung. Sie enthält Patientendaten im Klartext – nach dem Einspielen bitte sicher löschen und künftig verschlüsselt sichern.', { ja: 'Trotzdem einspielen' }).then(function (ok) { return ok ? daten : null; });
+      });
     },
     importieren: function () {
-      return HT.dateiLesen('.json,application/json').then(function (f) {
-        if (!f) return;
-        var daten;
-        try { daten = JSON.parse(f.inhalt); } catch (e) { UI.toast('Die Datei konnte nicht gelesen werden.', 'fehler'); return; }
-        if (!daten || daten.format !== 'hirntraining-sicherung') { UI.toast('Die Datei ist keine Hirntraining-Sicherung.', 'fehler'); return; }
+      return SI.dateiOeffnen('hirntraining-sicherung').then(function (daten) {
+        if (!daten) return;
         var n = (daten.patients || []).length, r = (daten.runs || []).length;
         return UI.bestaetigen('Sicherung vom ' + HT.datumZeit(daten.erstellt) + ' mit ' + n + ' Patienten und ' + r + ' Durchgängen wiederherstellen? Alle aktuellen Daten werden dabei ersetzt.', { gefahr: true, ja: 'Wiederherstellen' }).then(function (ok) {
           if (!ok) return;
           return S.importAll(daten).then(function () {
+            HT.audit('import');
             UI.toast('Daten wurden wiederhergestellt.', 'ok');
             HT.auth.abmelden();
           });
@@ -38,6 +74,7 @@
     { id: 'berichte', titel: 'Berichtsvorlagen', icon: 'dokument' },
     { id: 'module', titel: 'Modul-Schwellen', icon: 'trend' },
     { id: 'sicherung', titel: 'Datensicherung', icon: 'sicherung' },
+    { id: 'datenschutz', titel: 'Datenschutz', icon: 'schloss' },
     { id: 'daten', titel: 'Daten & Testdaten', icon: 'test' }
   ];
 
@@ -45,7 +82,7 @@
   HT.route('/verwaltung/:bereich', function (param, w) {
     w.appendChild(UI.seite(HT.t('nav_verwaltung'), 'Praxisweite Einstellungen – nur für Administratoren'));
     w.appendChild(UI.reiter(BEREICHE, param.bereich, function (b) { location.hash = '#/verwaltung/' + b; }));
-    var fn = { therapeuten: therapeuten, praxis: praxis, vorlagen: vorlagen, berichte: berichtsvorlagen, module: schwellen, sicherung: sicherung, daten: daten }[param.bereich] || therapeuten;
+    var fn = { therapeuten: therapeuten, praxis: praxis, vorlagen: vorlagen, berichte: berichtsvorlagen, module: schwellen, sicherung: sicherung, datenschutz: datenschutz, daten: daten }[param.bereich] || therapeuten;
     fn(w);
   }, { schutz: 'admin', nav: 'verwaltung' });
 
@@ -204,7 +241,7 @@
     var e = S.einstellungen();
     var g = HT.el('div', { class: 'raster raster-2' });
     g.appendChild(UI.karte('Sicherung erstellen', [
-      HT.el('p', null, 'Exportiert alle Daten (Patienten, Pläne, Ergebnisse, Einstellungen) als JSON-Datei. Bewahren Sie die Datei z. B. auf einem USB-Stick oder im Praxis-Netzlaufwerk auf.'),
+      HT.el('p', null, 'Exportiert alle Daten (Patienten, Pläne, Ergebnisse, Einstellungen) als verschlüsselte Datei (.htsich). Das Passwort wird nicht gespeichert – bitte sicher notieren. Bewahren Sie die Datei z. B. auf einem USB-Stick in der Praxis auf, nicht in Cloud-Ordnern wie Google Drive.'),
       HT.el('p', { class: 'gedimmt klein' }, 'Letzte Sicherung: ' + (e.letzterExport ? HT.datumZeit(e.letzterExport) : 'noch nie') + ' · Speicher: ' + S.backend),
       UI.knopf('Jetzt sichern', { art: 'primaer', icon: 'download', klick: function () { SI.exportieren().then(HT.app.neuZeichnen); } })
     ], { icon: 'download' }));
@@ -215,6 +252,69 @@
     var f = UI.formular([{ name: 'backupErinnerung', label: 'Erinnerung an Sicherung nach (Tagen)', typ: 'zahl', min: 1, max: 60 }], e);
     g.appendChild(UI.karte('Erinnerung', [f.el, UI.knopf(HT.t('speichern'), { art: 'klein', klick: function () { S.einstellungenSpeichern(f.werte()).then(function () { UI.toast(HT.t('gespeichert'), 'ok'); }); } })], { icon: 'kalender' }));
     w.appendChild(g);
+  }
+
+  /* ===================== Datenschutz: Sperre, Aufbewahrung, Löschen, Protokoll ===================== */
+  function behandlungsende(p) {
+    var t = p.angelegtAm || 0;
+    S.alle('sessions', function (s) { return s.patientId === p.id; }).forEach(function (s) { t = Math.max(t, s.ende || s.start || 0); });
+    return p.behandlungsende ? Math.max(t, new Date(p.behandlungsende).getTime() || 0) : t;
+  }
+  function datenschutz(w) {
+    var e = S.einstellungen();
+    var g = HT.el('div', { class: 'raster raster-2' });
+    // Status Datentresor (Verschlüsselung der Patientendaten im Browser)
+    var tr = S.tresor, ohne = S.alle('therapists').filter(function (t) { return t.aktiv !== false && !t.tresor; });
+    var trText = tr.aktiv()
+      ? '<p><b style="color:var(--erfolg)">● Aktiv:</b> Klientendaten, Pläne, Sitzungen und Ergebnisse werden mit AES-256 verschlüsselt gespeichert. Der Schlüssel ist mit der PIN jedes Zugangs geschützt und liegt nur während der Anmeldung im Arbeitsspeicher.</p>' +
+        (ohne.length ? '<p class="klein">Noch ohne eigenen Schlüssel (einmalige Freigabe bei der nächsten Anmeldung): ' + ohne.map(function (t) { return HT.esc(t.name); }).join(', ') + '</p>' : '')
+      : tr.moeglich ? '<p><b style="color:var(--warnung,#c99a12)">● Noch nicht aktiv</b> – wird bei der nächsten Anmeldung mit PIN automatisch eingerichtet.</p>'
+        : '<p><b style="color:var(--fehler)">● Nicht verfügbar</b> – dieser Browser kann nicht verschlüsseln. Bitte Google Chrome oder Safari verwenden.</p>';
+    g.appendChild(UI.karte('Datentresor (Verschlüsselung)', [HT.el('div', { html: trText + '<p class="klein gedimmt">Empfehlung zusätzlich: FileVault (Systemeinstellungen → Sicherheit) und ein Benutzerpasswort am Mac. PINs mit 6 oder mehr Ziffern sind deutlich sicherer als 4.</p>' })], { icon: 'schloss' }));
+    var f = UI.formular([
+      { name: 'sperreMin', label: 'Sperren nach Inaktivität', typ: 'auswahl', optionen: [{ wert: 5, label: '5 Minuten' }, { wert: 10, label: '10 Minuten' }, { wert: 15, label: '15 Minuten' }, { wert: 30, label: '30 Minuten' }] },
+      { name: 'aufbewahrungJahre', label: 'Aufbewahrungsfrist (Jahre nach Behandlungsende)', typ: 'zahl', min: 1, max: 30 }
+    ], e);
+    g.appendChild(UI.karte('Sperre und Aufbewahrung', [
+      HT.el('p', { class: 'klein gedimmt' }, 'Ohne Maus-, Tastatur- oder Touch-Eingabe wird das Programm gesperrt (nicht während eines laufenden Trainings). Sofort sperren: Strg + Alt + L.'),
+      f.el,
+      UI.knopf(HT.t('speichern'), { art: 'primaer klein', klick: function () { var v = f.werte(); v.sperreMin = Number(v.sperreMin) || 10; v.aufbewahrungJahre = Number(v.aufbewahrungJahre) || 10; S.einstellungenSpeichern(v).then(function () { UI.toast(HT.t('gespeichert'), 'ok'); HT.app.neuZeichnen(); }); } })
+    ], { icon: 'schloss' }));
+    // Frist abgelaufen
+    var jahre = Number(e.aufbewahrungJahre) || 10, grenze = Date.now() - jahre * 365.25 * 86400000;
+    var abgelaufen = S.alle('patients').filter(function (p) { return behandlungsende(p) < grenze; });
+    var wahl = {};
+    var kl = UI.karte('Frist abgelaufen (' + abgelaufen.length + ')', null, { icon: 'muell' });
+    if (!abgelaufen.length) kl.appendChild(UI.leer('Keine Klienten mit abgelaufener Aufbewahrungsfrist (' + jahre + ' Jahre nach Behandlungsende).', 'haken'));
+    else {
+      abgelaufen.forEach(function (p) {
+        var cb = HT.el('input', { type: 'checkbox' });
+        cb.addEventListener('change', function () { wahl[p.id] = cb.checked; });
+        kl.appendChild(HT.el('label', { class: 'ds-zeile' }, [cb, HT.el('span', null, (p.pseudonym || '–') + ' · Behandlungsende ' + HT.datum(behandlungsende(p)))]));
+      });
+      kl.appendChild(UI.knopf('Ausgewählte endgültig löschen', { art: 'gefahr klein', icon: 'muell', klick: function () {
+        var ids = Object.keys(wahl).filter(function (k) { return wahl[k]; });
+        if (!ids.length) { UI.toast('Bitte zuerst Klienten auswählen.', 'fehler'); return; }
+        UI.bestaetigen(ids.length + ' Klient(en) mit allen Durchgängen, Sitzungen, Plänen, Zielen und Notizen endgültig löschen? Das lässt sich nicht rückgängig machen.', { gefahr: true, ja: 'Endgültig löschen' }).then(function (ok) {
+          if (!ok) return;
+          Promise.all(ids.map(function (id) { var p = S.finde('patients', id); return p ? HT.patienten.loeschen(p) : null; })).then(function () { UI.toast('Gelöscht.', 'ok'); HT.app.neuZeichnen(); });
+        });
+      } }));
+    }
+    g.appendChild(kl);
+    w.appendChild(g);
+    // Protokoll
+    var pk = UI.karte('Protokoll (ohne Klardaten)', null, { icon: 'dokument' });
+    var liste = S.alle('audit').sort(function (a, b) { return b.zeit - a.zeit; }).slice(0, 300);
+    if (!liste.length) pk.appendChild(UI.leer('Noch keine Einträge. Protokolliert werden Export, Import, Löschen und Bericht drucken.', 'dokument'));
+    else pk.appendChild(UI.tabelle([
+      { titel: 'Datum', wert: function (a) { return HT.datumZeit(a.zeit); } },
+      { titel: 'Aktion', wert: function (a) { return a.aktion; } },
+      { titel: 'Therapeut', wert: function (a) { return a.therapeut || '–'; } },
+      { titel: 'Pseudonym', wert: function (a) { return a.pseudonym || '–'; } }
+    ], liste));
+    pk.style.marginTop = '1.2rem';
+    w.appendChild(pk);
   }
 
   function daten(w) {
@@ -239,7 +339,7 @@
       HT.el('p', null, 'Löscht sämtliche Daten dieses Browsers (Patienten, Ergebnisse, Therapeuten, Einstellungen). Erstellen Sie vorher eine Sicherung!'),
       UI.knopf('Alle Daten löschen …', { art: 'gefahr', icon: 'muell', klick: function () {
         var f = UI.formular([{ name: 'wort', label: 'Zur Bestätigung LÖSCHEN eingeben', breit: true }]);
-        UI.dialog({ titel: 'Alle Daten löschen', inhalt: f.el, knoepfe: [{ text: HT.t('abbrechen'), wert: null }, { text: 'Endgültig löschen', art: 'gefahr primaer', aktion: function () {
+        UI.dialog({ fokusFeld: true, titel: 'Alle Daten löschen', inhalt: f.el, knoepfe: [{ text: HT.t('abbrechen'), wert: null }, { text: 'Endgültig löschen', art: 'gefahr primaer', aktion: function () {
           if (f.werte().wort !== 'LÖSCHEN') { UI.toast('Bitte LÖSCHEN eingeben.', 'fehler'); return false; }
           return S.importAll({ format: 'hirntraining-sicherung' }).then(function () { HT.auth.aktuell = null; location.hash = '#/einrichtung'; location.reload(); });
         } }] });
@@ -263,14 +363,17 @@
     });
     var f1 = UI.formular([
       { name: 'schriftgroesse', label: 'Schriftgröße', typ: 'bereich', min: 100, max: 160, schritt: 10, breit: true, format: function (v) { return v + ' %'; } },
-      { name: 'kontrast', label: 'Hoher Kontrast (schwarz / weiß / gelb)', typ: 'schalter', breit: true }
+      { name: 'kontrast', label: 'Hoher Kontrast (schwarz / weiß / gelb)', typ: 'schalter', breit: true },
+      { name: 'grafik', label: 'Darstellung', typ: 'auswahl', breit: true, optionen: [{ wert: 'auto', label: 'Automatisch (misst die Leistung des Computers)' }, { wert: 'schoen', label: 'Schön (Schatten, Verläufe, Vorschau-Animationen)' }, { wert: 'leicht', label: 'Leicht (für ältere Computer, z. B. MacBook 2012)' }] },
+      { name: 'animationenReduzieren', label: 'Animationen reduzieren', typ: 'schalter', breit: true }
     ], e);
     g.appendChild(UI.karte('Darstellung', [HT.el('div', { class: 'feld-label' }, 'Farbschema'), wahl, f1.el], { icon: 'auge' }));
     var f2 = UI.formular([
       { name: 'ton', label: 'Töne an', typ: 'schalter', breit: true },
       { name: 'lautstaerke', label: 'Lautstärke', typ: 'bereich', min: 0, max: 100, schritt: 5, breit: true, format: function (v) { return v + ' %'; } },
       { name: 'sprachausgabe', label: 'Anleitungen und Hinweise vorlesen (Aufnahmen der Vorlesestimme)', typ: 'schalter', breit: true },
-      { name: 'sprachausgabeErsatz', label: 'Systemstimme verwenden, wenn für einen Text keine Aufnahme vorhanden ist', typ: 'schalter', breit: true },
+      { name: 'sprachausgabeErsatz', label: 'Systemstimme (deutsche Stimme des Mac), wenn für einen Text keine Aufnahme vorhanden ist', typ: 'auswahl', breit: true, optionen: [{ wert: 'ersatz', label: 'Systemstimme nur als Ersatz (empfohlen)' }, { wert: 'nie', label: 'nie' }] },
+      { name: 'sperreMin', label: 'Sperren nach Inaktivität (Minuten)', typ: 'auswahl', breit: true, optionen: [{ wert: 5, label: '5 Minuten' }, { wert: 10, label: '10 Minuten' }, { wert: 15, label: '15 Minuten' }, { wert: 30, label: '30 Minuten' }] },
       { typ: 'titel', label: 'Training' },
       { name: 'standarddauer', label: 'Standarddauer je Modul (min)', typ: 'zahl', min: 1, max: 60 },
       { name: 'pausenhinweisMin', label: 'Pausenhinweis alle … Minuten (0 = aus)', typ: 'zahl', min: 0, max: 120 },

@@ -82,7 +82,7 @@
     ziel: 'Räumliche Körper in der Vorstellung drehen und vergleichen',
     beschreibung: 'Zwei aus Würfeln zusammengesetzte Körper werden räumlich (isometrisch) dargestellt. Der rechte ist gedreht und ist entweder derselbe Körper oder sein Spiegelbild. Zunächst wird nur um die senkrechte Achse gedreht, in höheren Leveln um beliebige Achsen. Level: Anzahl der Würfel, Drehachsen und Zeitlimit.',
     anleitung: 'Stellen Sie sich vor, Sie drehen den linken Körper. Kann er genauso aussehen wie der rechte? Dann „Gleich“ (Taste J). Ist der rechte ein Spiegelbild, dann „Gespiegelt“ (Taste N).',
-    tasten: ['ja', 'nein'], levels: levels,
+    tasten: ['ja', 'nein'], eingaben: ['ja', 'nein'], levels: levels,
     levelLabels: { wuerfel: 'Würfel', achsen: 'Drehachsen', zeitlimitSek: 'Zeitlimit (s)' },
     bewertung: { aufstufenAb: 0.8, abstufenUnter: 0.55 },
     create: function (container, ctx) {

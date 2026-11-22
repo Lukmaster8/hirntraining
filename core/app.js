@@ -16,7 +16,15 @@
       HT.audio.an = e.ton !== false;
       HT.audio.lautstaerke = (e.lautstaerke === undefined ? 70 : e.lautstaerke) / 100;
       HT.audio.sprache = e.sprachausgabe !== false;
-      HT.audio.ersatzStimme = !!e.sprachausgabeErsatz;
+      HT.audio.ersatzStimme = e.sprachausgabeErsatz !== 'nie' && e.sprachausgabeErsatz !== 'aus'; // Standard: Systemstimme als Ersatz
+      // Animationen reduzieren (Einstellung oder Systemeinstellung „Bewegung reduzieren“)
+      var ruhig = !!e.animationenReduzieren || !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      root.classList.toggle('ruhig', ruhig);
+      // Darstellung: Automatisch (gemessen) | Schön | Leicht
+      var g = e.grafik || 'auto';
+      if (g === 'leicht') root.classList.add('leicht');
+      else if (g === 'schoen') root.classList.remove('leicht');
+      else root.classList.toggle('leicht', HT.leistung.gemessenLeicht === true);
     },
 
     /* Vollbild über die Fullscreen-API (Safari: webkit-Präfix) */
@@ -65,7 +73,7 @@
       var app = HT.$('#app');
       HT.leeren(app);
       document.querySelectorAll('.dialog-hinter').forEach(function (d) { d.remove(); });
-      if (!route.shell) { route.render(param, app); return; }
+      if (!route.shell) { app.classList.remove('seite-ein'); void app.offsetWidth; app.classList.add('seite-ein'); route.render(param, app); return; }
       var shell = HT.el('div', { class: 'shell' });
       // Handy: obere Leiste mit Menüknopf, die Seitenleiste fährt von links herein
       var mobil = HT.el('div', { class: 'mobil-leiste' });
@@ -84,6 +92,7 @@
       shell.appendChild(haupt);
       app.appendChild(shell);
       inhalt.appendChild(zurueckLeiste());
+      inhalt.classList.add('seite-ein');
       try { route.render(param, inhalt); } catch (e) { console.error(e); inhalt.appendChild(UI.leer('Beim Anzeigen ist ein Fehler aufgetreten: ' + e.message, 'warnung')); }
     }
   };
@@ -225,6 +234,7 @@
   APP.starten = function () {
     S.init().then(function () {
       APP.darstellungAnwenden();
+      HT.leistung.messen(function () { APP.darstellungAnwenden(); });
       HT.auth.wiederherstellen();
       if (HT.pult) HT.pult.init();
       return HT.Module.laden();
@@ -233,6 +243,8 @@
       window.addEventListener('hashchange', APP.routen);
       var lade = HT.$('#laden'); if (lade) lade.remove();
       APP.routen();
+      // Module, Vorschauen und Ansagen im Hintergrund vorladen, damit beim Öffnen nichts nachlädt
+      setTimeout(function () { if (HT.vorladen) HT.vorladen(); }, 900);
       // Neu zeichnen bei Größenänderung (Diagramme)
       var b = window.innerWidth;
       window.addEventListener('resize', HT.entprellen(function () { if (Math.abs(window.innerWidth - b) > 80 && !HT.session.laeuft && !document.querySelector('.dialog-hinter')) { b = window.innerWidth; APP.routen(); } }, 400));
@@ -251,6 +263,8 @@
 
   // Online-Version (https, z. B. GitHub Pages): Offline-Speicher aktivieren, damit das Programm
   // auf iPhone/iPad/Mac auch ohne Internet startet. Bei index.html direkt vom Mac (file://) nicht nötig.
+  // Manifest nur in der Online-Version einbinden (unter file:// meldet der Browser sonst einen Fehler in der Konsole)
+  if (location.protocol === 'https:') { var mf = document.createElement('link'); mf.rel = 'manifest'; mf.href = 'manifest.webmanifest'; document.head.appendChild(mf); }
   if (location.protocol === 'https:' && 'serviceWorker' in navigator) {
     window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function (e) { console.warn('Offline-Speicher nicht verfügbar', e); }); });
   }
@@ -263,6 +277,7 @@
   var THEMEN = [
     ['Arbeitsablauf', 'personen', '1. Patient anlegen (Patienten → Neuer Patient). 2. Trainingsplan aus einer Vorlage erstellen und anpassen (Reiter Trainingsplan). 3. Optional: Einstufungstest für passende Startlevel. 4. Therapieziele festlegen. 5. Sitzung starten – oder Wochenplan für das selbstständige Training im Patientenmodus anlegen. 6. Ergebnisse im Reiter Verlauf analysieren und Berichte erstellen.'],
     ['Während des Trainings', 'pause', 'Esc oder der Pauseknopf öffnen das Therapeutenmenü: Level ändern, Neustart mit oder ohne Anleitung, Parameter anpassen, Zwischenergebnisse ansehen, Modul überspringen, Sitzung unterbrechen oder beenden. Die Taste „+“ liest die Anleitung erneut vor, „−“ pausiert. Teilergebnisse werden immer gespeichert.'],
+    ['Pult einrichten (Tastatur)', 'pult', '1. Pult per USB anstecken – es meldet sich als Tastatur, ein Treiber ist nicht nötig. 2. Oben auf den Pult-Knopf (oder System → Bedienpult) klicken und „Tasten einrichten“ wählen. 3. Jede Taste drücken, wenn sie im Bild blau markiert ist; fehlende Tasten überspringen. Schon belegte Tasten werden abgelehnt. 4. Belegungsprofil wählen (Klassisch: Gelb = Anleitung vorlesen, Rot = Pause; Ja/Nein: Gelb = Ja, Rot = Nein) und alle Tasten kurz testen. Der Joystick funktioniert nur in Chrome, die Tasten überall.'],
     ['Patientenmodus', 'schloss', 'Im Patientenmodus sind alle Menüs gesperrt. Patienten wählen auf dem Startbildschirm ihren Namen (optional mit persönlicher PIN) und sehen ihre Übungen für heute. Verlassen nur mit Therapeuten-PIN: Strg + Alt + P oder die Ecke oben rechts 1,5 Sekunden gedrückt halten.'],
     ['Wochenplan', 'kalender', 'Im Reiter Trainingsplan legen Sie für jeden Tag Vorgaben fest (Plan oder Einzelmodul, Startlevel, Anleitung, Wiederholung, persönliche Hinweise vor/nach dem Training). Erledigte Vorgaben werden grün. Mit dem erweiterten Patientenmodus darf an freien Tagen der aktive Plan trainiert werden. Nachrichten der Patienten erscheinen in der Übersicht.'],
     ['Adaptive Schwierigkeit', 'trend', 'Nach jedem Durchgang (1–3 min) wird die Trefferquote bewertet: zweimal hintereinander über der Aufstufungsschwelle → Level +1, unter der Abstufungsschwelle → Level −1, deutlich langsamer als zuletzt → nicht aufstufen. Schwellen je Modul unter Verwaltung; Level und Automatik je Patient im Reiter Einstellungen.'],

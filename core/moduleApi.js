@@ -89,6 +89,12 @@
       var t = ev.target;
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
       if (ev.repeat) { if (TASTEN[ev.key]) ev.preventDefault(); return; }
+      // Enter/Leertaste auf einem fokussierten Knopf löst nur den Knopf aus, nicht zusätzlich „ok“
+      if (t && t.tagName === 'BUTTON' && (ev.key === 'Enter' || ev.key === ' ' || ev.key === 'Spacebar')) return;
+      // Ziffernblock (auch ohne NumLock) und Ziffern-Tasten des Pults gehen als „ziffer“, Ziffernblock-Enter = OK
+      var np = /^Numpad([0-9])$/.exec(ev.code || '');
+      if (np) { E.ausloesen('ziffer', { wert: Number(np[1]) }); ev.preventDefault(); return; }
+      if (ev.code === 'NumpadEnter') { E.ausloesen('ok', { taste: 'Enter' }); ev.preventDefault(); return; }
       if (/^[0-9]$/.test(ev.key)) { E.ausloesen('ziffer', { wert: Number(ev.key) }); ev.preventDefault(); return; }
       if (TASTEN[ev.key]) { E.ausloesen(TASTEN[ev.key], { taste: ev.key }); ev.preventDefault(); return; }
       if (/^[a-zA-ZäöüÄÖÜß]$/.test(ev.key)) {
@@ -213,7 +219,7 @@
 
   M.aktive = function () {
     var aus = HT.storage.einstellungen().moduleInaktiv || {};
-    return M.liste.filter(function (m) { return !aus[m.id]; });
+    return M.liste.filter(function (m) { return !aus[m.id] && !m.versteckt; });
   };
 
   /* =====================================================================
@@ -359,6 +365,7 @@
         knopf.classList.add('falsch'); knopf.disabled = true; knopf.style.opacity = '.45';
         ctx.onEvent({ korrekt: false, reiz: a.reiz, reaktion: String(wert), rtMs: Z.jetzt() - start, seite: a.seite, typ: 'erster versuch falsch' });
         var hb = HT.el('div', { class: 'hinweis-blase' }, 'Noch nicht ganz – schauen Sie noch einmal genau hin.');
+        HT.audio.sprechen('Noch nicht ganz – schauen Sie noch einmal genau hin.', { nurAufnahme: true });
         container.appendChild(hb); setTimeout(function () { if (hb.parentNode) hb.parentNode.removeChild(hb); }, 2200);
         return;
       }
@@ -366,7 +373,7 @@
       if (fehlversuch) {
         markieren(ok ? null : i);
         ctx.onEvent({ korrekt: ok, zaehlt: false, reiz: a.reiz, reaktion: String(wert), typ: 'korrektur' });
-        if (ok) HT.audio.richtig();
+        if (ok) { HT.audio.richtig(); HT.audio.sprechen('Richtig!', { nurAufnahme: true }); }
         fehlversuch = false;
         Z.nach(1100, weiter);
         return;
@@ -462,11 +469,20 @@
       }
     };
   })();
+  /* Pixeldichte für Canvas: Retina/4K scharf, aber höchstens 2-fach und höchstens ~4 Mio. Pixel (wird vom System scharf auf 4K hochskaliert),
+   * im Leicht-Modus (ältere Macs) immer 1 – so bleibt es auch auf dem iMac 2012 flüssig. */
+  HT.pixelDichte = function (b, h) {
+    var d = Math.min(window.devicePixelRatio || 1, 2);
+    if (HT.leicht && HT.leicht()) d = 1;
+    var flaeche = Math.max(1, (b || 1) * (h || 1));
+    if (flaeche * d * d > 4.2e6) d = Math.max(1, Math.sqrt(4.2e6 / flaeche));
+    return d;
+  };
   /* Canvas in HiDPI-Auflösung über die ganze Fläche */
   HT.canvasVoll = function (container) {
     var c = HT.el('canvas', { class: 'm-canvas' });
     container.appendChild(c);
-    var dpr = window.devicePixelRatio || 1, b = container.clientWidth, h = container.clientHeight;
+    var b = container.clientWidth, h = container.clientHeight, dpr = HT.pixelDichte(b, h);
     c.width = b * dpr; c.height = h * dpr;
     var ctx = c.getContext('2d'); ctx.scale(dpr, dpr);
     return { c: c, ctx: ctx, b: b, h: h };

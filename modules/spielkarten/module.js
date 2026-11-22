@@ -24,7 +24,8 @@
       var p = ctx.params, Z = HT.zeit, zone = HT.m.neu(container, 'm-zentrum'), aus = [];
       var regel = p.vergleich === 'farbe' ? 'Gleiche <b>Farbe</b> wie die Karte davor?' : 'Gleiche Karte wie ' + (p.n === 1 ? 'die Karte <b>davor</b>' : p.n === 2 ? 'die <b>vorletzte</b> Karte' : 'die <b>drittletzte</b> Karte') + '?';
       HT.m.neu(zone, 'm-anweisung', regel);
-      var tisch = HT.m.neu(zone, '', '', { width: '170px', height: '238px', transition: 'transform .18s', marginBottom: '1rem' });
+      var kb = Math.round(Math.max(170, Math.min(26 * (ctx.buehne ? ctx.buehne.einheit : 6.5), 260)));
+      var tisch = HT.m.neu(zone, '', '', { width: kb + 'px', height: Math.round(kb * 1.4) + 'px', transition: 'transform .18s', marginBottom: '1rem' });
       var stapel = HT.zufall.stichprobe((function () { var a = []; FARBEN.forEach(function (x, f) { WERTE.forEach(function (w) { a.push({ f: f, w: w }); }); }); return a; })(), p.kartenzahl);
       var verlauf = [], akt = null, timer = null;
       function gleich(a, b) { return p.vergleich === 'farbe' ? a.f === b.f : a.f === b.f && a.w === b.w; }

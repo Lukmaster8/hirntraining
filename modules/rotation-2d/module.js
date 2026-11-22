@@ -35,7 +35,7 @@
     ziel: 'Formen in der Vorstellung drehen und vergleichen',
     beschreibung: 'Zwei flache Figuren werden nebeneinander gezeigt. Die rechte ist gedreht – entweder ist sie dieselbe Figur oder ihr Spiegelbild. Die Entscheidung „gleich“ oder „gespiegelt“ erfordert mentale Rotation. Level: Komplexität der Figur (4–8 Felder), Drehwinkel (0° bis beliebig) und Zeitlimit.',
     anleitung: 'Ist die rechte Figur dieselbe wie die linke, nur gedreht? Dann „Gleich“ (Taste J). Ist sie gespiegelt (wie im Spiegel), dann „Gespiegelt“ (Taste N).',
-    tasten: ['ja', 'nein'], levels: levels,
+    tasten: ['ja', 'nein'], eingaben: ['ja', 'nein'], levels: levels,
     levelLabels: { zellen: 'Felder', maxWinkel: 'Max. Winkel (°)', beliebig: 'Beliebige Winkel', zeitlimitSek: 'Zeitlimit (s)' },
     create: function (container, ctx) {
       var p = ctx.params;

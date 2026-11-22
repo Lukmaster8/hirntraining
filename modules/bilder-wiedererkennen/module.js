@@ -12,7 +12,7 @@
     ziel: 'Visuelles Gedächtnis und Wiedererkennen stärken',
     beschreibung: 'In der Lernphase werden nacheinander Alltagsbilder gezeigt. In der Testphase erscheinen bekannte und neue Bilder gemischt; für jedes Bild wird entschieden, ob es bekannt oder neu ist. In höheren Leveln stammen die neuen Bilder aus derselben Kategorie (z. B. anderes Obst) und es gibt eine Wartezeit zwischen Lernen und Abfrage.',
     anleitung: 'Schauen Sie sich die Bilder genau an und merken Sie sie sich. Danach sehen Sie wieder Bilder: Tippen Sie auf „Bekannt“ (Taste J), wenn Sie es vorher gesehen haben, sonst auf „Neu“ (Taste N).',
-    tasten: ['ja', 'nein'],
+    tasten: ['ja', 'nein'], eingaben: ['ja', 'nein'],
     levels: levels,
     levelLabels: { anzahl: 'Bilder', darbietungMs: 'Darbietung (ms)', aehnlich: 'Ähnliche neue Bilder', verzoegerungSek: 'Verzögerung (s)' },
     bewertung: { aufstufenAb: 0.85, abstufenUnter: 0.65 },

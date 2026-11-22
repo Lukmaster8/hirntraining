@@ -45,6 +45,6 @@
 .lv-balken { width: 70%; background: linear-gradient(180deg, #2EAD6B, #1BA8B5); border-radius: 3mm 3mm 0 0; }
 .lv-smileys { font-size: 18pt; color: #E0A21B; writing-mode: vertical-rl; letter-spacing: 2mm; }
 .lv-saeule span { font-size: 8pt; color: #51606b; margin-top: 1.5mm; position: relative; top: 6mm; }
-@media print { .lv-druck { position: absolute; left: 0; } .lv-druck .bericht-papier, .lv-druck .bericht-papier * { visibility: visible; } body:has(.lv-druck) .bericht-papier:not(.lv-papier) { display: none; } }
+@media print { .lv-druck { position: absolute; left: 0; } .lv-druck .bericht-papier, .lv-druck .bericht-papier * { visibility: visible; } body.lv-druck-aktiv .bericht-papier:not(.lv-papier) { display: none; } }
 .bericht-text { margin: 4mm 0; line-height: 1.55; }
 code { background: var(--grund-2); padding: 0 .3rem; border-radius: 5px; font-size: .85em; }

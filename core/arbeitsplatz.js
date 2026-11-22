@@ -17,6 +17,16 @@
     nonstop: function () { try { return localStorage.getItem('ht-nonstop') === '1'; } catch (e) { return false; } }
   };
 
+  /* Mini-Verlauf als SVG (Werte 0..1) */
+  function sparkline(werte) {
+    if (!werte || werte.length < 2) return '<div class="ap2-spark-leer">Noch kein Verlauf</div>';
+    var b = 260, h = 46, n = werte.length;
+    var lo = Math.max(0, Math.min.apply(null, werte) - 0.05), hi = Math.min(1, Math.max.apply(null, werte) + 0.05);
+    if (hi - lo < 0.2) { var mitte = (hi + lo) / 2; lo = Math.max(0, mitte - 0.1); hi = Math.min(1, mitte + 0.1); }
+    var pkt = werte.map(function (v, k) { return (k / (n - 1) * (b - 8) + 4).toFixed(1) + ',' + (h - 4 - (v - lo) / (hi - lo) * (h - 10)).toFixed(1); });
+    return '<svg viewBox="0 0 ' + b + ' ' + h + '" preserveAspectRatio="none"><polyline points="' + pkt.join(' ') + '" fill="none" stroke="#1BA8B5" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>' +
+      '<circle cx="' + pkt[n - 1].split(',')[0] + '" cy="' + pkt[n - 1].split(',')[1] + '" r="3.5" fill="#1BA8B5"/></svg><span>Trefferquote je Sitzung</span>';
+  }
   function klientLabel(p) {
     var name = [p.nachname, p.vorname].filter(Boolean).join(', ') || p.pseudonym;
     var geb = p.geburtsdatum ? HT.datum(new Date(p.geburtsdatum + 'T12:00:00').getTime()) : (p.geburtsjahr ? 'Jg. ' + p.geburtsjahr : '');
@@ -43,8 +53,8 @@
     }
     box.addEventListener('keydown', function (ev) {
       var i = eintraege.map(function (e) { return e.id; }).indexOf(gewaehlt);
-      if (ev.key === 'ArrowDown') { ev.preventDefault(); i = Math.min(eintraege.length - 1, i + 1); waehlen(eintraege[i].id); zeilen[i].scrollIntoView({ block: 'nearest' }); }
-      if (ev.key === 'ArrowUp') { ev.preventDefault(); i = Math.max(0, i - 1); waehlen(eintraege[i].id); zeilen[i].scrollIntoView({ block: 'nearest' }); }
+      if (ev.key === 'ArrowDown') { ev.preventDefault(); i = Math.min(eintraege.length - 1, i + 1); waehlen(eintraege[i].id); HT.inSicht(zeilen[i], box); }
+      if (ev.key === 'ArrowUp') { ev.preventDefault(); i = Math.max(0, i - 1); waehlen(eintraege[i].id); HT.inSicht(zeilen[i], box); }
       if (ev.key === 'Enter' && opt.doppelklick && gewaehlt) { ev.preventDefault(); opt.doppelklick(gewaehlt); }
     });
     if (!eintraege.length && opt.leer) box.appendChild(HT.el('div', { class: 'ap-leer' }, opt.leer));
@@ -84,21 +94,26 @@
     kopf.appendChild(HT.el('div', { class: 'ap-marke', html: '<div class="marke-logo">' + HT.logoHtml() + '</div><div><strong>' + HT.esc(e.praxisname) + '</strong><span>Hirntraining · Kognitive Therapie und Hirnleistungstraining</span></div>' }));
     var kr = HT.el('div', { class: 'ap-kopf-rechts' });
     if (HT.pult) kr.appendChild(HT.pult.statusChip());
-    kr.appendChild(UI.knopf('Übersicht & Statistik', { art: 'geist klein', icon: 'diagramm', klick: function () { location.hash = '#/uebersicht'; } }));
+    var tageSeit = e.letzterExport ? Math.floor((Date.now() - e.letzterExport) / 86400000) : null, faellig = tageSeit === null || tageSeit >= (e.backupErinnerung || 7);
+    var siChip = HT.el('button', { type: 'button', class: 'ap2-chip ' + (faellig ? 'gelb' : 'gruen'), title: faellig ? 'Datensicherung fällig – klicken zum Sichern' : 'Letzte Sicherung: ' + HT.datum(e.letzterExport), html: '<span class="pult-punkt"></span>' + HT.icon('sicherung') + '<span>' + (faellig ? 'Sicherung fällig' : 'Gesichert ' + HT.datum(e.letzterExport)) + '</span>' });
+    siChip.addEventListener('click', function () { if (HT.auth.istAdmin()) location.hash = '#/verwaltung/sicherung'; else HT.sicherung.exportieren().then(HT.app.neuZeichnen); });
+    kr.appendChild(siChip);
+    kr.appendChild(UI.knopf('Statistik', { art: 'geist klein', icon: 'diagramm', titel: 'Übersicht & Statistik', klick: function () { location.hash = '#/uebersicht'; } }));
     kr.appendChild(UI.knopf('', { art: 'geist klein', icon: 'vollbild', titel: 'Vollbild', klick: function () { HT.app.vollbild(); } }));
     kopf.appendChild(kr);
     fe.appendChild(kopf);
 
-    var koerper = HT.el('div', { class: 'ap-koerper' });
-    // Linke Schalterleiste
-    var status = HT.el('div', { class: 'ap-status' }, 'Bereit.');
-    var links = HT.el('nav', { class: 'ap-schalter' });
+    var koerper = HT.el('div', { class: 'ap2-koerper' });
+    var status = HT.el('span', { class: 'ap2-status' }, 'Start mit OK am Pult oder Enter');
+    var STATUS_STD = 'Start mit OK am Pult oder Enter';
+    // ---- Linke schmale Leiste (Icon + Beschriftung) ----
+    var leiste = HT.el('nav', { class: 'ap2-leiste', 'aria-label': 'Arbeitsbereiche' });
     var schalter = function (text, icon, hinweis, klick, extra) {
-      var b = HT.el('button', { type: 'button', class: 'ap-gross' + (extra ? ' ' + extra : ''), html: '<span class="ap-gross-icon">' + HT.icon(icon) + '</span><span>' + HT.esc(text) + '</span>' });
+      var b = HT.el('button', { type: 'button', class: 'ap2-leistenknopf' + (extra ? ' ' + extra : ''), title: hinweis, html: HT.icon(icon) + '<span>' + HT.esc(text) + '</span>' });
       b.addEventListener('click', klick);
       b.addEventListener('mouseenter', function () { status.textContent = hinweis; });
-      b.addEventListener('mouseleave', function () { status.textContent = 'Bereit.'; });
-      links.appendChild(b);
+      b.addEventListener('mouseleave', function () { status.textContent = STATUS_STD; });
+      leiste.appendChild(b);
       return b;
     };
     schalter('Therapeuten', 'personen', 'Therapeuten anlegen, bearbeiten und den aktuellen Therapeuten wählen.', therapeutenListe);
@@ -106,62 +121,94 @@
     schalter('Module', 'raster', 'Trainingsmodule und eigene Trainingseinheiten verwalten, Standardparameter festlegen.', moduleFenster);
     schalter('Parameter', 'zahnrad', 'Trainingsparameter des gewählten Moduls für den aktuellen Klienten anpassen.', function () { parameterFenster(); });
     schalter('Ergebnisse', 'diagramm', 'Verlaufsdaten, Sitzungsanalyse, Berichte und Exporte des aktuellen Klienten.', function () { var k = AP.klient(); if (!k) { UI.toast('Bitte zuerst einen Klienten wählen.', 'fehler'); return; } location.hash = '#/patient/' + k.id + '/verlauf'; });
-    links.appendChild(HT.el('div', { class: 'ap-abstand' }));
+    leiste.appendChild(HT.el('div', { class: 'ap-abstand' }));
     schalter('Hilfe', 'info', 'Kurzanleitung und Tastaturbelegung.', function () { location.hash = '#/hilfe'; });
     schalter('System', 'zahnrad', 'Einstellungen, Verwaltung, Datensicherung, Patientenmodus und Systeminformationen.', systemFenster);
     schalter('Schließen', 'abmelden', 'Abmelden und zum Startbildschirm zurückkehren.', HT.auth.abmelden, 'gefahr');
-    koerper.appendChild(links);
+    koerper.appendChild(leiste);
 
-    // Rechte Seite
-    var rechts = HT.el('div', { class: 'ap-rechts' });
-    var kopfzeilen = HT.el('div', { class: 'ap-auswahlzeilen' });
-    // aktueller Therapeut
-    var thSel = HT.el('select');
-    HT.auth.therapeuten().forEach(function (x) { var o = HT.el('option', { value: x.id }, therapeutLabel(x) + (x.rolle === 'admin' ? '  (Administrator)' : '')); if (x.id === t.id) o.selected = true; thSel.appendChild(o); });
+    // ---- Linke Spalte: Therapeut/Klient, Kennzahlen, Verlauf, Gruppen ----
+    var linksSp = HT.el('aside', { class: 'ap2-links' });
+    var personen = HT.el('div', { class: 'ap2-karte ap2-personen' });
+    var thSel = HT.el('select', { 'aria-label': 'aktueller Therapeut' });
+    HT.auth.therapeuten().forEach(function (x) { var o = HT.el('option', { value: x.id }, therapeutLabel(x) + (x.rolle === 'admin' ? ' (Admin)' : '')); if (x.id === t.id) o.selected = true; thSel.appendChild(o); });
     thSel.addEventListener('change', function () {
       var neu = S.finde('therapists', thSel.value);
       var feld = UI.pinFeld(function (pin, fehler) {
         HT.auth.pruefen(neu, pin).then(function (ok) {
-          if (!ok) { fehler(); return; }
+          if (!ok) { fehler(HT.auth.sperrText()); return; }
           HT.auth.anmelden(neu); try { localStorage.setItem('ht-letzter-therapeut', neu.id); } catch (x) { /* egal */ }
           AP.setKlient(''); schliessen(true); HT.app.neuZeichnen(); UI.toast('Angemeldet als ' + neu.name, 'ok');
         });
       }, { text: 'PIN von ' + neu.name, manuell: true });
-      UI.dialog({ titel: 'Therapeut anmelden', inhalt: feld, klasse: 'pin-dialog', knoepfe: [{ text: HT.t('abbrechen'), wert: null }] }).then(function (w) { if (!w) thSel.value = t.id; });
+      UI.dialog({ fokusFeld: true, titel: 'Therapeut anmelden', inhalt: feld, klasse: 'pin-dialog', knoepfe: [{ text: HT.t('abbrechen'), wert: null }] }).then(function (w) { if (!w) thSel.value = t.id; });
     });
-    kopfzeilen.appendChild(HT.el('label', { class: 'ap-auswahl' }, [HT.el('span', null, 'aktueller Therapeut'), thSel]));
-    // aktueller Klient
-    var klSel = HT.el('select');
-    klSel.appendChild(HT.el('option', { value: '' }, '– bitte Klient wählen –'));
-    HT.patienten.alle(true).forEach(function (x) { var o = HT.el('option', { value: x.id }, (HT.patienten.entlassen(x) ? '○ ' : '● ') + klientLabel(x)); if (p && x.id === p.id) o.selected = true; klSel.appendChild(o); });
+    personen.appendChild(HT.el('div', { class: 'ap2-person' }, [UI.avatar(t.name), HT.el('div', { class: 'ap2-person-text' }, [HT.el('small', null, 'Therapeut'), thSel])]));
+    var klSel = HT.el('select', { 'aria-label': 'aktueller Klient' });
+    klSel.appendChild(HT.el('option', { value: '' }, '– Klient wählen –'));
+    HT.patienten.alle(true).forEach(function (x) { var o = HT.el('option', { value: x.id }, (HT.patienten.entlassen(x) ? '○ ' : '') + (x.pseudonym || '') + ' · ' + klientLabel(x)); if (p && x.id === p.id) o.selected = true; klSel.appendChild(o); });
     klSel.addEventListener('change', function () { AP.setKlient(klSel.value); AP.auswahl.modul = null; HT.app.neuZeichnen(); });
-    var klZeile = HT.el('label', { class: 'ap-auswahl' }, [HT.el('span', null, 'aktueller Klient'), klSel]);
-    if (p) klZeile.appendChild(UI.iconKnopf('stift', 'Klientendaten bearbeiten', function (ev) { ev.preventDefault(); klientendaten(p).then(function (x) { if (x) HT.app.neuZeichnen(); }); }, 'rand'));
-    kopfzeilen.appendChild(klZeile);
-    rechts.appendChild(kopfzeilen);
-    if (t.rolle === 'admin') rechts.appendChild(HT.el('div', { class: 'ap-hinweis' }, 'Administrator: Sie sehen alle Klienten aller Therapeuten.'));
-    else if (S.einstellungen().nurEigenePatienten) rechts.appendChild(HT.el('div', { class: 'ap-hinweis' }, 'Es werden die Klienten angezeigt, die ' + t.name + ' betreut.'));
+    var klText = HT.el('div', { class: 'ap2-person-text' }, [HT.el('small', null, p ? 'Klient · ' + (p.pseudonym || '') : 'Klient'), klSel]);
+    var klZeile = HT.el('div', { class: 'ap2-person' }, [p ? UI.avatar(HT.patienten.anzeigename(p)) : HT.el('span', { class: 'ap2-avatar-leer', html: HT.icon('person') }), klText]);
+    if (p) klZeile.appendChild(UI.iconKnopf('stift', 'Klientendaten bearbeiten', function (ev) { ev.preventDefault(); klientendaten(p).then(function (x) { if (x) HT.app.neuZeichnen(); }); }, 'rand klein'));
+    personen.appendChild(klZeile);
+    linksSp.appendChild(personen);
+    // Kennzahlen und Mini-Verlauf (Trefferquote je Sitzung)
+    var runsP = p ? S.alle('runs', function (r) { return r.patientId === p.id; }) : [];
+    var sitzP = p ? S.alle('sessions', function (x) { return x.patientId === p.id; }) : [];
+    var letzte = runsP.slice(-20), quote = letzte.length ? HT.results.zusammenfassung(letzte).quote : null;
+    var minuten = Math.round(HT.summe(runsP.filter(function (r) { return r.start > Date.now() - 30 * 86400000; }).map(function (r) { return r.dauerSek || 0; })) / 60);
+    var kz = HT.el('div', { class: 'ap2-kennzahlen' });
+    [[p ? String(sitzP.length) : '–', 'Sitzungen'], [p ? minuten + ' min' : '–', 'Training 30 Tage'], [quote === null ? '–' : HT.prozent(quote), 'Ø Quote']].forEach(function (k) {
+      kz.appendChild(HT.el('div', { class: 'ap2-kennzahl' }, [HT.el('b', null, k[0]), HT.el('small', null, k[1])]));
+    });
+    linksSp.appendChild(kz);
+    var proSitzung = {};
+    runsP.forEach(function (r) { var k = r.sessionId || r.start; (proSitzung[k] = proSitzung[k] || []).push(r); });
+    var werte = Object.keys(proSitzung).map(function (k) { return { t: proSitzung[k][0].start, q: HT.results.zusammenfassung(proSitzung[k]).quote }; }).sort(function (a, b) { return a.t - b.t; }).slice(-14).map(function (x) { return x.q; });
+    linksSp.appendChild(HT.el('div', { class: 'ap2-sparkline', title: 'Trefferquote der letzten Sitzungen', html: sparkline(werte) }));
+    // Gruppenliste
+    var plan = p ? HT.plaene.aktiverPlan(p.id) : null;
+    var aktive = HT.Module.aktive();
+    var gruppen = [{ id: 'klient', name: 'Module des Klienten', farbe: 'var(--akzent)', icon: 'person', anzahl: plan ? plan.eintraege.length : 0 }, { id: 'alle', name: 'Alle Module', farbe: '#7d8a94', icon: 'raster', anzahl: aktive.length }]
+      .concat(HT.KATEGORIEN.map(function (k) { return { id: k.id, name: k.name, farbe: k.farbe, icon: k.icon, anzahl: aktive.filter(function (m) { return m.kategorie === k.id; }).length }; }));
+    if (!AP.auswahl.gruppe) AP.auswahl.gruppe = p && plan ? 'klient' : 'alle';
+    var gl = HT.el('div', { class: 'ap2-gruppen', tabindex: '0', role: 'listbox', 'aria-label': 'Gruppen' });
+    var gKnoepfe = gruppen.map(function (gr) {
+      var z = HT.el('div', { class: 'ap2-gruppe' + (AP.auswahl.gruppe === gr.id ? ' aktiv' : ''), role: 'option', html: '<span class="ap2-gpunkt" style="background:' + gr.farbe + '">' + HT.icon(gr.icon) + '</span><span class="ap2-gname">' + HT.esc(gr.name) + '</span><span class="ap2-ganzahl">' + gr.anzahl + '</span>' });
+      z.addEventListener('click', function () { gruppeWaehlen(gr.id); gl.focus(); });
+      gl.appendChild(z);
+      return z;
+    });
+    linksSp.appendChild(HT.el('div', { class: 'ap2-spaltenkopf' }, 'Gruppen'));
+    linksSp.appendChild(gl);
+    koerper.appendChild(linksSp);
 
-    // Reiter Training / Screening
-    var karte = HT.el('section', { class: 'ap-reiterkarte' });
-    var reiterKopf = HT.el('div', { class: 'ap-reiterkopf' });
+    // ---- Rechte Spalte: Reiter, Suche, Modulkarten ----
+    var rechts = HT.el('section', { class: 'ap2-rechts' });
+    var reiterKopf = HT.el('div', { class: 'ap2-reiterkopf' });
     var rT = HT.el('button', { type: 'button', class: AP.auswahl.tab === 'training' ? 'aktiv' : '' }, 'Training');
     var rS = HT.el('button', { type: 'button', class: AP.auswahl.tab === 'screening' ? 'aktiv' : '' }, 'Screening');
     rT.addEventListener('click', function () { AP.auswahl.tab = 'training'; AP.auswahl.modul = null; HT.app.neuZeichnen(); });
     rS.addEventListener('click', function () { AP.auswahl.tab = 'screening'; AP.auswahl.modul = null; HT.app.neuZeichnen(); });
     reiterKopf.appendChild(rT); reiterKopf.appendChild(rS);
-    var sortL = HT.el('label', { class: 'ap-check' });
+    var suche = HT.el('input', { type: 'search', class: 'ap2-suche', placeholder: 'Modul suchen …', 'aria-label': 'Modul suchen' });
+    suche.value = AP.auswahl.suche || '';
+    suche.addEventListener('input', function () { AP.auswahl.suche = suche.value; karten(); });
+    reiterKopf.appendChild(suche);
+    var sortL = HT.el('label', { class: 'ap-check', title: 'Häufig genutzte Module zuerst' });
     var sortC = HT.el('input', { type: 'checkbox' }); sortC.checked = AP.sortNutzung();
-    sortC.addEventListener('change', function () { try { localStorage.setItem('ht-sort-nutzung', sortC.checked ? '1' : '0'); } catch (x) { /* egal */ } HT.app.neuZeichnen(); });
-    sortL.appendChild(sortC); sortL.appendChild(document.createTextNode(' sortieren nach Nutzungshäufigkeit'));
+    sortC.addEventListener('change', function () { try { localStorage.setItem('ht-sort-nutzung', sortC.checked ? '1' : '0'); } catch (x) { /* egal */ } karten(); });
+    sortL.appendChild(sortC); sortL.appendChild(document.createTextNode(' häufig zuerst'));
     reiterKopf.appendChild(sortL);
-    karte.appendChild(reiterKopf);
-    var inhalt = HT.el('div', { class: 'ap-reiterinhalt' });
-    karte.appendChild(inhalt);
-    rechts.appendChild(karte);
+    rechts.appendChild(reiterKopf);
+    var hinweisZeile = HT.el('div', { class: 'ap2-hinweis' });
+    rechts.appendChild(hinweisZeile);
+    var raster = HT.el('div', { class: 'ap2-raster', role: 'listbox', 'aria-label': 'Module' });
+    rechts.appendChild(raster);
+    koerper.appendChild(rechts);
 
     var nutzung = AP.nutzung();
-    var plan = p ? HT.plaene.aktiverPlan(p.id) : null;
     function sortiert(mods) {
       mods = mods.slice();
       if (AP.sortNutzung()) mods.sort(function (a, b) {
@@ -171,74 +218,137 @@
       else mods.sort(function (a, b) { return a.name.localeCompare(b.name); });
       return mods;
     }
-    function modulZeile(m) {
-      var kat = HT.kategorie(m.kategorie), lv = p ? HT.patienten.zustand(p.id, m.id).aktuellesLevel : null;
-      var war = p && S.alle('runs', function (r) { return r.patientId === p.id && r.modulId === m.id; }).length;
-      return { id: m.id, html: '<span class="ap-modul-icon" style="background:' + kat.farbe + '">' + HT.icon(m.symbol || kat.icon) + '</span><span class="ap-kuerzel">' + HT.modulKuerzel(m) + '</span><span class="ap-name">' + HT.esc(m.name) + '</span>' + (war ? '<span class="abzeichen akzent">L' + lv + '</span>' : '') };
+    function trend(m) {
+      if (!p) return '';
+      var rs = S.alle('runs', function (r) { return r.patientId === p.id && r.modulId === m.id; });
+      if (rs.length < 2) return '';
+      var a = rs[rs.length - 2], b = rs[rs.length - 1];
+      var la = a.levelNachher || a.level || 0, lb = b.levelNachher || b.level || 0;
+      if (lb > la) return '<span class="ap2-trend hoch" title="Level gestiegen">▲</span>';
+      if (lb < la) return '<span class="ap2-trend runter" title="Level gesunken">▼</span>';
+      return '<span class="ap2-trend gleich" title="Level gleich">▶</span>';
     }
-    if (AP.auswahl.tab === 'training') {
-      var g = HT.el('div', { class: 'ap-zweispaltig' });
-      var gruppen = [{ id: 'klient', html: HT.icon('person') + '<span>Module des Klienten</span>' }, { id: 'alle', html: HT.icon('raster') + '<span>alle Module</span>' }]
-        .concat(HT.KATEGORIEN.map(function (k) { return { id: k.id, html: '<span class="ap-kat-punkt" style="background:' + k.farbe + '">' + HT.icon(k.icon) + '</span><span>' + HT.esc(k.name) + '</span>' }; }));
-      var modListeWrap = HT.el('div', { class: 'ap-spalte' });
-      var gl = auswahlListe(gruppen, { gewaehlt: AP.auswahl.gruppe, beiWahl: function (id) { AP.auswahl.gruppe = id; AP.auswahl.modul = null; module(); } });
-      g.appendChild(HT.el('div', { class: 'ap-spalte' }, [HT.el('div', { class: 'ap-spaltenkopf' }, 'Gruppe'), gl]));
-      g.appendChild(modListeWrap);
-      inhalt.appendChild(g);
-      var module = function () {
-        HT.leeren(modListeWrap);
-        modListeWrap.appendChild(HT.el('div', { class: 'ap-spaltenkopf' }, 'Module'));
-        var mods, eintr = [];
+    var kartenEls = [], kartenIds = [];
+    function karte(m, id, sonder) {
+      var kat = m ? HT.kategorie(m.kategorie) : null;
+      var el;
+      if (sonder) el = HT.el('div', { class: 'ap2-modul sonder', role: 'option', html: '<span class="ap2-micon" style="background:var(--akzent)">' + HT.icon(sonder.icon) + '</span><div class="ap2-mtext"><b>' + HT.esc(sonder.name) + '</b><small>' + HT.esc(sonder.text) + '</small></div>' });
+      else {
+        var max = m.levels.length, lv = p ? HT.patienten.zustand(p.id, m.id).aktuellesLevel : 0;
+        el = HT.el('div', { class: 'ap2-modul', role: 'option', title: m.ziel, html:
+          '<span class="ap2-micon" style="background:' + kat.farbe + '">' + HT.icon(m.symbol || kat.icon) + '</span>' +
+          '<div class="ap2-mtext"><div class="ap2-mkopf"><span class="ap-kuerzel">' + HT.modulKuerzel(m) + '</span>' + trend(m) + '</div><b>' + HT.esc(m.name) + '</b><small>' + HT.esc(m.ziel || '') + '</small>' +
+          '<div class="ap2-level"><span style="width:' + (p ? Math.round(lv / max * 100) : 0) + '%;background:' + kat.farbe + '"></span></div><em>' + (p ? 'Lv ' + lv + '/' + max : max + ' Level') + '</em></div>' });
+      }
+      el.addEventListener('click', function () { modulWaehlen(id); });
+      el.addEventListener('dblclick', function () { modulWaehlen(id); starten(); });
+      el.addEventListener('mouseenter', function () { if (m && HT.vorschauHover) { /* Vorschau nur bei Hover über dem Symbol (Leistung) */ } });
+      kartenEls.push(el); kartenIds.push(id);
+      return el;
+    }
+    function karten() {
+      HT.leeren(raster); kartenEls = []; kartenIds = [];
+      var q = (AP.auswahl.suche || '').toLowerCase().trim();
+      var passt = function (m) { return !q || (m.name + ' ' + HT.modulKuerzel(m) + ' ' + (m.ziel || '')).toLowerCase().indexOf(q) >= 0; };
+      var mods;
+      if (AP.auswahl.tab === 'screening') {
+        hinweisZeile.textContent = 'Screening = kurzer Leistungsüberblick bzw. Einstufung. Kein Diagnostikum.';
+        if (HT.screening) raster.appendChild(karte(null, '__screening', { icon: 'ziel', name: 'Screening-Batterie', text: 'Kurzer Leistungsüberblick (ca. 15–20 min), Vergleich mit dem ersten Screening' }));
+        if (HT.screening && p && HT.screening.vorhanden(p)) raster.appendChild(karte(null, '__screeningVerlauf', { icon: 'diagramm', name: 'Screening-Verlauf', text: 'Ergebnisse, Vergleich mit dem ersten Screening, Empfehlungen' }));
+        if (plan) raster.appendChild(karte(null, '__plan', { icon: 'trend', name: 'Einstufung aller Module des Plans', text: 'Startlevel für jedes Modul des Klienten ermitteln' }));
+        mods = sortiert(aktive).filter(passt);
+      } else {
+        hinweisZeile.textContent = '';
         if (AP.auswahl.gruppe === 'klient') {
-          mods = plan ? plan.eintraege.map(function (x) { return HT.Module.map[x.modulId]; }).filter(Boolean) : [];
-          if (plan && mods.length) eintr.push({ id: '__plan', html: '<span class="ap-modul-icon" style="background:var(--akzent)">' + HT.icon('vorlage') + '</span><span class="ap-name"><b>Gesamter Trainingsplan „' + HT.esc(plan.name) + '“</b> · ' + plan.eintraege.length + ' Module · ca. ' + HT.plaene.gesamtdauer(plan) + ' min</span>' });
-          mods = AP.sortNutzung() ? sortiert(mods) : mods;
-        } else if (AP.auswahl.gruppe === 'alle') mods = sortiert(HT.Module.aktive());
-        else mods = sortiert(HT.Module.aktive().filter(function (m) { return m.kategorie === AP.auswahl.gruppe; }));
-        mods.forEach(function (m) { eintr.push(modulZeile(m)); });
-        if (!AP.auswahl.modul && eintr.length) AP.auswahl.modul = eintr[0].id;
-        modListeWrap.appendChild(auswahlListe(eintr, { gewaehlt: AP.auswahl.modul, beiWahl: function (id) { AP.auswahl.modul = id; }, doppelklick: function () { starten(); },
-          leer: AP.auswahl.gruppe === 'klient' ? (p ? 'Diesem Klienten sind noch keine Module zugeordnet. Über „Module“ oder die Klientendaten (Reiter Module) zuordnen – oder ein Modul aus einer anderen Gruppe wählen.' : 'Bitte zuerst oben einen Klienten wählen.') : 'Keine Module.' }));
-      };
-      module();
-    } else {
-      inhalt.appendChild(HT.el('p', { class: 'gedimmt klein', style: { margin: '0 0 .6rem' } }, 'Screening = Einstufungstest: Das Level steigt schnell, bis die Trefferquote unter 80 % fällt. Das letzte sicher gelöste Level wird als Startlevel übernommen. Für eine Verlaufskontrolle nach etwa 10 Sitzungen wiederholen. (Hinweis: ohne Normwerte gesunder Vergleichspersonen – kein Ersatz für neuropsychologische Diagnostik.)'));
-      var eintr2 = [];
-      if (plan) eintr2.push({ id: '__plan', html: '<span class="ap-modul-icon" style="background:var(--akzent)">' + HT.icon('ziel') + '</span><span class="ap-name"><b>Einstufung aller Module des Klienten</b> (' + plan.eintraege.length + ')</span>' });
-      sortiert(HT.Module.aktive()).forEach(function (m) {
-        var r = modulZeile(m);
-        var einst = p ? S.alle('runs', function (x) { return x.patientId === p.id && x.modulId === m.id && x.einstufung; }) : [];
-        if (einst.length) r.html += '<span class="klein gedimmt" style="margin-left:.5rem">zuletzt ' + HT.datum(einst[einst.length - 1].start) + '</span>';
-        eintr2.push(r);
-      });
-      if (!AP.auswahl.modul && eintr2.length) AP.auswahl.modul = eintr2[0].id;
-      inhalt.appendChild(auswahlListe(eintr2, { gewaehlt: AP.auswahl.modul, beiWahl: function (id) { AP.auswahl.modul = id; }, doppelklick: function () { starten(); }, klasse: 'hoch' }));
+          mods = plan ? plan.eintraege.map(function (x) { return HT.Module.map[x.modulId]; }).filter(Boolean).filter(passt) : [];
+          if (plan && mods.length && !q) raster.appendChild(karte(null, '__plan', { icon: 'vorlage', name: 'Gesamter Trainingsplan', text: plan.name + ' · ' + plan.eintraege.length + ' Module' }));
+          if (AP.sortNutzung()) mods = sortiert(mods);
+          if (!mods.length) hinweisZeile.textContent = p ? 'Diesem Klienten sind noch keine Module zugeordnet – Gruppe „Alle Module“ wählen oder über „Module“ zuordnen.' : 'Bitte links einen Klienten wählen.';
+        } else if (AP.auswahl.gruppe === 'alle') mods = sortiert(aktive).filter(passt);
+        else mods = sortiert(aktive.filter(function (m) { return m.kategorie === AP.auswahl.gruppe; })).filter(passt);
+      }
+      mods.forEach(function (m) { raster.appendChild(karte(m, m.id)); });
+      if (kartenIds.indexOf(AP.auswahl.modul) < 0) AP.auswahl.modul = kartenIds[0] || null;
+      markieren();
     }
+    function markieren() {
+      kartenEls.forEach(function (el, k) { var an = kartenIds[k] === AP.auswahl.modul; el.classList.toggle('aktiv', an); el.setAttribute('aria-selected', an ? 'true' : 'false'); });
+    }
+    function modulWaehlen(id) { AP.auswahl.modul = id; markieren(); fokusZone = 'karten'; }
+    function gruppeWaehlen(id) {
+      AP.auswahl.gruppe = id; AP.auswahl.modul = null;
+      if (AP.auswahl.tab !== 'training') { AP.auswahl.tab = 'training'; rT.classList.add('aktiv'); rS.classList.remove('aktiv'); }
+      gKnoepfe.forEach(function (z, k) { z.classList.toggle('aktiv', gruppen[k].id === id); });
+      karten();
+    }
+    karten();
 
-    // Fußzeile: Non-Stop + Start
-    var fuss = HT.el('div', { class: 'ap-fuss' });
-    var nsL = HT.el('label', { class: 'ap-check' });
+    // ---- Feste Startleiste unten ----
+    var fuss = HT.el('div', { class: 'ap2-start' });
+    var nsL = HT.el('label', { class: 'ap2-schalter', title: 'Ohne Zwischenbildschirme durcharbeiten (für selbstständig trainierende Klienten)' });
     var nsC = HT.el('input', { type: 'checkbox' }); nsC.checked = AP.nonstop();
     nsC.addEventListener('change', function () { try { localStorage.setItem('ht-nonstop', nsC.checked ? '1' : '0'); } catch (x) { /* egal */ } });
-    nsL.appendChild(nsC); nsL.appendChild(document.createTextNode(' Modul Non-Stop'));
-    nsL.title = 'Ohne Zwischenbildschirme durcharbeiten (für selbstständig trainierende Klienten)';
+    nsL.appendChild(nsC); nsL.appendChild(HT.el('span', { class: 'ap2-schieber' })); nsL.appendChild(HT.el('span', null, 'Modul Non-Stop'));
     fuss.appendChild(nsL);
-    var startK = HT.el('button', { type: 'button', class: 'ap-start', html: HT.icon('play') + '<span>Start</span>' });
+    fuss.appendChild(status);
+    var startK = HT.el('button', { type: 'button', class: 'ap2-start-knopf', html: HT.icon('play') + '<span>Training starten</span>' });
     startK.addEventListener('click', starten);
-    startK.addEventListener('mouseenter', function () { status.textContent = 'Training mit dem gewählten Modul für den aktuellen Klienten starten.'; });
     fuss.appendChild(startK);
-    rechts.appendChild(fuss);
-    koerper.appendChild(rechts);
+
     fe.appendChild(koerper);
-    fe.appendChild(status);
+    fe.appendChild(fuss);
     seite.appendChild(fe);
     wurzel.appendChild(seite);
+
+    // ---- Komplett per Pfeiltasten bedienbar: Gruppen ↔ Karten ↔ Start ----
+    var fokusZone = 'karten';
+    function spalten() { var b = raster.clientWidth || 600, k = kartenEls[0]; return k ? Math.max(1, Math.round(b / (k.offsetWidth + 12))) : 3; }
+    function navigieren(aktion) {
+      if (document.querySelector('.dialog-hinter')) return false;
+      var gi = gruppen.map(function (x) { return x.id; }).indexOf(AP.auswahl.gruppe), ki = kartenIds.indexOf(AP.auswahl.modul), sp = spalten();
+      if (fokusZone === 'gruppen') {
+        if (aktion === 'hoch' && gi > 0) gruppeWaehlen(gruppen[gi - 1].id);
+        else if (aktion === 'runter' && gi < gruppen.length - 1) gruppeWaehlen(gruppen[gi + 1].id);
+        else if (aktion === 'rechts' && kartenEls.length) { fokusZone = 'karten'; AP.auswahl.modul = AP.auswahl.modul || kartenIds[0]; markieren(); }
+        else return false;
+        HT.inSicht(gKnoepfe[Math.max(0, gruppen.map(function (x) { return x.id; }).indexOf(AP.auswahl.gruppe))], gl);
+        gl.classList.add('pult-fokus-zone'); raster.classList.remove('pult-fokus-zone'); startK.classList.remove('pult-fokus');
+        return true;
+      }
+      if (fokusZone === 'start') {
+        if (aktion === 'hoch') { fokusZone = 'karten'; startK.classList.remove('pult-fokus'); markieren(); return true; }
+        if (aktion === 'ok') { starten(); return true; }
+        return false;
+      }
+      if (aktion === 'ok') { starten(); return true; }
+      if (ki < 0) ki = 0;
+      if (aktion === 'links') { if (ki % sp === 0) { fokusZone = 'gruppen'; gl.classList.add('pult-fokus-zone'); raster.classList.remove('pult-fokus-zone'); return true; } ki--; }
+      else if (aktion === 'rechts') ki = Math.min(kartenEls.length - 1, ki + 1);
+      else if (aktion === 'hoch') ki = Math.max(0, ki - sp);
+      else if (aktion === 'runter') { if (ki + sp >= kartenEls.length) { fokusZone = 'start'; startK.classList.add('pult-fokus'); return true; } ki += sp; }
+      else return false;
+      AP.auswahl.modul = kartenIds[ki]; markieren(); HT.inSicht(kartenEls[ki], raster);
+      raster.classList.add('pult-fokus-zone'); gl.classList.remove('pult-fokus-zone');
+      return true;
+    }
+    HT.apNavi = navigieren;
+    var TAST = { ArrowUp: 'hoch', ArrowDown: 'runter', ArrowLeft: 'links', ArrowRight: 'rechts', Enter: 'ok' };
+    var tastenHandler = function (ev) {
+      if (!document.body.contains(seite)) { document.removeEventListener('keydown', tastenHandler); if (HT.apNavi === navigieren) HT.apNavi = null; return; }
+      var tg = ev.target;
+      if (tg && (tg.tagName === 'INPUT' || tg.tagName === 'SELECT' || tg.tagName === 'TEXTAREA' || (tg.tagName === 'BUTTON' && ev.key === 'Enter'))) return;
+      var a = TAST[ev.key]; if (!a) return;
+      if (navigieren(a)) ev.preventDefault();
+    };
+    document.addEventListener('keydown', tastenHandler);
 
     function starten() {
       var k = AP.klient();
       if (!k) { UI.toast('Bitte zuerst einen Klienten wählen.', 'fehler'); klSel.focus(); return; }
       var id = AP.auswahl.modul;
       if (!id) { UI.toast('Bitte ein Modul wählen.', 'fehler'); return; }
+      if (id === '__screening') { if (HT.screening) HT.screening.starten(k); return; }
+      if (id === '__screeningVerlauf') { location.hash = '#/screening/' + k.id; return; }
       var pl = HT.plaene.aktiverPlan(k.id);
       var ns = AP.nonstop();
       if (AP.auswahl.tab === 'screening') {
@@ -270,11 +380,11 @@
       if (!t || t.id === ich.id) { schliessen(); return; }
       var feld = UI.pinFeld(function (pin, fehler) {
         HT.auth.pruefen(t, pin).then(function (ok) {
-          if (!ok) { fehler(); return; }
+          if (!ok) { fehler(HT.auth.sperrText()); return; }
           HT.auth.anmelden(t); AP.setKlient(''); schliessen(); setTimeout(function () { schliessen(); HT.app.neuZeichnen(); }, 30);
         });
       }, { text: 'PIN von ' + t.name, manuell: true });
-      UI.dialog({ titel: 'Therapeut wählen', inhalt: feld, klasse: 'pin-dialog', knoepfe: [{ text: HT.t('abbrechen'), wert: null }] });
+      UI.dialog({ fokusFeld: true, titel: 'Therapeut wählen', inhalt: feld, klasse: 'pin-dialog', knoepfe: [{ text: HT.t('abbrechen'), wert: null }] });
     }
     zeichnen();
     fenster('Therapeuten-Liste', [kopf, tab], [
@@ -529,7 +639,7 @@
     });
     panels.therapeuten.appendChild(thBox);
 
-    return UI.dialog({ titel: neu ? 'Neuer Klient – Klientendaten' : 'Klientendaten: ' + HT.patienten.anzeigename(p), inhalt: box, breit: true, klasse: 'kd-dialog', knoepfe: [
+    return UI.dialog({ fokusFeld: neu, titel: neu ? 'Neuer Klient – Klientendaten' : 'Klientendaten: ' + HT.patienten.anzeigename(p), inhalt: box, breit: true, klasse: 'kd-dialog', knoepfe: [
       { text: HT.t('abbrechen'), wert: null },
       { text: 'OK', art: 'primaer', aktion: function () {
         if (!formulare.adresse.pruefen()) { kopf.children[0].click(); return false; }
@@ -566,7 +676,7 @@
     function zeichnen() {
       HT.leeren(wrap);
       var vorlagen = HT.vorlagen.alle().map(function (v) { return { id: 'vorlage:' + v.id, html: HT.icon('vorlage') + '<span class="ap-name"><b>' + HT.esc(v.name) + '</b> · Trainingseinheit mit ' + v.eintraege.length + ' Modulen · ' + HT.plaene.gesamtdauer(v) + ' min</span>' + (v.standard ? '' : UI.abzeichen('eigene', 'akzent').outerHTML) }; });
-      var mods = HT.Module.liste.slice().sort(function (a, b) { return AP.sortNutzung() ? ((nutzung[b.id] || 0) - (nutzung[a.id] || 0)) || a.name.localeCompare(b.name) : a.name.localeCompare(b.name); })
+      var mods = HT.Module.liste.filter(function (m) { return !m.versteckt; }).sort(function (a, b) { return AP.sortNutzung() ? ((nutzung[b.id] || 0) - (nutzung[a.id] || 0)) || a.name.localeCompare(b.name) : a.name.localeCompare(b.name); })
         .map(function (m) { var kat = HT.kategorie(m.kategorie); return { id: m.id, inaktiv: !!(S.einstellungen().moduleInaktiv || {})[m.id], html: '<span class="ap-modul-icon" style="background:' + kat.farbe + '">' + HT.icon(m.symbol || kat.icon) + '</span><span class="ap-kuerzel">' + HT.modulKuerzel(m) + '</span><span class="ap-name">' + HT.esc(m.name) + '</span><span class="klein gedimmt">' + HT.esc(kat.name) + '</span>' + (((S.einstellungen().standardParameter || {})[m.id]) ? UI.abzeichen('angepasst', 'gelb').outerHTML : '') }; });
       wrap.appendChild(HT.el('div', { class: 'feld-label' }, 'Trainingseinheiten (Modulkombinationen)'));
       wrap.appendChild(auswahlListe(vorlagen, { gewaehlt: gewaehlt, beiWahl: function (id) { gewaehlt = id; }, doppelklick: function () { waehlen(); } }));

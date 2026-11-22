@@ -19,9 +19,10 @@
    * Rückgabe: Promise mit dem 'wert' des gedrückten Knopfes (null bei Abbruch). */
   UI.dialog = function (opt) {
     return new Promise(function (resolve) {
-      var hinter = HT.el('div', { class: 'dialog-hinter' });
+      var hinter = HT.el('div', { class: 'dialog-hinter' + (opt.breit ? ' dialog-hinter--breit' : '') });
       var box = HT.el('div', { class: 'dialog' + (opt.breit ? ' breit' : '') + (opt.klasse ? ' ' + opt.klasse : ''), role: 'dialog', 'aria-modal': 'true' });
-      var kopf = HT.el('div', { class: 'dialog-kopf' }, [HT.el('h2', null, opt.titel || '')]);
+      var titelEl = HT.el('h2', { tabindex: '-1' }, opt.titel || '');
+      var kopf = HT.el('div', { class: 'dialog-kopf' }, [titelEl]);
       if (opt.schliessbar !== false) {
         var x = HT.el('button', { class: 'icon-knopf', type: 'button', 'aria-label': 'Schließen', html: HT.icon('schliessen') });
         x.addEventListener('click', function () { fertig(null); });
@@ -46,8 +47,10 @@
       hinter.appendChild(box);
       document.body.appendChild(hinter);
       requestAnimationFrame(function () { hinter.classList.add('offen'); });
-      var erstes = rumpf.querySelector('input:not([type=hidden]):not([type=checkbox]),select,textarea');
-      setTimeout(function () { if (erstes) erstes.focus(); else { var p = fuss.querySelector('.primaer'); if (p) p.focus(); } }, 60);
+      // Standard: Fokus auf den Titel, Inhalt oben – nur Formulardialoge (opt.fokusFeld) springen ins erste Feld
+      var erstes = opt.fokusFeld === true ? rumpf.querySelector('input:not([type=hidden]):not([type=checkbox]),select,textarea') : null;
+      rumpf.scrollTop = 0;
+      setTimeout(function () { if (erstes) erstes.focus(); else { try { titelEl.focus({ preventScroll: true }); } catch (e) { titelEl.focus(); } rumpf.scrollTop = 0; } }, 60);
       function taste(ev) {
         if (ev.key === 'Escape' && opt.schliessbar !== false) { ev.stopPropagation(); fertig(null); }
         if (ev.key === 'Enter' && ev.target.tagName !== 'TEXTAREA' && ev.target.tagName !== 'BUTTON') {
@@ -162,7 +165,7 @@
     opt = opt || {};
     var f = UI.formular(felder, werte);
     return UI.dialog({
-      titel: titel, inhalt: f.el, breit: opt.breit,
+      fokusFeld: true, titel: titel, inhalt: f.el, breit: opt.breit,
       knoepfe: [{ text: HT.t('abbrechen'), wert: null }, {
         text: opt.ok || HT.t('speichern'), art: 'primaer',
         aktion: function () {

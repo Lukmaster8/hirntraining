@@ -25,7 +25,7 @@
           if (i >= paare.length) { if (p.ablenkung) ablenken(); else abruf(); return; }
           var pr = paare[i++];
           HT.m.neu(zone, 'm-anweisung', 'Paar ' + i + ' von ' + paare.length + ' – merken');
-          HT.m.neu(zone, '', '<div style="display:flex;align-items:center;gap:1.4rem">' + karte(pr.bild.id, 180) + '<div class="m-wort">' + HT.esc(pr.name) + '</div></div>');
+          HT.m.neu(zone, '', '<div class="ht-reihe" style="display:flex;align-items:center">' + karte(pr.bild.id, 180) + '<div class="m-wort">' + HT.esc(pr.name) + '</div></div>');
           HT.m.neu(zone, 'm-anweisung', HT.esc(pr.name) + ' und ' + HT.esc((pr.bild.artikel ? pr.bild.artikel + ' ' : '') + pr.bild.name), { fontSize: '1rem', marginTop: '1rem' });
           Z.nach(p.zeigeMs, lernen);
         }

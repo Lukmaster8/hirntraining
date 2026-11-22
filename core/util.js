@@ -225,6 +225,36 @@
     });
   };
 
+  /* Element in einem scrollbaren Behälter sichtbar machen, ohne die ganze Seite zu verschieben (statt scrollIntoView) */
+  HT.inSicht = function (el, behaelter) {
+    if (!el || !behaelter) return;
+    var oben = el.offsetTop - behaelter.offsetTop, unten = oben + el.offsetHeight;
+    if (el.offsetParent !== behaelter && behaelter.contains(el)) { var r1 = el.getBoundingClientRect(), r2 = behaelter.getBoundingClientRect(); oben = r1.top - r2.top + behaelter.scrollTop; unten = oben + r1.height; }
+    if (oben < behaelter.scrollTop) behaelter.scrollTop = oben;
+    else if (unten > behaelter.scrollTop + behaelter.clientHeight) behaelter.scrollTop = unten - behaelter.clientHeight;
+  };
+
+  /* Leistungsmodus: beim Start 30 Bilder messen. Mittlere Bildzeit > 22 ms (z. B. MacBook 2012) → html.leicht */
+  HT.leistung = {
+    gemessenLeicht: null,
+    messen: function (fertig) {
+      if (!window.requestAnimationFrame) return;
+      var zeiten = [], letzte = 0;
+      var schritt = function (t) {
+        if (letzte) zeiten.push(t - letzte);
+        letzte = t;
+        if (zeiten.length < 30) { requestAnimationFrame(schritt); return; }
+        zeiten.sort(function (a, b) { return a - b; });
+        var mitte = zeiten.slice(3, 27), schnitt = mitte.reduce(function (a, b) { return a + b; }, 0) / mitte.length;
+        HT.leistung.gemessenLeicht = schnitt > 22;
+        HT.leistung.bildzeit = Math.round(schnitt * 10) / 10;
+        if (fertig) fertig();
+      };
+      setTimeout(function () { requestAnimationFrame(schritt); }, 400);
+    }
+  };
+  HT.leicht = function () { return document.documentElement.classList.contains('leicht'); };
+
   HT.skriptLaden = function (src) {
     return new Promise(function (resolve) {
       var s = document.createElement('script');

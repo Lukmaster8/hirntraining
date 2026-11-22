@@ -27,30 +27,122 @@
         .sort(function (a, b) { return a.name.localeCompare(b.name); });
     },
 
+    /* Neuer PIN-Hash: PBKDF2-SHA256 mit 16 Byte Zufallssalz (150 000 Runden, ohne crypto.subtle 20 000) */
+    neuerHash: function (pin) {
+      var kr = HT.krypto, salz = kr.zufallHex(16), iter = kr.verfuegbar ? kr.ITER : kr.ITER_JS;
+      return kr.pbkdf2(pin, salz, iter).then(function (h) { return { pinHash: h, salz: salz, kdf: { alg: 'pbkdf2', iter: iter } }; });
+    },
+    /* PIN gegen einen gespeicherten Datensatz prüfen; alte SHA-256-Werte (ohne kdf) bleiben gültig */
+    hashPruefen: function (pin, pinHash, salz, kdf) {
+      if (!pinHash) return Promise.resolve(false);
+      if (kdf && kdf.alg === 'pbkdf2') return HT.krypto.pbkdf2(pin, salz, kdf.iter).then(function (h) { return h === pinHash; });
+      return A.hash(pin, salz).then(function (h) { return h === pinHash; });
+    },
+
     anlegen: function (daten) {
-      var salz = Math.random().toString(36).slice(2, 12);
-      return A.hash(daten.pin, salz).then(function (h) {
+      return A.neuerHash(daten.pin).then(function (n) {
         return S.put('therapists', {
           id: daten.id || HT.uid('the'), name: daten.name, kuerzel: daten.kuerzel || A.kuerzel(daten.name),
-          rolle: daten.rolle || 'therapeut', pinHash: h, salz: salz, aktiv: true, angelegtAm: Date.now()
+          rolle: daten.rolle || 'therapeut', pinHash: n.pinHash, salz: n.salz, kdf: n.kdf, aktiv: true, angelegtAm: Date.now()
         });
-      });
+      }).then(function (t) { return S.tresorFreigeben(t, daten.pin); }); // Datentresor-Schlüssel für den neuen Zugang
     },
 
     pinSetzen: function (t, pin) {
-      var salz = Math.random().toString(36).slice(2, 12);
-      return A.hash(pin, salz).then(function (h) { t.pinHash = h; t.salz = salz; return S.put('therapists', t); });
+      return A.neuerHash(pin).then(function (n) { t.pinHash = n.pinHash; t.salz = n.salz; t.kdf = n.kdf; return S.put('therapists', t); })
+        .then(function (x) { return S.tresor.schluessel ? S.tresorFreigeben(x, pin) : x; }); // neue PIN → Tresorschlüssel neu verpacken
     },
 
-    pruefen: function (t, pin) {
-      return A.hash(pin, t.salz).then(function (h) { return h === t.pinHash; });
+    /* Nach erfolgreicher PIN-Prüfung den Datentresor öffnen (bzw. beim ersten Mal einrichten). Promise<boolean> */
+    tresorNachPin: function (t, pin) {
+      if (!S.tresor.aktiv()) {
+        if (!S.tresor.moeglich) return Promise.resolve(true);
+        return S.tresorEinrichten(t, pin).then(function (neu) { if (neu) HT.ui.toast('Die Patientendaten werden ab jetzt verschlüsselt gespeichert.', 'ok'); return true; });
+      }
+      return S.tresorOeffnen(t, pin).then(function (r) {
+        if (r === 'ok' || r === 'aus') return true;
+        if (r === 'fehlt') return A.tresorFreigabe(t, pin);
+        HT.ui.toast('Die Patientendaten konnten nicht entschlüsselt werden.', 'fehler');
+        return false;
+      });
+    },
+    /* Zugang ohne Tresorschlüssel (angelegt vor dem Tresor): einmalige Freigabe durch einen Zugang, der ihn schon hat */
+    tresorFreigabe: function (t, pin) {
+      return new Promise(function (resolve) {
+        var fertig = false;
+        var feld = HT.ui.pinFeld(function (pin2, fehler) {
+          A.pinVonIrgendwem(pin2).then(function (t2) {
+            if (!t2 || !t2.tresor) { fehler(A.sperrText() || 'Diese PIN kann den Datentresor nicht öffnen.'); return null; }
+            return S.tresorOeffnen(t2, pin2).then(function (r) {
+              if (r !== 'ok') { fehler('Diese PIN kann den Datentresor nicht öffnen.'); return; }
+              return S.tresorFreigeben(t, pin).then(function () { fertig = true; resolve(true); if (HT.ui._offen) HT.ui._offen(true); });
+            });
+          });
+        }, { text: 'PIN eines Kollegen bzw. Administrators, der schon Zugriff hat', manuell: true });
+        HT.ui.dialog({ fokusFeld: true, titel: 'Einmalige Freigabe', inhalt: HT.el('div', null, [HT.el('p', { class: 'dialog-text' }, 'Die Patientendaten sind verschlüsselt. Ihr Zugang braucht einmal die Freigabe durch jemanden, der schon Zugriff hat. Danach öffnet Ihre eigene PIN die Daten.'), feld]), klasse: 'pin-dialog', knoepfe: [{ text: HT.t('abbrechen'), wert: null }] })
+          .then(function () { if (!fertig) resolve(false); });
+      });
+    },
+    /* Gesperrten Tresor mit irgendeiner Therapeuten-PIN öffnen (z. B. Patientenstart nach Neustart). Promise<boolean> */
+    entsperrDialog: function () {
+      return new Promise(function (resolve) {
+        var fertig = false;
+        var feld = HT.ui.pinFeld(function (pin, fehler) {
+          A.pinVonIrgendwem(pin).then(function (t) {
+            if (!t) { fehler(A.sperrText()); return; }
+            A.tresorNachPin(t, pin).then(function (ok) { if (ok) { fertig = true; resolve(true); if (HT.ui._offen) HT.ui._offen(true); } else fehler('Die Daten konnten nicht geöffnet werden.'); });
+          });
+        }, { text: 'Therapeuten-PIN eingeben', manuell: true });
+        HT.ui.dialog({ fokusFeld: true, titel: 'Patientendaten entsperren', inhalt: HT.el('div', null, [HT.el('p', { class: 'dialog-text' }, 'Die Patientendaten sind verschlüsselt. Bitte einmal eine Therapeuten-PIN eingeben.'), feld]), klasse: 'pin-dialog', knoepfe: [{ text: HT.t('abbrechen'), wert: null }] })
+          .then(function () { if (!fertig) resolve(false); });
+      });
     },
 
-    /* Prüft eine PIN gegen alle aktiven Therapeuten (für das Verlassen des Patientenmodus) */
+    /* Wartezeit nach 5 Fehlversuchen: 30 s, dann 60 s, 120 s … (bleibt auch nach Neuladen bestehen) */
+    gesperrt: function () { return Date.now() < sperrZustand().bis; },
+    sperrText: function () {
+      var z = sperrZustand();
+      if (Date.now() >= z.bis) return undefined;
+      return 'Zu viele Fehlversuche. Bitte ' + Math.ceil((z.bis - Date.now()) / 1000) + ' Sekunden warten.';
+    },
+    versuchMerken: function (ok) {
+      var z = sperrZustand();
+      if (ok) { z.fehl = 0; z.stufe = 0; z.bis = 0; }
+      else { z.fehl++; if (z.fehl >= 5) { z.stufe++; z.fehl = 0; z.bis = Date.now() + 30000 * Math.pow(2, z.stufe - 1); } }
+      try { localStorage.setItem('ht-pin-sperre', JSON.stringify(z)); } catch (e) { /* egal */ }
+    },
+
+    /* Therapeuten-PIN prüfen (mit Sperre); alter SHA-256-Hash wird nach erfolgreicher Anmeldung auf PBKDF2 umgestellt */
+    pruefen: function (t, pin, ohneZaehlen) {
+      if (!ohneZaehlen && A.gesperrt()) return Promise.resolve(false);
+      return A.hashPruefen(pin, t.pinHash, t.salz, t.kdf).then(function (ok) {
+        if (!ohneZaehlen) A.versuchMerken(ok);
+        if (ok && !(t.kdf && t.kdf.alg === 'pbkdf2')) A.pinSetzen(t, pin);
+        return ok;
+      });
+    },
+
+    /* Patienten-PIN (Patientenmodus) setzen und prüfen – gleiche Verfahren */
+    patientPinSetzen: function (p, pin) {
+      if (!pin) { delete p.pinHash; delete p.pinSalz; delete p.pinKdf; return S.put('patients', p); }
+      return A.neuerHash(pin).then(function (n) { p.pinHash = n.pinHash; p.pinSalz = n.salz; p.pinKdf = n.kdf; return S.put('patients', p); });
+    },
+    patientPinPruefen: function (p, pin) {
+      if (A.gesperrt()) return Promise.resolve(false);
+      return A.hashPruefen(pin, p.pinHash, p.pinSalz, p.pinKdf).then(function (ok) {
+        A.versuchMerken(ok);
+        if (ok && !(p.pinKdf && p.pinKdf.alg === 'pbkdf2')) A.patientPinSetzen(p, pin);
+        return ok;
+      });
+    },
+
+    /* Prüft eine PIN gegen alle aktiven Therapeuten (für das Verlassen des Patientenmodus) – zählt als ein Versuch */
     pinVonIrgendwem: function (pin) {
+      if (A.gesperrt()) return Promise.resolve(null);
       var liste = A.therapeuten();
-      return Promise.all(liste.map(function (t) { return A.pruefen(t, pin); })).then(function (erg) {
-        for (var i = 0; i < erg.length; i++) if (erg[i]) return liste[i];
+      return Promise.all(liste.map(function (t) { return A.pruefen(t, pin, true); })).then(function (erg) {
+        for (var i = 0; i < erg.length; i++) if (erg[i]) { A.versuchMerken(true); if (!(liste[i].kdf && liste[i].kdf.alg === 'pbkdf2')) A.pinSetzen(liste[i], pin); return liste[i]; }
+        A.versuchMerken(false);
         return null;
       });
     },
@@ -58,17 +150,19 @@
     anmelden: function (t) {
       A.aktuell = t; A.patientenmodus = false;
       try { sessionStorage.setItem('ht-angemeldet', t.id); } catch (e) { /* egal */ }
+      setTimeout(function () { if (HT.vorladen) HT.vorladen(); }, 600);
     },
     abmelden: function () {
       A.aktuell = null;
       try { sessionStorage.removeItem('ht-angemeldet'); } catch (e) { /* egal */ }
-      location.hash = '#/start';
+      S.tresorSchliessen().then(function () { location.hash = '#/start'; if (HT.app && HT.app.routen) HT.app.routen(); });
     },
     wiederherstellen: function () {
       try {
         var id = sessionStorage.getItem('ht-angemeldet');
         var t = id && S.finde('therapists', id);
-        if (t && t.aktiv !== false) A.aktuell = t;
+        // Bei verschlüsselten Daten nach dem Neuladen neu anmelden (der Schlüssel liegt nur im Arbeitsspeicher)
+        if (t && t.aktiv !== false && !S.tresorGesperrt()) A.aktuell = t;
       } catch (e) { /* egal */ }
     },
     istAdmin: function () { return !!(A.aktuell && A.aktuell.rolle === 'admin'); },
@@ -81,14 +175,19 @@
         var feld = HT.ui.pinFeld(function (pin, fehler) {
           A.pinVonIrgendwem(pin).then(function (t) {
             if (t) { erledigt = true; resolve(t); if (HT.ui._offen) HT.ui._offen(true); }
-            else fehler();
+            else fehler(A.sperrText());
           });
         }, { text: text || 'Therapeuten-PIN eingeben', manuell: true });
-        HT.ui.dialog({ titel: titel || 'Therapeuten-PIN', inhalt: feld, klasse: 'pin-dialog', knoepfe: [{ text: HT.t('abbrechen'), wert: null }] })
+        HT.ui.dialog({ fokusFeld: true, titel: titel || 'Therapeuten-PIN', inhalt: feld, klasse: 'pin-dialog', knoepfe: [{ text: HT.t('abbrechen'), wert: null }] })
           .then(function () { if (!erledigt) resolve(null); });
       });
     }
   };
+
+  function sperrZustand() {
+    try { var z = JSON.parse(localStorage.getItem('ht-pin-sperre') || 'null'); if (z && typeof z.fehl === 'number') return z; } catch (e) { /* egal */ }
+    return { fehl: 0, stufe: 0, bis: 0 };
+  }
 
   /* ===================== Seiten ===================== */
 
@@ -165,7 +264,10 @@
     var feld = HT.ui.pinFeld(function (pin, fehler) {
       if (!gewaehlt) { fehler('Bitte zuerst einen Namen wählen.'); return; }
       A.pruefen(gewaehlt, pin).then(function (ok) {
-        if (!ok) { fehler(); return; }
+        if (!ok) { fehler(A.sperrText()); return false; }
+        return A.tresorNachPin(gewaehlt, pin).then(function (offen) { if (!offen) fehler('Die Patientendaten konnten nicht geöffnet werden.'); return offen; });
+      }).then(function (ok) {
+        if (!ok) return;
         A.anmelden(gewaehlt);
         try { localStorage.setItem('ht-letzter-therapeut', gewaehlt.id); } catch (e) { /* egal */ }
         location.hash = '#/arbeitsplatz';
@@ -203,6 +305,8 @@
       knopf.disabled = true;
       S.einstellungenSpeichern({ praxisname: w.praxisname }).then(function () {
         return A.anlegen({ name: w.name, kuerzel: w.kuerzel, pin: w.pin, rolle: 'admin' });
+      }).then(function (t) {
+        return S.tresorEinrichten(t, w.pin).then(function () { return t; }); // Patientendaten von Anfang an verschlüsselt
       }).then(function (t) {
         HT.vorlagen.standardAnlegen();
         A.anmelden(t);

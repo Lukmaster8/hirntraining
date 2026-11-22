@@ -31,9 +31,10 @@
     Z = {
       opt: opt, patient: patient, plan: plan, eintraege: eintraege, sitzung: sitzung, index: sitzung.index || 0,
       probe: !!opt.probe, patientenmodus: !!opt.patientenmodus, pausiert: false, beendet: false,
-      ergebnisse: [], seitPause: 0, uebungGemacht: {}, einstufung: !!opt.einstufung,
+      ergebnisse: [], seitPause: 0, uebungGemacht: {}, einstufung: !!opt.einstufung, screening: opt.screening || null,
       nonstop: opt.nonstop !== undefined ? !!opt.nonstop : !!(plan && plan.nonstop), sitzungsStart: Date.now()
     };
+    if (Z.screening) { sitzung.art = 'screening'; sitzung.screeningId = Z.screening.id; }
     if (Z.einstufung) { sitzung.art = 'einstufung'; Z.eintraege = Z.eintraege.map(function (e) { return HT.zusammen(e, { startLevel: 1 }); }); }
     if (!Z.probe) S.put('sessions', sitzung);
     SE.laeuft = true;
@@ -158,7 +159,8 @@
   /* ---------------- DOM ---------------- */
   var D = {};
   function aufbauen() {
-    var t = HT.el('div', { class: 'training' + (Z.patientenmodus ? ' patientenmodus' : '') });
+    var pe0 = (Z.patient && Z.patient.einstellungen) || {};
+    var t = HT.el('div', { class: 'training' + (Z.patientenmodus ? ' patientenmodus' : '') + (pe0.buehnenThema && pe0.buehnenThema !== 'hell' ? ' thema-' + pe0.buehnenThema : '') });
     var kopf = HT.el('div', { class: 'training-kopf' });
     D.punkt = HT.el('div', { class: 'tk-punkt' });
     D.name = HT.el('div', { class: 'tk-name' });
@@ -167,12 +169,17 @@
     var zLabel = Z.patientenmodus ? 'Menü' : 'Zurück';
     D.zurueck = HT.el('button', { class: 'tk-zurueck', type: 'button', title: Z.patientenmodus ? 'Zurück zur Übersicht' : 'Zurück', 'aria-label': zLabel, html: HT.icon('zurueck') + '<span>' + zLabel + '</span>' });
     D.zurueck.addEventListener('click', zurueckAusTraining);
+    if (Z.screening) t.appendChild(HT.el('div', { class: 'screening-hinweis' }, 'Screening – kurzer Leistungsüberblick, kein Diagnostikum'));
     kopf.appendChild(D.zurueck);
+    // Ansage wiederholen (letzte Ansage, sonst die Anleitung des Moduls)
+    D.wiederholen = HT.el('button', { class: 'tk-wiederholen', type: 'button', title: 'Ansage wiederholen', 'aria-label': 'Ansage wiederholen', html: HT.icon('ton') });
+    D.wiederholen.addEventListener('click', function () { if (!HT.audio.wiederholen() && Z && Z.modul) anleitungVorlesen(); });
     kopf.appendChild(HT.el('div', { class: 'tk-modul' }, [D.punkt, HT.el('div', { style: { minWidth: 0 } }, [D.name, D.unter])]));
     D.fortschritt = HT.el('div');
     D.fText1 = HT.el('span'); D.fText2 = HT.el('span');
     kopf.appendChild(HT.el('div', { class: 'tk-mitte' }, [HT.el('div', { class: 'tk-fortschritt' }, D.fortschritt), HT.el('div', { class: 'tk-fortschritt-text' }, [D.fText1, D.fText2])]));
     D.level = HT.el('span', { class: 'tk-level' }, 'Level 1');
+    kopf.appendChild(D.wiederholen);
     D.pauseKnopf = HT.el('button', { class: 'tk-pause', type: 'button', title: 'Pause (Esc)', 'aria-label': 'Pause', html: HT.icon('pause') });
     D.pauseKnopf.addEventListener('click', function () { pauseMenue(false); });
     kopf.appendChild(HT.el('div', { class: 'tk-rechts' }, [D.level, D.pauseKnopf]));
@@ -213,8 +220,17 @@
     if (ev.ctrlKey && ev.altKey && (ev.key === 'p' || ev.key === 'P' || ev.code === 'KeyP')) { ev.preventDefault(); ev.stopPropagation(); therapeutZugang(); return; }
     if (ev.key === 'Escape' && Z.inst && !Z.pausiert && !document.querySelector('.dialog-hinter')) { ev.preventDefault(); pauseMenue(false); }
     if ((ev.key === '-' || ev.key === 'Subtract') && Z.inst && !Z.pausiert && !document.querySelector('.dialog-hinter')) { ev.preventDefault(); pauseMenue(false); }
-    if ((ev.key === '+' || ev.key === 'Add') && Z.modul && !document.querySelector('.dialog-hinter')) { ev.preventDefault(); HT.audio.stumm(); HT.audio.an && (HT.audio.sprache = true); HT.audio.sprechen(Z.modul.def.anleitung); }
+    if ((ev.key === '+' || ev.key === 'Add') && Z.modul && !document.querySelector('.dialog-hinter')) { ev.preventDefault(); anleitungVorlesen(); }
   }
+
+  /* Für das Pult und andere Eingaben: Anleitung vorlesen (+), Pause (−), aktuell laufendes Modul */
+  function anleitungVorlesen() {
+    if (!Z || !Z.modul) return;
+    HT.audio.stumm(); HT.audio.an && (HT.audio.sprache = true); HT.audio.sprechen(Z.modul.def.anleitung);
+  }
+  SE.anleitungWiederholen = function () { if (SE.laeuft && !document.querySelector('.dialog-hinter')) anleitungVorlesen(); };
+  SE.pauseOeffnen = function () { if (SE.laeuft && Z && Z.inst && !Z.pausiert && !document.querySelector('.dialog-hinter')) pauseMenue(false); };
+  SE.modulLaeuft = function () { return SE.laeuft && Z && Z.inst && Z.modul ? Z.modul.def : null; };
 
   function anwendenPatientEinstellungen(an) {
     var root = document.documentElement;
@@ -269,11 +285,11 @@
     var e = Z.eintraege[Z.index];
     var m = HT.Module.map[e.modulId];
     var zustand = Z.patient ? HT.patienten.zustand(Z.patient.id, m.id) : { aktuellesLevel: 1, automatik: true, letzteDurchgaenge: [], hochSerie: 0 };
-    if (Z.probe) zustand = { aktuellesLevel: e.startLevel || 1, automatik: false, letzteDurchgaenge: [], hochSerie: 0 };
+    if (Z.probe || Z.screening) zustand = { aktuellesLevel: e.startLevel || 1, automatik: false, letzteDurchgaenge: [], hochSerie: 0 };
     else if (e.startLevel && e.startLevel !== 'auto' && !Z.modulGestartet) zustand.aktuellesLevel = HT.klemmen(Number(e.startLevel), 1, m.levels.length);
     var params0 = HT.Module.parameter(m, zustand.aktuellesLevel, e.parameterOverrides);
-    var dgSek = HT.klemmen(Number(params0.dauerDurchgangSek) || 90, 30, 300);
-    var anzahl = Z.einstufung ? 6 : Math.max(1, Math.round((Number(e.dauerMin) || 5) * 60 / dgSek));
+    var dgSek = Z.screening && e.dauerSek ? e.dauerSek : HT.klemmen(Number(params0.dauerDurchgangSek) || 90, 30, 300);
+    var anzahl = Z.screening ? 1 : Z.einstufung ? 6 : Math.max(1, Math.round((Number(e.dauerMin) || 5) * 60 / dgSek));
     Z.modul = { def: m, eintrag: e, zustand: zustand, startLevel: zustand.aktuellesLevel, durchgang: 0, anzahl: anzahl, dgSek: dgSek, runs: [] };
     Z.uebung = false;
     kopfSetzen(m);
@@ -381,6 +397,8 @@
       patientSettings: pe,
       patient: Z.patient ? { betroffeneSeite: Z.patient.betroffeneSeite || 'keine', gesichtsfeld: Z.patient.gesichtsfeld || 'frei', haendigkeit: Z.patient.haendigkeit } : { betroffeneSeite: 'keine', gesichtsfeld: 'frei' },
       zeit: HT.zeit, eingabe: HT.eingabe, container: D.container,
+      // Bühnengröße: einheit = 1 % der kürzeren Seite (Reize ≥ 18 einheit, Text ≥ 32 px, Antwortknöpfe ≥ 64 px)
+      buehne: (function () { var b = D.container.clientWidth || 800, h = D.container.clientHeight || 600; return { b: b, h: h, einheit: Math.min(b, h) / 100 }; })(),
       jetzt: function () { return HT.zeit.jetzt(); },
       feedback: function (richtig, x, y, o) { HT.feedback(D.container, richtig, x, y, o); },
       onEvent: function (ev) {
@@ -388,6 +406,8 @@
         ev.zeit = Math.round(HT.zeit.jetzt() - t0);
         Z.ereignisse.push(ev);
         if (ev.zaehlt !== false) zaehler++;
+        // Serienzähler: dezent oben „5 richtig in Folge!“ (nicht in der Übung)
+        if (ev.zaehlt !== false && !uebung) { if (ev.korrekt) { Z.serie = (Z.serie || 0) + 1; if (Z.serie % 5 === 0) serieZeigen(Z.serie); } else Z.serie = 0; }
         if (uebung && zaehler >= 3) setTimeout(function () { if (Z.uebung) beiEnde(); }, 700);
       },
       onFinish: function () { if (!Z.beendet) setTimeout(beiEnde, 600); }
@@ -395,6 +415,25 @@
     var tasten = (pe.eingabe === 'touch' || pe.tastenOverlay) ? m.tasten : [];
     D.root.classList.toggle('mit-tasten', !!(tasten && tasten.length));
     HT.eingabe.overlay(D.buehne, tasten);
+    // Pult-Hinweis unten links: die gerade sinnvolle Taste leuchtet sanft (je Patient abschaltbar)
+    if (D.pultHinweis) { D.pultHinweis.remove(); D.pultHinweis = null; }
+    if (HT.pult && (HT.pult.tastaturBereit() || HT.pult.geraet) && pe.pultHinweis !== false) {
+      var ta = (m.tasten || []).map(function (x) { return typeof x === 'string' ? x : x.aktion; });
+      var teile = [];
+      if (m.eingaben && m.eingaben.indexOf('ja') >= 0) teile.push('<i class="gelb"></i>Ja', '<i class="rot"></i>Nein');
+      else {
+        if (ta.indexOf('ok') >= 0 || !ta.length) teile.push('<i class="gruen"></i>OK');
+        if (ta.indexOf('links') >= 0 || ta.indexOf('rechts') >= 0 || ta.indexOf('hoch') >= 0) teile.push('<i class="weiss"></i>Pfeile');
+      }
+      D.pultHinweis = HT.el('div', { class: 'pult-hinweis-training', title: 'Bedienpult', html: HT.icon('pult') + teile.map(function (x) { return '<span>' + x + '</span>'; }).join('') });
+      D.buehne.appendChild(D.pultHinweis);
+    }
+    // Ja/Nein-Module: kleiner Hinweis unten, welche Pulttaste was bedeutet
+    if (D.janein) { D.janein.remove(); D.janein = null; }
+    if (!D.pultHinweis && m.eingaben && m.eingaben.indexOf('ja') >= 0 && HT.pult && (HT.pult.tastaturBereit() || HT.pult.geraet)) {
+      D.janein = HT.el('div', { class: 'pult-janein', html: '<span><i class="gelb"></i>Ja</span><span><i class="rot"></i>Nein</span>' });
+      D.buehne.appendChild(D.janein);
+    }
     try {
       Z.inst = HT.Module.instanz(m, D.container, ctx);
       Z.inst.start();
@@ -406,8 +445,25 @@
     }
   }
 
+  /* Belohnung: Serienzähler und Level-Aufstieg (dezent, nur transform/opacity) */
+  function serieZeigen(n) {
+    if (!D.buehne) return;
+    var e = HT.el('div', { class: 'serie-hinweis' }, n + ' richtig in Folge!');
+    D.buehne.appendChild(e);
+    setTimeout(function () { if (e.parentNode) e.parentNode.removeChild(e); }, 1300);
+  }
+  function levelBanner(neu) {
+    if (!D.buehne) return;
+    var e = HT.el('div', { class: 'levelup-banner', html: HT.icon('trend') + '<span>Eine Stufe aufgestiegen! Jetzt Level ' + neu + '</span>' });
+    D.buehne.appendChild(e);
+    HT.audio.sprechen('Sie sind eine Stufe aufgestiegen!', { nurAufnahme: true });
+    setTimeout(function () { if (e.parentNode) e.parentNode.removeChild(e); }, 2600);
+  }
+
   function instanzStoppen() {
     if (Z.inst) { Z.inst.stop(); Z.inst = null; }
+    if (D.janein) { D.janein.remove(); D.janein = null; }
+    if (D.pultHinweis) { D.pultHinweis.remove(); D.pultHinweis = null; }
     HT.eingabe.overlay(D.buehne, null);
     D.root.classList.remove('mit-tasten');
     clearInterval(Z.uhr);
@@ -465,7 +521,7 @@
     var erg = durchgangSpeichern();
     M.durchgang++;
     var r = erg ? erg.anpassung : null;
-    if (r && r.neu !== r.alt) { if (r.neu > r.alt) HT.audio.levelAuf(); else HT.audio.levelAb(); }
+    if (r && r.neu !== r.alt) { if (r.neu > r.alt) { HT.audio.levelAuf(); levelBanner(r.neu); } else { HT.audio.levelAb(); setTimeout(function () { HT.audio.sprechen('Wir machen jetzt etwas leichter weiter.', { nurAufnahme: true }); }, 400); } }
     if (Z.einstufung && (!M.einst || M.einst.fertig || M.durchgang >= 6)) { M.zustand.hochSerie = 0; M.zustand.letzteDurchgaenge = []; if (Z.patient) S.put('moduleState', M.zustand); modulErgebnis(); return; }
     if (Z.einstufung) { zwischenschirm(r); return; }
     if (M.durchgang >= M.anzahl) { modulErgebnis(); return; }
@@ -480,7 +536,7 @@
     if (!ev.filter(function (e) { return e.zaehlt !== false; }).length) return null;
     var w = HT.results.berechnen(ev);
     var alt = M.zustand.aktuellesLevel;
-    var anpassung = Z.einstufung ? einstufungSchritt(M, w) : HT.adaptive.nachDurchgang(M.def, M.zustand, w);
+    var anpassung = Z.screening ? { alt: alt, neu: alt } : Z.einstufung ? einstufungSchritt(M, w) : HT.adaptive.nachDurchgang(M.def, M.zustand, w);
     var run = {
       id: HT.uid('run'), sessionId: Z.sitzung.id, patientId: Z.patient ? Z.patient.id : null, modulId: M.def.id,
       level: alt, levelNachher: anpassung.neu, start: Z.dgStart, dauerSek: Math.round(Z.verstrichen),
@@ -488,14 +544,14 @@
       rtMittel: w.rtMittel, rtMedian: w.rtMedian, rtStreuung: w.rtStreuung, rtLinks: w.rtLinks, rtRechts: w.rtRechts,
       trefferLinks: w.trefferLinks, trefferRechts: w.trefferRechts, fehlerLinks: w.fehlerLinks, fehlerRechts: w.fehlerRechts,
       auslassungenLinks: w.auslassungenLinks, auslassungenRechts: w.auslassungenRechts, extra: w.extra,
-      einstufung: Z.einstufung || undefined, pausen: Z.pausenDg || 0, parameter: HT.Module.parameter(M.def, alt, M.eintrag.parameterOverrides), therapeutId: HT.auth.aktuell ? HT.auth.aktuell.id : (Z.sitzung.therapeutId || null),
+      einstufung: Z.einstufung || undefined, screening: Z.screening ? Z.screening.id : undefined, screeningTest: Z.screening ? M.eintrag.test : undefined, pausen: Z.pausenDg || 0, parameter: HT.Module.parameter(M.def, alt, M.eintrag.parameterOverrides), therapeutId: HT.auth.aktuell ? HT.auth.aktuell.id : (Z.sitzung.therapeutId || null),
       rohdaten: ev.slice(0, 600).map(function (e) { return { zeit: e.zeit, reiz: e.reiz, reaktion: e.reaktion, korrekt: !!e.korrekt, auslassung: !!e.auslassung, rtMs: e.rtMs ? Math.round(e.rtMs) : null, seite: e.seite || null, typ: e.typ || null }; })
     };
     M.runs.push(run);
     Z.ereignisse = [];
     if (!Z.probe && Z.patient) {
       S.put('runs', run);
-      S.put('moduleState', M.zustand);
+      if (!Z.screening) S.put('moduleState', M.zustand); // Screening verändert das Trainingslevel nicht
     } else if (Z.probe) {
       M.zustand.aktuellesLevel = alt; // Ausprobieren verändert nichts
     }
@@ -567,7 +623,7 @@
     var b = UI.knopf('Weiter trainieren', { art: 'primaer gross', icon: 'play', klick: weiter });
     kn.appendChild(b); k.appendChild(kn);
     schirm(k);
-    HT.audio.sprechen(HT.t('pausenhinweis'));
+    HT.audio.sprechen(HT.t('pausenhinweis'), { danach: function () { if (document.body.contains(k)) HT.audio.sprechen(HT.t('pausenhinweis_text')); } });
   }
 
   function modulErgebnis() {
@@ -583,9 +639,14 @@
     var sterne = HT.results.sterne(zs.quote);
     HT.audio.ende();
     var k = HT.el('div', { class: 't-karte' });
-    var st = HT.el('div', { class: 't-sterne' });
+    var st = HT.el('div', { class: 't-sterne einflug' });
     for (var i = 1; i <= 3; i++) st.innerHTML += HT.icon('stern', i <= sterne ? 'an' : '');
+    [].forEach.call(st.children, function (c, j) { c.style.animationDelay = (0.15 + j * 0.22) + 's'; });
     k.appendChild(st);
+    // kleine Sterne-Wolke für jeden Durchgang (max. 12 Elemente)
+    var wolke = HT.el('div', { class: 't-sternwolke' });
+    for (var w2 = 0; w2 < Math.min(12, Math.round(zs.quote * 12)); w2++) { var sp = HT.el('span', { html: '★' }); sp.style.animationDelay = (0.8 + w2 * 0.08) + 's'; sp.style.left = (8 + (w2 * 7.3) % 84) + '%'; wolke.appendChild(sp); }
+    k.appendChild(wolke);
     var lob = HT.t('motivation_' + sterne);
     k.appendChild(HT.el('h1', null, lob));
     setTimeout(function () { HT.audio.sprechen(lob, { nurAufnahme: true }); }, 900);
@@ -595,6 +656,19 @@
       werte.appendChild(HT.el('div', { class: 't-wert', html: '<b>' + HT.esc(x[0]) + '</b><span>' + x[1] + '</span>' }));
     });
     k.appendChild(werte);
+    // Vergleich mit der letzten Sitzung dieses Moduls (▲/▼ Quote und Reaktionszeit) und ein Satz in einfacher Sprache
+    if (Z.patient && !Z.probe && !Z.screening) {
+      var frueher = S.alle('runs', function (r) { return r.patientId === Z.patient.id && r.modulId === M.def.id && r.sessionId !== Z.sitzung.id && !r.screening; });
+      if (frueher.length) {
+        var letzteId = frueher[frueher.length - 1].sessionId, vorher = HT.results.zusammenfassung(frueher.filter(function (r) { return r.sessionId === letzteId; }));
+        var dq = zs.quote - vorher.quote, drt = (zs.rtMedian && vorher.rtMedian) ? zs.rtMedian - vorher.rtMedian : null;
+        var pf = function (gut, schlecht) { return gut ? '<span class="sc-besser">▲</span>' : schlecht ? '<span class="sc-schlechter">▼</span>' : '<span class="sc-gleich">▶</span>'; };
+        var satz = dq > 0.03 ? 'Heute haben Sie mehr richtig gemacht als beim letzten Mal.' : dq < -0.03 ? 'Heute war es etwas schwieriger als beim letzten Mal – das ist ganz normal.' : 'Sie sind genauso sicher wie beim letzten Mal.';
+        if (drt !== null && drt < -40 && Math.abs(dq) <= 0.03) satz = 'Sie waren heute schneller als beim letzten Mal.';
+        k.appendChild(HT.el('div', { class: 't-vergleich', html: '<div>' + pf(dq > 0.02, dq < -0.02) + ' Trefferquote: ' + HT.prozent(zs.quote) + ' <span class="gedimmt">(letztes Mal ' + HT.prozent(vorher.quote) + ')</span></div>' +
+          (drt !== null ? '<div>' + pf(drt < -20, drt > 20) + ' Reaktionszeit: ' + Math.round(zs.rtMedian) + ' ms <span class="gedimmt">(letztes Mal ' + Math.round(vorher.rtMedian) + ' ms)</span></div>' : '') + '<p>' + HT.esc(satz) + '</p>' }));
+      }
+    }
     var d = M.zustand.aktuellesLevel - M.startLevel;
     if (Z.einstufung) k.appendChild(HT.el('div', { class: 't-level-info auf', html: HT.icon('ziel') + 'Empfohlenes Startlevel: ' + M.zustand.aktuellesLevel + ' von ' + M.def.levels.length }));
     else k.appendChild(HT.el('div', { class: 't-level-info ' + (d > 0 ? 'auf' : d < 0 ? 'ab' : ''), html: HT.icon(d > 0 ? 'trend' : 'info') + (d > 0 ? 'Level ' + M.startLevel + ' → ' + M.zustand.aktuellesLevel + ' – toller Fortschritt!' : d < 0 ? 'Level ' + M.startLevel + ' → ' + M.zustand.aktuellesLevel : 'Level ' + M.zustand.aktuellesLevel + ' gehalten') }));
@@ -685,7 +759,9 @@
     } }));
     k.appendChild(kn);
     schirm(k);
-    if (!Z.probe && !Z.einstufung) setTimeout(function () { HT.audio.sprechen('Super – Sitzung geschafft!', { nurAufnahme: true }); }, 900);
+    if (!Z.probe && !Z.einstufung) setTimeout(function () {
+      HT.audio.sprechen('Super – Sitzung geschafft!', { nurAufnahme: true, danach: function () { if (Z && Z.patientenmodus) HT.audio.sprechen('Vielen Dank fürs Mitmachen. Bis zum nächsten Mal!', { nurAufnahme: true }); } });
+    }, 900);
     HT.audio.ende();
     HT.app.sicherungsHinweisNachSitzung && HT.app.sicherungsHinweisNachSitzung();
   }
@@ -905,6 +981,11 @@
 
   /* ===================== Patientenstart (ohne Anmeldung) ===================== */
   HT.route('/patientenstart', function (param, w) {
+    if (HT.storage.tresorGesperrt()) {
+      // Verschlüsselte Daten: erst eine Therapeuten-PIN, dann die Namensauswahl
+      HT.auth.entsperrDialog().then(function (ok) { if (ok) HT.app.routen(); else location.hash = '#/start'; });
+      return;
+    }
     var start = HT.el('div', { class: 'start' });
     var box = HT.el('div', { class: 'anmelde-box', style: { maxWidth: '960px' } });
     box.appendChild(HT.ui.iconKnopf('links', HT.t('zurueck'), function () { location.hash = HT.auth.aktuell ? '#/arbeitsplatz' : '#/start'; }, 'zurueck-knopf rand'));

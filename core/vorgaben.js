@@ -90,7 +90,7 @@
         }
         return V.speichern(p).then(function () { UI.toast(HT.t('gespeichert'), 'ok'); return true; });
       } });
-      return UI.dialog({ titel: neu ? 'Neue Vorgabe' : 'Vorgabe bearbeiten', inhalt: f.el, breit: true, knoepfe: knoepfe });
+      return UI.dialog({ fokusFeld: true, titel: neu ? 'Neue Vorgabe' : 'Vorgabe bearbeiten', inhalt: f.el, breit: true, knoepfe: knoepfe });
     },
 
     /* Karte Wochenplan im Reiter „Trainingsplan“ */
@@ -150,9 +150,9 @@
       if (!p.pinHash) { weiter(); return; }
       var erledigt = false;
       var feld = UI.pinFeld(function (pin, fehler) {
-        HT.auth.hash(pin, p.pinSalz).then(function (h) { if (h === p.pinHash) { erledigt = true; if (UI._offen) UI._offen(true); weiter(); } else fehler(); });
+        HT.auth.patientPinPruefen(p, pin).then(function (ok) { if (ok) { erledigt = true; if (UI._offen) UI._offen(true); weiter(); } else fehler(HT.auth.sperrText()); });
       }, { text: 'Bitte Ihre persönliche PIN eingeben', manuell: true });
-      UI.dialog({ titel: 'Hallo ' + (p.vorname || p.pseudonym) + '!', inhalt: feld, klasse: 'pin-dialog', knoepfe: [{ text: HT.t('abbrechen'), wert: null }] });
+      UI.dialog({ fokusFeld: true, titel: 'Hallo ' + (p.vorname || p.pseudonym) + '!', inhalt: feld, klasse: 'pin-dialog', knoepfe: [{ text: HT.t('abbrechen'), wert: null }] });
     },
 
     /* Übersicht „Ihre Übungen heute“ im Patientenmodus */
@@ -163,14 +163,19 @@
       var box = HT.el('div', { class: 'anmelde-box', style: { maxWidth: '820px' } });
       box.appendChild(UI.iconKnopf('links', 'Menü (Therapeut oder Patient)', function () { location.hash = '#/start'; HT.app.neuZeichnen(); }, 'zurueck-knopf rand'));
       box.appendChild(HT.el('h1', null, 'Hallo ' + (p.vorname || p.pseudonym) + '!'));
+      setTimeout(function () { if (document.body.contains(box)) HT.audio.sprechen('Schön, dass Sie da sind. Viel Freude beim Training!', { nurAufnahme: true }); }, 500);
       var heute = V.heute(p);
       var plan = HT.plaene.aktiverPlan(p.id);
       var liste = HT.el('div', { class: 'patient-aufgaben' });
       if (heute.length) {
         box.appendChild(HT.el('p', { class: 'untertitel' }, 'Ihre Übungen für heute. Sie können die Reihenfolge selbst wählen.'));
+        var fertigN = heute.filter(function (v) { return V.erledigt(v); }).length, anteil = heute.length ? fertigN / heute.length : 0, umfang = 2 * Math.PI * 34;
+        box.appendChild(HT.el('div', { class: 'tagesziel', html: '<svg viewBox="0 0 80 80" width="92" height="92"><circle cx="40" cy="40" r="34" fill="none" stroke="#e1e8ed" stroke-width="9"/><circle cx="40" cy="40" r="34" fill="none" stroke="#2EAD6B" stroke-width="9" stroke-linecap="round" stroke-dasharray="' + (umfang * anteil).toFixed(1) + ' ' + umfang.toFixed(1) + '" transform="rotate(-90 40 40)"/><text x="40" y="46" text-anchor="middle" font-size="18" font-weight="800" fill="#1E2A33">' + fertigN + '/' + heute.length + '</text></svg><span>' + (fertigN === heute.length ? 'Tagesziel erreicht – prima!' : 'Tagesziel: ' + heute.length + ' Übung' + (heute.length > 1 ? 'en' : '')) + '</span>' }));
         heute.forEach(function (v) {
           var ok = V.erledigt(v), darf = !ok || v.wiederholung;
           var e = HT.el('div', { class: 'pa-eintrag' + (ok ? ' erledigt' : '') });
+          var ein0 = V.eintraege(p, v)[0], kat0 = ein0 && HT.Module.map[ein0.modulId] ? HT.Module.map[ein0.modulId].kategorie : 'aufmerksamkeit';
+          e.appendChild(HT.el('div', { class: 'pa-illu', html: HT.illustration ? HT.illustration(kat0) : '' }));
           e.appendChild(HT.el('div', { class: 'pa-text', html: '<b>' + HT.esc(V.titel(p, v)) + '</b><span>' + (ok ? '✓ erledigt' : 'ca. ' + V.dauer(p, v) + ' Minuten') + '</span>' }));
           if (darf) e.appendChild(UI.knopf(ok ? 'Noch einmal' : 'Training starten', { art: ok ? 'gross' : 'primaer gross', icon: 'play', klick: function () { V.starten(p, v); } }));
           liste.appendChild(e);
@@ -217,9 +222,7 @@
         { name: 'pin', label: 'PIN (4–8 Ziffern, leer lassen = keine PIN)', typ: 'pin', breit: true }
       ], {}, { pruefen: function (w) { if (w.pin && !/^[0-9]{4,8}$/.test(w.pin)) return 'Die PIN muss aus 4 bis 8 Ziffern bestehen.'; return null; } }).then(function (w) {
         if (!w) return null;
-        if (!w.pin) { delete p.pinHash; delete p.pinSalz; return S.put('patients', p); }
-        p.pinSalz = Math.random().toString(36).slice(2, 12);
-        return HT.auth.hash(w.pin, p.pinSalz).then(function (h) { p.pinHash = h; return S.put('patients', p); });
+        return HT.auth.patientPinSetzen(p, w.pin);
       });
     }
   };

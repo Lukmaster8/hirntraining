@@ -17,7 +17,8 @@ Auswertung mit Diagrammen und druckfertige Berichte. Alle Programmteile, Grafike
 
 ## 2. Starten
 
-* Doppelklick auf **`index.html`**. Die Datei öffnet sich im Standardbrowser.
+* Doppelklick auf **`Hirntraining starten`** (Programmsymbol im Ordner). Er öffnet `index.html` in Chrome, falls vorhanden, sonst in Safari. Für den Schreibtisch: mit **cmd + alt** auf den Schreibtisch ziehen (Alias). Beim ersten Mal ggf. Rechtsklick → *Öffnen*. Die Kurzanleitung steht in **`LIESMICH – Start auf iMac und iPad.txt`**.
+* Alternativ Doppelklick auf **`index.html`**. Die Datei öffnet sich im Standardbrowser.
 * Empfehlung: Mit **Google Chrome** öffnen (Rechtsklick → *Öffnen mit* → *Google Chrome*). Chrome speichert die Daten am zuverlässigsten in der Datenbank (IndexedDB). Safari funktioniert ebenfalls. Unter `file://` nutzt Safari automatisch den Ersatzspeicher (localStorage), der kleiner ist.
 * Für den Vollbildmodus auf **Vollbild** klicken. Der Knopf ist auf dem Startbildschirm und unten in der Seitenleiste. Beim Start einer Trainingssitzung schaltet das Programm selbst in den Vollbildmodus.
 * Tipp: `index.html` im Browser als Lesezeichen speichern oder in das Dock ziehen.
@@ -65,20 +66,20 @@ So erzeugen Sie die Aufnahmen (einmalig; dafür ist kurz Internet nötig, danach
 | **Startbildschirm** | Kachel „Therapeut“ (Anmeldung mit PIN) oder „Patient starten“ (Patient wählt seinen Namen und trainiert seinen aktiven Plan) |
 | **Übersicht** | heutige Sitzungen, zuletzt trainierte Patienten, Trainingsminuten, Status der Datensicherung |
 | **Patienten** | Suche, Filter nach Therapeut und Archiv, Patientenakte mit Reitern *Stammdaten · Trainingsplan · Therapieziele · Verlauf · Berichte · Einstellungen* |
-| **Modulbibliothek** | alle 50 Module mit laufender Vorschau-Animation, Beschreibung und Leveltabelle. Module lassen sich einzeln ein- und ausschalten und über „Training starten“ sofort ausprobieren (ohne Speichern) |
+| **Modulbibliothek** | alle 56 Module mit laufender Vorschau-Animation, Beschreibung und Leveltabelle. Module lassen sich einzeln ein- und ausschalten und über „Training starten“ sofort ausprobieren (ohne Speichern) |
 | **Auswertung** | Verlauf je Patient und Modul: Level, Trefferquote, Treffer/Fehler/Auslassungen, Reaktionszeit, Links-Rechts-Verteilung, Vergleich zweier Zeiträume |
 | **Verwaltung** (nur Admin) | Therapeuten, Praxisdaten und Logo, Vorlagen, Schwellen der Levelsteuerung, Datensicherung, Testdaten, Daten löschen |
 | **Einstellungen** | Farbschema (6 Varianten inkl. dunkel), Schriftgröße 100–160 %, hoher Kontrast, Ton, Lautstärke, Sprachausgabe, Pausenhinweis, Standarddauer |
 
-### USB-Bedienpult (Patiententastatur)
-Das USB-Pult wird direkt im Browser erkannt. Einen Treiber braucht es nicht. Voraussetzung ist **Google Chrome** (oder Microsoft Edge), auch Chrome 116 unter macOS 10.13 High Sierra. Safari kann keine USB-Geräte lesen.
+### USB-Bedienpult (HASOMED RehaCom-Pult, USB-A)
+Das RehaCom-Pult meldet sich am Mac und am iPad (über USB-Adapter) als **normale USB-Tastatur**. Hirntraining liest es deshalb in jedem Browser (Chrome und Safari), ohne Treiber. Andere Joysticks oder Gamepads werden nicht ausgelesen. Sobald eine Pult-Taste ankommt, meldet das Programm **„RehaCom-Pult erkannt“** (Browser dürfen Tastaturen nicht nach Namen auflisten).
 
-1. Pult per USB anstecken und Hirntraining in Chrome öffnen.
-2. Oben rechts im Startfenster auf **„Bedienpult nicht verbunden“** klicken (oder *System → Bedienpult*), dann auf **„Bedienpult verbinden“**. Im Chrome-Fenster das Pult auswählen und „Verbinden“ drücken. Das ist nur beim ersten Mal nötig, danach verbindet sich das Pult automatisch.
-3. Einmalig **„Tasten einrichten“**: Das Programm fragt jede Taste nacheinander ab (grün, gelb, rot, weiße Pfeiltasten, Fußtasten). Fehlende Tasten einfach überspringen.
-4. Optional **„Joystick kalibrieren“**: einmal ganz nach links und rechts bewegen, dann ganz nach oben und unten.
+* **Sofort ohne Einrichtung:** weiße Pfeiltasten, grüne OK-Tasten, Zifferntasten 0–9, Gelb „+“ = Anleitung noch einmal vorlesen, Rot „−“ = Pause/Therapeutenmenü.
+* **Tasten genau anlernen:** Pult-Knopf oben im Startfenster → **„Tasten einrichten“**. Jede Taste drücken, wenn sie im Bild markiert ist: große grüne OK-Tasten, Gelb +, Rot −, die vier Pfeiltasten, die kleine Tastenreihe „OK 9 … 0 OK“, optional Fußtasten. Mit „Rest überspringen & speichern“ kann man vorzeitig abschließen. Schon belegte Tasten werden abgelehnt.
+* **Belegungsprofil:** *Klassisch* (Gelb = Anleitung „+“, Rot = Pause „−“) oder *Ja/Nein* (Gelb = Ja/Bekannt, Rot = Nein/Neu). Module mit Ja/Nein-Antworten schalten automatisch um.
+* Meldet sich ein Pult nicht als Tastatur, sondern als HID-Gerät: „Als USB-HID verbinden (Chrome)“. Danach wird nur genau dieses Gerät (gespeicherte VID/PID) automatisch geöffnet.
 
-Die Anzeige ist **grün**, wenn das Pult verbunden und eingerichtet ist. Im Pulttest leuchtet jede gedrückte Taste auf und zählt mit. Der Joystickpunkt zeigt die Position, die Belegung jeder Taste ist änderbar, und **„Protokoll drucken“** gibt alles aus. Im Training lösen die Tasten die Modulaktionen aus (grün = Reagieren/OK, gelb = Ja/Bekannt, rot = Nein/Neu, Pfeile = Richtungen). Auf Zwischenbildschirmen drückt die grüne Taste den Hauptknopf.
+Im Arbeitsplatz wählen die Pfeile Gruppe und Modul, OK startet das Training. Zifferntasten gehen an laufende Module. „Protokoll drucken“ gibt die Belegung aus.
 
 ### iPhone, iPad und Online-Version (GitHub Pages)
 Hirntraining läuft auch auf iPhone und iPad als App mit eigenem Icon auf dem Home-Bildschirm. Dafür braucht es eine Internetadresse. GitHub Pages ist kostenlos:
@@ -153,7 +154,7 @@ Gut zu wissen:
 
 ### Patientenmodus
 Mit **Patientenmodus** in der Akte oder **Patient starten** auf dem Startbildschirm trainiert der Patient selbstständig. Die Menüs sind dann gesperrt.
-Verlassen geht nur mit einer **Therapeuten-PIN**: Tastenkombination **Strg + Alt + P** oder **die Ecke oben rechts 1,5 Sekunden gedrückt halten**.
+Patientinnen und Patienten kommen jederzeit über den Knopf **„Menü“** oben links zurück zu ihrer Übersicht (bisherige Ergebnisse bleiben gespeichert). Das Therapeutenmenü (Level, Parameter, Sitzung verwalten) öffnet sich nur mit einer **Therapeuten-PIN**: Tastenkombination **Strg + Alt + P**, **die Ecke oben links 1,5 Sekunden gedrückt halten** oder **den Pauseknopf lange drücken**.
 
 ### Adaptive Levelsteuerung
 * Trefferquote = Treffer / (Treffer + Fehler + Auslassungen)
@@ -171,11 +172,24 @@ Verlassen geht nur mit einer **Therapeuten-PIN**: Tastenkombination **Strg + Alt
 Die Daten liegen **im Profil des Browsers** auf diesem Mac. Deshalb gilt:
 
 * **Immer denselben Browser verwenden.** Chrome und Safari haben getrennte Daten.
-* **Regelmäßig sichern:** *Verwaltung → Datensicherung → Jetzt sichern*. Es wird eine Datei `hirntraining-sicherung-JJJJ-MM-TT.json` heruntergeladen. Diese bitte z. B. auf einem USB-Stick oder im Praxis-Netzlaufwerk aufbewahren.
-* Das Programm erinnert nach **7 Tagen** ohne Sicherung. Der Zeitraum ist einstellbar.
+* **Regelmäßig sichern:** *Verwaltung → Datensicherung → Jetzt sichern*. Die Sicherung wird mit einem **Sicherungspasswort verschlüsselt** (AES-GCM, Schlüssel per PBKDF2) und als `hirntraining-sicherung-JJJJ-MM-TT.htsich` heruntergeladen. Das Passwort wird nirgends gespeichert – bitte sicher notieren.
+* Sicherungen **nicht in Cloud-Ordnern** (Google Drive, iCloud, Dropbox) ablegen, sondern z. B. auf einem USB-Stick, der in der Praxis verschlossen aufbewahrt wird.
+* Das Programm erinnert nach **7 Tagen** ohne Sicherung (Status-Chip oben im Arbeitsplatz). Der Zeitraum ist einstellbar.
 * Wer im Browser „Verlauf / Websitedaten löschen“ wählt, löscht auch die Trainingsdaten. Vorher sichern!
 
-**Wiederherstellen:** *Verwaltung → Datensicherung → Sicherung einspielen …* und die JSON-Datei wählen. Dabei werden die vorhandenen Daten ersetzt.
+**Wiederherstellen:** *Verwaltung → Datensicherung → Sicherung einspielen …*, Datei wählen und das Passwort eingeben. Ältere, unverschlüsselte JSON-Sicherungen werden mit einem Warnhinweis weiterhin eingelesen. Dabei werden die vorhandenen Daten ersetzt.
+
+**ZIP des Programms:** Nach Änderungen am Programm `python3 tools/zip_erstellen.py` ausführen – das erzeugt `Hirntraining.zip` (ohne Sicherungen und Entwicklerdateien).
+
+### Datenschutz in der Praxis
+* **Datentresor:** Klientendaten, Pläne, Sitzungen und Ergebnisse werden im Browser **verschlüsselt** gespeichert (AES-256-GCM). Der Schlüssel ist für jeden Zugang mit dessen PIN geschützt (PBKDF2-SHA256, 150 000 Runden) und liegt nur nach der Anmeldung im Arbeitsspeicher. Nach Abmelden oder Neuladen sind die Daten gesperrt; der Patientenstart verlangt dann einmal eine Therapeuten-PIN. Bestehende Daten werden bei der ersten Anmeldung nach dem Update automatisch verschlüsselt. Zugänge, die vor dem Tresor angelegt wurden, brauchen einmal die Freigabe durch jemanden mit Zugriff. Status: *Verwaltung → Datenschutz*.
+* **Wo liegen die Daten?** Nicht im Programmordner, sondern im Speicher des jeweiligen Browsers auf diesem Gerät (Chrome und Safari getrennt). Sicherungen (`.htsich`, mit Passwort verschlüsselt) landen im Ordner *Downloads*.
+* **Mac-Benutzerkonto mit Passwort** und **FileVault** (Festplattenverschlüsselung) einschalten.
+* Für Hirntraining ein **eigenes Browser-Profil** verwenden (keine Erweiterungen, keine Synchronisation).
+* **PINs** werden nur als PBKDF2-Hash (150 000 Runden, zufälliges Salz) gespeichert; ältere PINs werden bei der nächsten Anmeldung automatisch umgestellt. Nach 5 Fehlversuchen gibt es eine Wartezeit (30 s, steigend).
+* **Automatische Sperre** nach Inaktivität (5/10/15/30 min, Standard 10) – nie während eines laufenden Trainings. Sofort sperren: **Strg + Alt + L**. Der Sperrbildschirm zeigt keine Patientendaten.
+* **Löschkonzept:** *Verwaltung → Datenschutz*: Aufbewahrungsfrist (Standard 10 Jahre nach Behandlungsende), Liste „Frist abgelaufen“ mit endgültigem Löschen. Ein **Protokoll** (nur Datum, Aktion, Therapeuten-Kürzel, Pseudonym) hält Export, Import, Löschen und Bericht drucken fest.
+* **Online-Version (GitHub Pages):** Alle Seiten unter `name.github.io` teilen sich im Browser denselben Speicher. Für echte Patientendaten die lokale Version (index.html auf dem Praxis-Mac) verwenden.
 
 ## 5. Umzug auf einen anderen Mac
 
@@ -234,14 +248,16 @@ Hirntraining/
   docs/               Entwickler-Dokumentation, Modulübersicht
 ```
 
-## 8. Modulkatalog
+## 8. Modulkatalog (56 Module)
 
-**Aufmerksamkeit:** Reaktion (Alertness) · Wahlreaktion · Daueraufmerksamkeit · Vigilanz · Selektive Aufmerksamkeit · Geteilte Aufmerksamkeit · Hörtraining · Straßenverkehr (Cockpit-Fahrt: Tempo im grünen Band, Ampeln, Fußgänger, Stopp, Hindernisse, Bahnübergang, Abbiegen, Kontrollleuchten, Durchsagen, Polizei im Spiegel) · Alarm Straße (plötzliche Gefahr – sofort OK) · Zahlenfeld
-**Gedächtnis:** Arbeitsgedächtnis Folgen · Zahlenspanne · Bilder wiedererkennen · Wortlisten · Memory · Wege merken · Alltagsgedächtnis · Einkaufen · Geschichten merken · Wort-Bild-Paare · Personen merken · Spielkarten merken
+Dazu die **Screening-Batterie** (Arbeitsplatz, Reiter „Screening“): Reaktion einfach und mit Warnton, geteilte Aufmerksamkeit, selektive Suche (Zahlenfeld 1–25), Zahlenspanne vorwärts/rückwärts, Wortgedächtnis, logisches Denken und Gesichtsfeld-Kurzcheck – feste Parameter, Vergleich mit dem eigenen ersten Screening, Trainingsempfehlungen, Druckseite „Screening-Verlauf“. **Kein Diagnostikum.** Planvorlagen „Beruflich“ und „Frühphase / Aktivierung“ sind neu.
+
+**Aufmerksamkeit:** Reagieren nach Regel (Go/No-Go mit Regelwechsel) · Reaktion (Alertness) · Wahlreaktion · Daueraufmerksamkeit · Vigilanz · Selektive Aufmerksamkeit · Geteilte Aufmerksamkeit · Hörtraining · Straßenverkehr (Cockpit-Fahrt: Tempo im grünen Band, Ampeln, Fußgänger, Stopp, Hindernisse, Bahnübergang, Abbiegen, Kontrollleuchten, Durchsagen, Polizei im Spiegel) · Alarm Straße (plötzliche Gefahr – sofort OK) · Zahlenfeld
+**Gedächtnis:** Arbeitsgedächtnis Folgen · Zahlenspanne · Bilder wiedererkennen · Wortlisten · Memory · Wege merken · Alltagsgedächtnis · Einkaufen · Geschichten merken · Wort-Bild-Paare · Personen merken · Spielkarten merken · Alltagsszenen beobachten · Telefonnotizen
 **Wahrnehmung & Neglect:** Visuelle Exploration · Neglect-Training · Gesichtsfeldtraining · Sakkadentraining · Lesetraining · Formen unterscheiden · Figur-Grund
-**Räumliches Denken:** Richtungen · Mentale Rotation 2D · Mentale Rotation 3D · Muster nachbauen
-**Exekutivfunktionen:** Reihen fortsetzen · Regeln erkennen und wechseln · Turm-Aufgabe · Handlungsplanung · Tagesplanung · Kategorisieren · Büroaufgaben
-**Rechnen & Sprache:** Rechnen im Alltag · Uhrzeit · Zahlen und Mengen · Wortfindung · Buchstaben- und Wortsuche · Textverständnis
+**Räumliches Denken:** Richtungen · Mentale Rotation 2D · Mentale Rotation 3D · Muster nachbauen · Räume erkunden (Ich-Perspektive im Gebäude)
+**Exekutivfunktionen:** Reihen fortsetzen · Regeln erkennen und wechseln · Turm-Aufgabe · Handlungsplanung · Tagesplanung · Kategorisieren · Büroaufgaben · Ausflug planen · Lager und Bestellungen
+**Rechnen & Sprache:** Rechnen im Alltag · Uhrzeit · Zahlen und Mengen · Wortfindung · Buchstaben- und Wortsuche · Textverständnis · Denksport (Aktivierung)
 **Visuomotorik:** Zielklicken · Spur nachfahren · Labyrinth · Verfolgen
 
 ## 9. Hinweise und Problemlösung

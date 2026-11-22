@@ -1,9 +1,16 @@
-/* Hirntraining – USB-Bedienpult (Patiententastatur) direkt im Browser über WebHID.
+/* Hirntraining – USB-Bedienpult: HASOMED-RehaCom-Patientenpult (USB-A), direkt im Browser.
  *
  * Kein Treiber nötig: Das Pult meldet sich am Mac als HID-Gerät. Chrome (ab Version 89, auch Chrome 116
  * unter macOS 10.13 High Sierra) kann solche Geräte über WebHID lesen. Beim ersten Mal muss das Pult einmal
  * über „Bedienpult verbinden“ freigegeben werden (Sicherheitsregel des Browsers), danach verbindet es sich
  * beim Einstecken bzw. beim Programmstart automatisch.
+ *
+ * Tastatur-Modus (immer verfügbar, auch in Safari): Die meisten Pulte melden sich am Mac als normale USB-Tastatur.
+ * WebHID darf Tastaturen in Chrome nicht lesen – deshalb werden die Tasten über die normalen Tastatur-Ereignisse
+ * angelernt (ev.code) und an die zentrale Eingabe gegeben. WebHID wird nur noch für Joystick bzw. HID-Pulte genutzt.
+ *
+ * Belegungsprofile: „Klassisch“ (Gelb = Anleitung vorlesen, Rot = Pause) und „Ja/Nein“ (Gelb = Ja, Rot = Nein).
+ * Module mit eingaben: ['ja','nein'] schalten während des Moduls automatisch auf Ja/Nein um.
  *
  * Weil jedes Pult seine Tasten etwas anders meldet, werden die Tasten einmal „angelernt“ (Taste drücken →
  * Bit im HID-Bericht merken). Der Joystick wird über zwei kurze Bewegungen kalibriert. Meldet sich das Pult
@@ -14,26 +21,36 @@
   var HT = window.HT;
   var S = HT.storage, UI = HT.ui;
 
+  // Tastenbild des HASOMED-RehaCom-Patientenpults: links und rechts je große grüne OK-Taste, gelbe „+“- und rote „−“-Taste,
+  // in der Mitte vier weiße Pfeiltasten (Raute), oben eine Reihe kleiner Tasten „OK 9 8 7 6 5 4 3 2 1 0 OK“.
   var ROLLEN = [
-    { id: 'ok_links', name: 'Große grüne Taste links (OK)', aktion: 'ok', farbe: 'gruen', x: 105, y: 205, r: 44 },
-    { id: 'gelb_links', name: 'Gelbe Taste links', aktion: 'ja', farbe: 'gelb', x: 92, y: 108, r: 21 },
-    { id: 'rot_links', name: 'Rote Taste links', aktion: 'nein', farbe: 'rot', x: 150, y: 82, r: 21 },
-    { id: 'hoch', name: 'Weiße Taste oben', aktion: 'hoch', farbe: 'weiss', x: 300, y: 88, r: 30 },
-    { id: 'links', name: 'Weiße Taste links', aktion: 'links', farbe: 'weiss', x: 232, y: 152, r: 30 },
-    { id: 'mitte', name: 'Weiße Taste Mitte', aktion: 'ok', farbe: 'weiss', x: 300, y: 165, r: 26 },
-    { id: 'rechts', name: 'Weiße Taste rechts', aktion: 'rechts', farbe: 'weiss', x: 368, y: 152, r: 30 },
-    { id: 'runter', name: 'Weiße Taste unten', aktion: 'runter', farbe: 'weiss', x: 300, y: 236, r: 30 },
-    { id: 'rot_rechts', name: 'Rote Taste rechts', aktion: 'nein', farbe: 'rot', x: 450, y: 82, r: 21 },
-    { id: 'gelb_rechts', name: 'Gelbe Taste rechts', aktion: 'ja', farbe: 'gelb', x: 508, y: 108, r: 21 },
-    { id: 'ok_rechts', name: 'Große grüne Taste rechts (OK)', aktion: 'ok', farbe: 'gruen', x: 495, y: 205, r: 44 },
-    { id: 'fuss_links', name: 'Fußtaste links (falls angeschlossen)', aktion: 'ok', farbe: 'fuss' },
-    { id: 'fuss_rechts', name: 'Fußtaste rechts (falls angeschlossen)', aktion: 'ok', farbe: 'fuss' }
+    { id: 'ok_links', name: 'Große grüne OK-Taste links', aktion: 'ok', farbe: 'gruen', x: 100, y: 222, r: 40 },
+    { id: 'gelb_links', name: 'Gelbe Taste „+“ links', aktion: 'ja', farbe: 'gelb', x: 132, y: 132, r: 20 },
+    { id: 'rot_links', name: 'Rote Taste „−“ links', aktion: 'nein', farbe: 'rot', x: 80, y: 158, r: 20 },
+    { id: 'hoch', name: 'Weiße Pfeiltaste oben', aktion: 'hoch', farbe: 'weiss', x: 300, y: 108, r: 30 },
+    { id: 'links', name: 'Weiße Pfeiltaste links', aktion: 'links', farbe: 'weiss', x: 232, y: 172, r: 30 },
+    { id: 'rechts', name: 'Weiße Pfeiltaste rechts', aktion: 'rechts', farbe: 'weiss', x: 368, y: 172, r: 30 },
+    { id: 'runter', name: 'Weiße Pfeiltaste unten', aktion: 'runter', farbe: 'weiss', x: 300, y: 236, r: 30 },
+    { id: 'gelb_rechts', name: 'Gelbe Taste „+“ rechts', aktion: 'ja', farbe: 'gelb', x: 468, y: 132, r: 20 },
+    { id: 'rot_rechts', name: 'Rote Taste „−“ rechts', aktion: 'nein', farbe: 'rot', x: 520, y: 158, r: 20 },
+    { id: 'ok_rechts', name: 'Große grüne OK-Taste rechts', aktion: 'ok', farbe: 'gruen', x: 500, y: 222, r: 40 },
+    { id: 'ok_klein_links', name: 'Kleine OK-Taste oben links', aktion: 'ok', farbe: 'gruen', x: 62, y: 46, r: 13, klein: 'OK' }
   ];
-  var AKTIONEN = [['ok', 'Reagieren / OK'], ['ja', 'Ja / Bekannt'], ['nein', 'Nein / Neu'], ['hoch', 'Pfeil oben'], ['runter', 'Pfeil unten'], ['links', 'Pfeil links'], ['rechts', 'Pfeil rechts'], ['pause', 'Pause (Therapeutenmenü)'], ['', 'keine Funktion']];
-  var FARBEN = { gruen: ['#2EAD6B', '#1f8a52'], gelb: ['#F2C230', '#c99a12'], rot: ['#E25C5C', '#b93c3c'], weiss: ['#ffffff', '#c9d2d8'], fuss: ['#8a97a1', '#5f6b74'] };
+  [9, 8, 7, 6, 5, 4, 3, 2, 1, 0].forEach(function (z, i) {
+    ROLLEN.push({ id: 'ziffer_' + z, name: 'Zifferntaste ' + z, aktion: 'ziffer:' + z, farbe: 'grau', x: 104 + i * 43.6, y: 46, r: 13, klein: String(z) });
+  });
+  ROLLEN.push({ id: 'ok_klein_rechts', name: 'Kleine OK-Taste oben rechts', aktion: 'ok', farbe: 'gruen', x: 538, y: 46, r: 13, klein: 'OK' });
+  ROLLEN.push({ id: 'fuss_links', name: 'Fußtaste links (falls angeschlossen)', aktion: 'ok', farbe: 'fuss' });
+  ROLLEN.push({ id: 'fuss_rechts', name: 'Fußtaste rechts (falls angeschlossen)', aktion: 'ok', farbe: 'fuss' });
+  var AKTIONEN = [['auto', 'Automatisch (nach Profil)'], ['ok', 'Reagieren / OK'], ['ja', 'Ja / Bekannt'], ['nein', 'Nein / Neu'], ['hoch', 'Pfeil oben'], ['runter', 'Pfeil unten'], ['links', 'Pfeil links'], ['rechts', 'Pfeil rechts'], ['anleitung', 'Anleitung noch einmal vorlesen (+)'], ['pause', 'Pause / Therapeutenmenü (−)'], ['', 'keine Funktion']];
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function (z) { AKTIONEN.splice(AKTIONEN.length - 1, 0, ['ziffer:' + z, 'Ziffer ' + z]); });
+  var PROFILE = [['klassisch', 'Klassisch: Gelb = Anleitung vorlesen, Rot = Pause'], ['janein', 'Ja/Nein: Gelb = Ja / Bekannt, Rot = Nein / Neu']];
+  var FARBEN = { gruen: ['#2EAD6B', '#1f8a52'], gelb: ['#F2C230', '#c99a12'], rot: ['#E25C5C', '#b93c3c'], weiss: ['#ffffff', '#c9d2d8'], grau: ['#56636c', '#3b464e'], fuss: ['#8a97a1', '#5f6b74'] };
 
   var P = HT.pult = {
-    unterstuetzt: !!(window.navigator && navigator.hid),
+    unterstuetzt: !!(window.navigator && navigator.hid), // nur WebHID (Joystick, HID-Pulte)
+    tastaturModus: true,                                  // Tasten über die normale Tastatur: überall verfügbar
+    letzteTaste: null,                                    // { code, key } – Live-Anzeige zur Fehlersuche
     geraet: null,
     letzte: {},            // reportId → Uint8Array (letzter Bericht)
     gedrueckt: {},         // rollenId → bool
@@ -57,11 +74,27 @@
   P.an = function (f) { P._hoerer.push(f); return function () { P._hoerer = P._hoerer.filter(function (x) { return x !== f; }); }; };
 
   P.eingerichtet = function () { var k = konfig(); return !!(k.tasten && Object.keys(k.tasten).length); };
+  P.profil = function () { return konfig().profil || 'klassisch'; };
+  // Ja/Nein gilt im Profil „Ja/Nein“ immer, sonst nur während eines Moduls, das eingaben: ['ja','nein'] erklärt
+  P.janeinAktiv = function () {
+    if (P.profil() === 'janein') return true;
+    var m = HT.session && HT.session.modulLaeuft && HT.session.modulLaeuft();
+    return !!(m && m.eingaben && m.eingaben.indexOf('ja') >= 0);
+  };
   P.aktionVon = function (rolleId) {
     var k = konfig();
-    if (k.aktionen && k.aktionen[rolleId] !== undefined) return k.aktionen[rolleId];
+    if (k.aktionen && k.aktionen[rolleId] !== undefined && k.aktionen[rolleId] !== 'auto') return k.aktionen[rolleId];
     var r = ROLLEN.filter(function (x) { return x.id === rolleId; })[0];
-    return r ? r.aktion : '';
+    if (!r) return '';
+    if (r.farbe === 'gelb' && !r.klein) return P.janeinAktiv() ? 'ja' : 'anleitung';
+    if (r.farbe === 'rot' && !r.klein) return P.janeinAktiv() ? 'nein' : 'pause';
+    return r.aktion;
+  };
+  // Tastatur-Pult bereit: OK und die vier Pfeile sind als Tasten angelernt
+  P.tastaturBereit = function () {
+    var t = konfig().tasten || {};
+    var hat = function (id) { return !!(t[id] && t[id].key); };
+    return (hat('ok_links') || hat('ok_rechts')) && hat('hoch') && hat('runter') && hat('links') && hat('rechts');
   };
 
   /* ---------- Verbindung ---------- */
@@ -88,7 +121,7 @@
     });
   }
   P.verbinden = function () {
-    if (!P.unterstuetzt) { UI.hinweis('Bedienpult', 'Dieser Browser kann keine USB-Geräte lesen. Bitte das Programm in Google Chrome (oder Microsoft Edge) öffnen. Safari unterstützt das nicht.'); return Promise.resolve(null); }
+    if (!P.unterstuetzt) { UI.hinweis('Joystick', 'Der Joystick funktioniert nur in Google Chrome. Die Tasten des Pults funktionieren überall: einfach unter „Tasten einrichten“ anlernen.'); return Promise.resolve(null); }
     return navigator.hid.requestDevice({ filters: [] }).then(function (liste) {
       if (!liste || !liste.length) return null;
       var d = liste[0];
@@ -161,38 +194,102 @@
       }
     }
   }
-  function tasteGedrueckt(rolle) {
+  var RICHTUNG = { hoch: 1, runter: 1, links: 1, rechts: 1 }, wdh = {};
+  var STANDARD = { ArrowUp: 'hoch', ArrowDown: 'runter', ArrowLeft: 'links', ArrowRight: 'rechts', Space: 'ok', Enter: 'ok', NumpadEnter: 'ok' };
+  function tasteGedrueckt(rolle, vonTastatur) {
     P.gedrueckt[rolle] = true;
     P.zaehler[rolle] = (P.zaehler[rolle] || 0) + 1;
     benachrichtigen('taste', { rolle: rolle, gedrueckt: true });
-    if (!P._lernen && !P._testModus) ausfuehren(P.aktionVon(rolle));
-  }
-  // Meldet sich das Pult als Tastatur, werden die angelernten Tasten hier abgefangen
-  document.addEventListener('keydown', function (ev) {
-    if (P._lernen && P._lernenTaste) { P._lernenTaste(ev); return; }
-    var tasten = konfig().tasten || {};
-    for (var rolle in tasten) {
-      if (tasten[rolle].key && tasten[rolle].key === ev.code) {
-        if (ev.repeat) { ev.preventDefault(); ev.stopImmediatePropagation(); return; }
-        ev.preventDefault(); ev.stopImmediatePropagation();
-        tasteGedrueckt(rolle);
-        setTimeout(function (r) { P.gedrueckt[r] = false; benachrichtigen('taste', { rolle: r, gedrueckt: false }); }, 150, rolle);
-        return;
-      }
+    if (P._lernen || P._testModus) return;
+    var aktion = P.aktionVon(rolle);
+    ausfuehren(aktion);
+    // Gedrückt halten: eigene Wiederholung (400 ms, dann alle 150 ms) nur für Module mit wiederholung: true
+    var m = HT.session && HT.session.modulLaeuft && HT.session.modulLaeuft();
+    if (vonTastatur && RICHTUNG[aktion] && m && m.wiederholung) {
+      clearTimeout(wdh[rolle]);
+      wdh[rolle] = setTimeout(function los() { if (!P.gedrueckt[rolle]) return; ausfuehren(aktion); wdh[rolle] = setTimeout(los, 150); }, 400);
     }
+  }
+  function tasteLos(rolle) {
+    clearTimeout(wdh[rolle]);
+    if (!P.gedrueckt[rolle]) return;
+    P.gedrueckt[rolle] = false;
+    benachrichtigen('taste', { rolle: rolle, gedrueckt: false });
+  }
+  function rolleZurTaste(code) {
+    var tasten = konfig().tasten || {};
+    for (var rolle in tasten) if (tasten[rolle].key && tasten[rolle].key === code) return rolle;
+    return null;
+  }
+  // Tastatur-Modus: angelernte Pulttasten werden hier abgefangen und als Aktion weitergegeben
+  document.addEventListener('keydown', function (ev) {
+    P.letzteTaste = { code: ev.code, key: ev.key };
+    benachrichtigen('tastatur', P.letzteTaste);
+    if (P._lernen !== null && P._lernenTaste) { P._lernenTaste(ev); return; }
+    var t = ev.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+    var rolle = rolleZurTaste(ev.code);
+    if (!rolle) {
+      // Standardbelegung RehaCom-Pult ohne Anlernen: „+“ = gelbe Taste, „−“ = rote Taste (Pfeile, Enter, Ziffern laufen normal)
+      var std = (ev.key === '+' || ev.code === 'NumpadAdd') ? 'gelb_links' : (ev.key === '-' || ev.code === 'NumpadSubtract') ? 'rot_links' : null;
+      if (!std || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+      erkannt('Tasten + / −');
+      if (P._testModus) { tasteGedrueckt(std); setTimeout(function () { tasteLos(std); }, 150); return; }
+      ev.preventDefault(); ev.stopImmediatePropagation();
+      if (!ev.repeat) ausfuehren(P.aktionVon(std));
+      return;
+    }
+    erkannt('angelernte Taste');
+    // Sendet das Pult ohnehin die passende Standardtaste (z. B. Pfeil oben für „hoch“), läuft sie normal weiter –
+    // so funktionieren auch gehaltene Tasten (Gas im Straßenverkehr); nur die Testanzeige zählt mit.
+    if (STANDARD[ev.code] && STANDARD[ev.code] === P.aktionVon(rolle) && !P._testModus) {
+      if (!ev.repeat && !P.gedrueckt[rolle]) { P.gedrueckt[rolle] = true; P.zaehler[rolle] = (P.zaehler[rolle] || 0) + 1; benachrichtigen('taste', { rolle: rolle, gedrueckt: true }); }
+      return;
+    }
+    ev.preventDefault(); ev.stopImmediatePropagation();
+    if (ev.repeat) return; // Systemwiederholung ignorieren (eigene Wiederholung siehe oben)
+    tasteGedrueckt(rolle, true);
   }, true);
+  document.addEventListener('keyup', function (ev) {
+    var rolle = rolleZurTaste(ev.code);
+    if (rolle) tasteLos(rolle);
+  }, true);
+  window.addEventListener('blur', function () { Object.keys(P.gedrueckt).forEach(tasteLos); });
+
+  /* Erkennung: Das RehaCom-Pult meldet sich am Mac und am iPad (USB-Adapter) als Tastatur. Browser dürfen Tastaturen
+   * nicht nach Namen auflisten – das Pult gilt daher als erkannt, sobald eine seiner Tasten ankommt. */
+  P.erkannt = false;
+  function erkannt(wie) {
+    if (P.erkannt) return;
+    P.erkannt = true;
+    melden('RehaCom-Pult erkannt (' + wie + ').');
+    if (UI.toast && !P._testModus) UI.toast('RehaCom-Pult erkannt', 'erfolg');
+    statusAktualisieren();
+  }
 
   /* Aktion ausführen: im Training an das Modul, auf Zwischenbildschirmen den Hauptknopf drücken */
   function ausfuehren(aktion) {
     if (!aktion) return;
+    if (aktion.indexOf('ziffer:') === 0) {
+      // Zifferntasten gehen nur an laufende Module (z. B. Zahlenspanne, Kopfrechnen)
+      if (document.querySelector('.training') && HT.eingabe.aktiv && !document.querySelector('.pause-schleier, .dialog-hinter')) HT.eingabe.ausloesen('ziffer', { wert: Number(aktion.slice(7)), quelle: 'pult' });
+      return;
+    }
     var training = document.querySelector('.training');
     if (!training) {
       // außerhalb des Trainings: OK bestätigt einen offenen Dialog
       var dlg = document.querySelector('.dialog-hinter');
-      if (dlg && aktion === 'ok') { var k0 = dlg.querySelector('button.primaer'); if (k0) k0.click(); }
+      if (dlg) { if (aktion === 'ok') { var k0 = dlg.querySelector('button.primaer'); if (k0) k0.click(); } return; }
+      // Arbeitsplatz: Pfeile wählen Gruppe/Modul, OK startet das Training
+      if (HT.apNavi) HT.apNavi(aktion);
       return;
     }
-    if (aktion === 'pause') { var pk = training.querySelector('.tk-pause'); if (pk && !training.querySelector('.pause-schleier')) pk.click(); return; }
+    if (aktion === 'pause') {
+      if (HT.session && HT.session.pauseOeffnen) HT.session.pauseOeffnen();
+      else { var pk = training.querySelector('.tk-pause'); if (pk && !training.querySelector('.pause-schleier')) pk.click(); }
+      return;
+    }
+    if (aktion === 'anleitung') { if (HT.session && HT.session.anleitungWiederholen) HT.session.anleitungWiederholen(); return; }
     var schleier = training.querySelector('.pause-schleier') || document.querySelector('.dialog-hinter');
     if (schleier) { if (aktion === 'ok') { var k1 = schleier.querySelector('button.primaer'); if (k1) k1.click(); } return; }
     var schirm = training.querySelector('.t-schirm');
@@ -216,10 +313,14 @@
 
   /* ---------- Statusanzeige (grün = verbunden) ---------- */
   function zustand() {
-    if (!P.unterstuetzt) return { klasse: 'aus', text: 'Bedienpult: nur in Chrome', titel: 'Das USB-Bedienpult funktioniert in Google Chrome oder Microsoft Edge (nicht in Safari).' };
-    if (!P.geraet) return { klasse: 'getrennt', text: 'Bedienpult nicht verbunden', titel: 'Klicken, um das USB-Bedienpult zu verbinden oder zu testen' };
-    if (!P.eingerichtet()) return { klasse: 'einrichten', text: 'Bedienpult verbunden – Tasten einrichten', titel: 'Pult ist verbunden, die Tasten müssen noch einmal angelernt werden' };
-    return { klasse: 'verbunden', text: 'Bedienpult verbunden', titel: (P.geraet.productName || 'USB-Pult') + ' – klicken für Pulttest' };
+    var tast = P.tastaturBereit();
+    if (P.geraet) {
+      if (!P.eingerichtet()) return { klasse: 'einrichten', text: 'Pult verbunden – Tasten einrichten', titel: 'HID-Pult ist verbunden, die Tasten müssen noch einmal angelernt werden' };
+      return { klasse: 'verbunden', text: tast ? 'Pult bereit (Tastatur + Joystick)' : 'Pult verbunden (Joystick)', titel: (P.geraet.productName || 'USB-Pult') + ' – klicken für Pulttest' };
+    }
+    if (P.erkannt && !tast) return { klasse: 'verbunden', text: 'RehaCom-Pult erkannt', titel: 'Standardbelegung aktiv (Pfeile, OK, Ziffern, + und −) – klicken für Pulttest' };
+    if (tast) return { klasse: 'verbunden', text: P.erkannt ? 'RehaCom-Pult bereit' : 'Pult bereit (Tastatur)', titel: 'Die Pulttasten sind angelernt – klicken für Pulttest' };
+    return { klasse: 'getrennt', text: 'Pult: Tasten einrichten', titel: 'Klicken, um die Tasten des Pults anzulernen (funktioniert in jedem Browser)' };
   }
   function chipMalen(c) {
     var z = zustand();
@@ -241,16 +342,23 @@
 
   /* ---------- Pultgrafik ---------- */
   function pultSvg() {
+    // Gehäuse in der Form des RehaCom-Pults (flach von oben), graue Bedienfläche, Tasten nach ROLLEN
     var s = '<svg class="pult-svg" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">' +
-      '<path d="M40 70 Q40 40 75 38 L525 38 Q560 40 560 70 L572 236 Q575 282 528 284 L72 284 Q25 282 28 236 Z" fill="#eef2f4" stroke="#c9d2d8" stroke-width="3"/>' +
-      '<path d="M190 50 L410 50 Q430 52 430 72 L430 262 Q430 274 410 274 L190 274 Q170 274 170 262 L170 72 Q170 52 190 50 Z" fill="#dfe5e9"/>';
+      '<path d="M30 60 Q30 22 70 20 L530 20 Q570 22 570 60 L580 240 Q582 286 534 288 L66 288 Q18 286 20 240 Z" fill="#f4f6f7" stroke="#c9d2d8" stroke-width="3"/>' +
+      '<path d="M44 92 Q150 70 300 72 Q450 70 556 92 L560 262 Q560 276 544 276 L56 276 Q40 276 40 262 Z" fill="#dfe4e8"/>' +
+      '<text x="48" y="284" font-size="11" font-weight="700" fill="#2EAD6B">RehaCom-Pult</text>';
     ROLLEN.forEach(function (r) {
       if (!r.x) return;
       var f = FARBEN[r.farbe];
-      s += '<g class="pult-taste" data-rolle="' + r.id + '"><circle cx="' + r.x + '" cy="' + (r.y + 4) + '" r="' + r.r + '" fill="rgba(0,0,0,.12)"/>' +
-        '<circle class="pult-kappe" cx="' + r.x + '" cy="' + r.y + '" r="' + r.r + '" fill="' + f[0] + '" stroke="' + f[1] + '" stroke-width="3"/>' +
-        (r.farbe === 'gruen' ? '<text x="' + r.x + '" y="' + (r.y + 8) + '" text-anchor="middle" font-size="22" font-weight="800" fill="#fff">OK</text>' : '') +
-        '<text class="pult-zahl" x="' + r.x + '" y="' + (r.y + r.r + 22) + '" text-anchor="middle" font-size="15" font-weight="700" fill="#5f6b74">0</text></g>';
+      s += '<g class="pult-taste" data-rolle="' + r.id + '"><circle cx="' + r.x + '" cy="' + (r.y + (r.klein ? 2 : 4)) + '" r="' + r.r + '" fill="rgba(0,0,0,.12)"/>' +
+        '<circle class="pult-kappe" cx="' + r.x + '" cy="' + r.y + '" r="' + r.r + '" fill="' + f[0] + '" stroke="' + f[1] + '" stroke-width="' + (r.klein ? 2 : 3) + '"/>';
+      if (r.klein) s += '<text x="' + r.x + '" y="' + (r.y + 4) + '" text-anchor="middle" font-size="' + (r.klein.length > 1 ? 9 : 12) + '" font-weight="800" fill="#fff">' + r.klein + '</text>';
+      else {
+        if (r.farbe === 'gruen') s += '<text x="' + r.x + '" y="' + (r.y + 8) + '" text-anchor="middle" font-size="22" font-weight="800" fill="#fff">OK</text>';
+        if (r.farbe === 'gelb' || r.farbe === 'rot') s += '<text x="' + r.x + '" y="' + (r.y + 7) + '" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">' + (r.farbe === 'gelb' ? '+' : '−') + '</text>';
+        if (r.farbe === 'weiss') { var pf = { hoch: 'M0 -10 L9 5 L-9 5 Z', runter: 'M0 10 L9 -5 L-9 -5 Z', links: 'M-10 0 L5 -9 L5 9 Z', rechts: 'M10 0 L-5 -9 L-5 9 Z' }[r.id]; s += '<path d="' + pf + '" transform="translate(' + r.x + ' ' + r.y + ')" fill="#b8c2c9"/>'; }
+      }
+      s += '<text class="pult-zahl" x="' + r.x + '" y="' + (r.y + r.r + (r.klein ? 14 : 22)) + '" text-anchor="middle" font-size="' + (r.klein ? 10 : 15) + '" font-weight="700" fill="#5f6b74">0</text></g>';
     });
     return s + '</svg>';
   }
@@ -259,16 +367,19 @@
   P.dialog = function () {
     var aus = [];
     var w = HT.el('div', { class: 'pult-dialog' });
-    var oben = HT.el('div', { class: 'pult-oben' });
-    var knVerb = UI.knopf('Bedienpult verbinden', { art: 'primaer', icon: 'pult', klick: function () { P.verbinden(); } });
-    var knTrenn = UI.knopf('Trennen', { icon: 'stopp', klick: function () { P.trennen(); } });
-    var knLern = UI.knopf('Tasten einrichten', { icon: 'tastatur', klick: function () { lernen(); } });
-    var knJoy = UI.knopf('Joystick kalibrieren', { icon: 'ziel', klick: function () { kalibrieren(); } });
-    var knDruck = UI.knopf('Protokoll drucken', { icon: 'drucker', klick: protokoll });
-    [knVerb, knTrenn, knLern, knJoy, knDruck].forEach(function (k) { oben.appendChild(k); });
-    w.appendChild(oben);
     var hinweisBox = HT.el('div', { class: 'pult-hinweis' });
     w.appendChild(hinweisBox);
+    var oben = HT.el('div', { class: 'pult-oben' });
+    var knLern = UI.knopf('Tasten einrichten', { art: 'primaer gross', icon: 'tastatur', klick: function () { lernen(); } });
+    var knJoy = UI.knopf('Als USB-HID verbinden (Chrome)', { art: 'gross', icon: 'pult', klick: function () { P.verbinden(); } });
+    knJoy.title = 'Nur nötig, wenn das RehaCom-Pult sich nicht als Tastatur meldet';
+    if (!P.unterstuetzt) { knJoy.disabled = true; knJoy.title = 'Nur in Chrome – die Tasten funktionieren überall über „Tasten einrichten“'; }
+    var knTrenn = UI.knopf('HID trennen', { art: 'geist', icon: 'stopp', klick: function () { P.trennen(); } });
+    var knDruck = UI.knopf('Protokoll drucken', { art: 'geist', icon: 'drucker', klick: protokoll });
+    [knLern, knJoy, knTrenn, knDruck].forEach(function (k) { oben.appendChild(k); });
+    w.appendChild(oben);
+    var live = HT.el('div', { class: 'pult-live klein' }, 'Zuletzt gedrückte Taste: –');
+    w.appendChild(live);
     var raster = HT.el('div', { class: 'pult-raster' });
     var links = HT.el('div', { class: 'pult-links' });
     links.appendChild(HT.el('div', { class: 'feld-label' }, 'Meldungen'));
@@ -284,11 +395,11 @@
     raster.appendChild(links);
     var rechts = HT.el('div', { class: 'pult-rechts' });
     var joyKopf = HT.el('div', { class: 'pult-joykopf' }, [HT.el('span', null, 'Joystick'), HT.el('span', { class: 'pult-joywert' }, '(X: –; Y: –)')]);
-    rechts.appendChild(joyKopf);
+    if (konfig().joystick) rechts.appendChild(joyKopf);
     var feld = HT.el('div', { class: 'pult-joyfeld' });
     var punkt = HT.el('div', { class: 'pult-joypunkt' });
     feld.appendChild(punkt);
-    rechts.appendChild(feld);
+    if (konfig().joystick) rechts.appendChild(feld);
     var roh = HT.el('div', { class: 'pult-roh klein' }, 'Rohdaten: –');
     rechts.appendChild(roh);
     var zuordnung = HT.el('div', { class: 'pult-zuordnung' });
@@ -298,21 +409,24 @@
 
     function malen() {
       var verbunden = !!P.geraet;
-      knVerb.style.display = verbunden ? 'none' : '';
       knTrenn.style.display = verbunden ? '' : 'none';
-      knLern.disabled = !verbunden; knJoy.disabled = !verbunden;
       var z = zustand();
       hinweisBox.className = 'pult-hinweis ' + z.klasse;
       hinweisBox.innerHTML = '<span class="pult-punkt"></span><b>' + HT.esc(z.text) + '</b>' + (
-        !P.unterstuetzt ? '<span>Bitte index.html in Google Chrome öffnen. Ein Treiber ist nicht nötig.</span>'
-          : !verbunden ? '<span>Pult per USB anstecken und „Bedienpult verbinden“ klicken. Im Chrome-Fenster das Pult auswählen und „Verbinden“ drücken. Danach verbindet es sich automatisch. Ein Treiber ist nicht nötig.</span>'
-            : !P.eingerichtet() ? '<span>Einmalig „Tasten einrichten“: Das Programm fragt jede Taste nacheinander ab.</span>' : '<span>Alle Tasten sind eingerichtet. Zum Prüfen einfach Tasten drücken.</span>');
+        P.tastaturBereit() ? '<span>Die Tasten sind eingerichtet. Zum Prüfen einfach Tasten drücken – sie leuchten unten auf.</span>'
+          : '<span>Pult per USB anstecken und einmal „Tasten einrichten“ wählen: Das Programm fragt jede Taste nacheinander ab. Ein Treiber ist nicht nötig, es funktioniert in Safari und Chrome.</span>');
       var k = konfig();
       info.innerHTML = verbunden ? '<b>' + HT.esc(P.geraet.productName || 'HID-Gerät') + '</b> · VID ' + hex(P.geraet.vendorId) + ' · PID ' + hex(P.geraet.productId) + (k.joystick ? ' · Joystick kalibriert' : '') : '';
       log.textContent = P.meldungen.length ? P.meldungen.join('\n') : 'Noch keine Meldungen.';
       log.scrollTop = log.scrollHeight;
       // Zuordnungstabelle (Aktion je Taste änderbar)
       HT.leeren(zuordnung);
+      zuordnung.appendChild(HT.el('div', { class: 'feld-label' }, 'Belegungsprofil'));
+      var profSel = HT.el('select', { class: 'pult-profil' });
+      PROFILE.forEach(function (pr) { var o = HT.el('option', { value: pr[0] }, pr[1]); if (P.profil() === pr[0]) o.selected = true; profSel.appendChild(o); });
+      profSel.addEventListener('change', function () { var kk = konfig(); kk.profil = profSel.value; konfigSpeichern(kk).then(malen); });
+      zuordnung.appendChild(profSel);
+      zuordnung.appendChild(HT.el('div', { class: 'klein gedimmt', style: { margin: '.3rem 0 .6rem' } }, 'Module mit Ja/Nein-Antworten schalten Gelb und Rot automatisch auf Ja/Nein um.'));
       zuordnung.appendChild(HT.el('div', { class: 'feld-label' }, 'Belegung der Tasten'));
       var t = k.tasten || {};
       ROLLEN.forEach(function (r) {
@@ -320,7 +434,8 @@
         z2.appendChild(HT.el('span', { class: 'pult-farbpunkt ' + r.farbe }));
         z2.appendChild(HT.el('span', { class: 'pult-zeilenname' }, r.name + (t[r.id] ? '' : ' – nicht eingerichtet')));
         var sel = HT.el('select');
-        AKTIONEN.forEach(function (a) { var o = HT.el('option', { value: a[0] }, a[1]); if (P.aktionVon(r.id) === a[0]) o.selected = true; sel.appendChild(o); });
+        var gesetzt = (k.aktionen && k.aktionen[r.id] !== undefined) ? k.aktionen[r.id] : 'auto';
+        AKTIONEN.forEach(function (a) { var o = HT.el('option', { value: a[0] }, a[1] + (a[0] === 'auto' ? ' – jetzt: ' + ((AKTIONEN.filter(function (x) { return x[0] === P.aktionVon(r.id); })[0] || ['', 'keine'])[1]) : '')); if (gesetzt === a[0]) o.selected = true; sel.appendChild(o); });
         sel.addEventListener('change', function () { var kk = konfig(); kk.aktionen = kk.aktionen || {}; kk.aktionen[r.id] = sel.value; konfigSpeichern(kk); });
         z2.appendChild(sel);
         zuordnung.appendChild(z2);
@@ -332,7 +447,7 @@
       ROLLEN.forEach(function (r) {
         var g = grafik.querySelector('[data-rolle="' + r.id + '"]');
         if (!g) return;
-        g.querySelector('.pult-zahl').textContent = P.zaehler[r.id] || 0;
+        var zl = g.querySelector('.pult-zahl'); if (zl) zl.textContent = P.zaehler[r.id] || 0;
         g.classList.toggle('an', !!P.gedrueckt[r.id]);
         g.classList.toggle('fehlt', !(konfig().tasten || {})[r.id]);
       });
@@ -344,6 +459,7 @@
     P._testModus = true;
     aus.push(P.an(function (art, d) {
       if (art === 'taste') { zaehlerMalen(); if (d.rolle.indexOf('fuss') === 0) malen(); }
+      else if (art === 'tastatur') live.textContent = 'Zuletzt gedrückte Taste: ' + d.code + (d.key && d.key.length === 1 ? ' („' + d.key + '“)' : d.key ? ' (' + d.key + ')' : '');
       else if (art === 'joystick') joyMalen(d);
       else if (art === 'roh') roh.textContent = 'Rohdaten (Bericht ' + d.reportId + '): ' + [].map.call(d.daten, function (b) { return hex(b, 2); }).join(' ');
       else malen();
@@ -361,7 +477,8 @@
       var knopfZeile = HT.el('div', { class: 'pult-lernknoepfe' });
       var weiterK = UI.knopf('Überspringen', { klick: function () { naechste(); } });
       var abbrK = UI.knopf('Abbrechen', { art: 'geist', klick: function () { ende(false); } });
-      knopfZeile.appendChild(abbrK); knopfZeile.appendChild(weiterK);
+      var restK = UI.knopf('Rest überspringen & speichern', { art: 'geist', klick: function () { ende(true); } });
+      knopfZeile.appendChild(abbrK); knopfZeile.appendChild(restK); knopfZeile.appendChild(weiterK);
       [titel, text, fort, knopfZeile].forEach(function (e) { box.appendChild(e); });
       w.appendChild(box);
       function kopieren() { var b = {}; Object.keys(P.letzte).forEach(function (r) { b[r] = new Uint8Array(P.letzte[r]); }); return b; }
@@ -406,10 +523,18 @@
         }
       };
       P._lernenTaste = function (ev) {
-        if (phase === 'ruhe' || index < 0) return;
+        if (phase === 'ruhe' || index < 0 || ev.repeat) return;
         if (/^(Tab|Escape)$/.test(ev.key)) return;
         ev.preventDefault(); ev.stopImmediatePropagation();
-        neu[rollen[index].id] = { key: ev.code, name: ev.key };
+        var id = rollen[index].id, alt = konfig().tasten || {}, belegt = null;
+        Object.keys(neu).forEach(function (r) { if (r !== id && neu[r].key === ev.code) belegt = r; });
+        if (!belegt) Object.keys(alt).forEach(function (r) { if (r !== id && !neu[r] && alt[r].key === ev.code) belegt = r; });
+        if (belegt) {
+          var rn = (ROLLEN.filter(function (x) { return x.id === belegt; })[0] || { name: belegt }).name;
+          text.textContent = 'Diese Taste (' + ev.code + ') ist schon für „' + rn + '“ belegt. Bitte die gesuchte Taste drücken oder „Überspringen“.';
+          return;
+        }
+        neu[id] = { key: ev.code, name: ev.key, location: ev.location };
         naechste();
       };
       function ende(ok) {
@@ -421,6 +546,7 @@
         k.tasten = HT.zusammen(k.tasten || {}, neu);
         konfigSpeichern(k).then(function () { melden(Object.keys(neu).length + ' Tasten eingerichtet.'); statusAktualisieren(); malen(); });
       }
+      P._lernen = P._lernen || function () {};
       titel.textContent = 'Bitte keine Taste drücken …';
       text.textContent = 'Das Programm misst kurz die Ruhewerte des Pults.';
       fort.textContent = '';

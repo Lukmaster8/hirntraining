@@ -11,7 +11,7 @@
     ziel: 'Verbales Lernen und Wiedererkennen von Wörtern',
     beschreibung: 'Eine Wortliste wird Wort für Wort gezeigt und – sofern eine Systemstimme verfügbar ist – vorgelesen. Danach erscheinen gelernte und neue Wörter gemischt und es wird entschieden: bekannt oder neu. In höheren Leveln stammen neue Wörter aus denselben Oberbegriffen und es gibt eine Wartezeit.',
     anleitung: 'Lesen Sie die Wörter und merken Sie sie sich. Danach erscheinen Wörter einzeln: Tippen Sie auf „Bekannt“ (J), wenn das Wort in der Liste war, sonst auf „Neu“ (N).',
-    tasten: ['ja', 'nein'],
+    tasten: ['ja', 'nein'], eingaben: ['ja', 'nein'],
     levels: levels,
     levelLabels: { anzahl: 'Wörter', darbietungMs: 'Darbietung (ms)', aehnlich: 'Ähnliche neue Wörter', verzoegerungSek: 'Verzögerung (s)' },
     parameterSchema: { vorlesen: { typ: 'schalter', label: 'Wörter vorlesen (falls Systemstimme vorhanden)', standard: true } },

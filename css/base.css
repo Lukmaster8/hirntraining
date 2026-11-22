@@ -21,11 +21,11 @@
   --linie: #e1e8ed;
   --linie-2: #cfd9e0;
   --schatten-1: 0 1px 2px rgba(20, 40, 60, .06), 0 1px 3px rgba(20, 40, 60, .05);
-  --schatten-2: 0 4px 14px rgba(20, 40, 60, .08), 0 1px 3px rgba(20, 40, 60, .05);
-  --schatten-3: 0 18px 50px rgba(20, 40, 60, .18), 0 4px 12px rgba(20, 40, 60, .08);
-  --radius: 12px;
-  --radius-gross: 18px;
-  --radius-klein: 8px;
+  --schatten-2: 0 calc(4px * var(--bildschirm, 1)) calc(14px * var(--bildschirm, 1)) rgba(20, 40, 60, .08), 0 1px 3px rgba(20, 40, 60, .05);
+  --schatten-3: 0 calc(18px * var(--bildschirm, 1)) calc(50px * var(--bildschirm, 1)) rgba(20, 40, 60, .18), 0 calc(4px * var(--bildschirm, 1)) calc(12px * var(--bildschirm, 1)) rgba(20, 40, 60, .08);
+  --radius: calc(12px * var(--bildschirm, 1));
+  --radius-gross: calc(18px * var(--bildschirm, 1));
+  --radius-klein: calc(8px * var(--bildschirm, 1));
   --schnell: 160ms;
   --mittel: 240ms;
   --kurve: cubic-bezier(.2, .7, .2, 1);
@@ -43,7 +43,7 @@
   --akzent: #3cc3cf; --akzent-dunkel: #2aa3ae; --akzent-hell: #17353b; --verlauf: linear-gradient(135deg, #1f9aa6 0%, #2a6fb8 100%);
   --text: #e7eef2; --text-2: #a9b7c0; --text-3: #7a8a95; --grund: #12191e; --grund-2: #19232a; --karte: #1c262d;
   --linie: #2b3841; --linie-2: #3a4955; --erfolg-hell: #173527; --fehler-hell: #3a1f21; --warnung-hell: #3a301a;
-  --schatten-1: 0 1px 2px rgba(0, 0, 0, .3); --schatten-2: 0 4px 14px rgba(0, 0, 0, .35); --schatten-3: 0 18px 50px rgba(0, 0, 0, .55);
+  --schatten-1: 0 1px 2px rgba(0, 0, 0, .3); --schatten-2: 0 calc(4px * var(--bildschirm, 1)) calc(14px * var(--bildschirm, 1)) rgba(0, 0, 0, .35); --schatten-3: 0 calc(18px * var(--bildschirm, 1)) calc(50px * var(--bildschirm, 1)) rgba(0, 0, 0, .55);
   --training-grund: #161f25;
 }
 
@@ -58,7 +58,11 @@
 [data-kontrast="an"] .knopf.primaer { color: #000 !important; }
 
 * { box-sizing: border-box; }
-html { font-size: calc(112.5% * var(--skala)); -webkit-text-size-adjust: 100%; }
+html { font-size: calc(112.5% * var(--skala) * var(--bildschirm, 1)); -webkit-text-size-adjust: 100%; }
+/* 4K / große Bildschirme ohne Systemskalierung (CSS-Breite über 2200 px): Schrift und Bedienelemente mitwachsen lassen */
+@media (min-width: 2200px) { :root { --bildschirm: 1.3; } }
+@media (min-width: 2800px) { :root { --bildschirm: 1.6; } }
+@media (min-width: 3400px) { :root { --bildschirm: 1.9; } }
 html, body { margin: 0; height: 100%; }
 body {
   font-family: var(--schrift);
@@ -79,8 +83,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 img { max-width: 100%; }
 ::selection { background: var(--akzent-hell); }
-:focus { outline: none; }
-:focus-visible { outline: 3px solid var(--akzent); outline-offset: 2px; }
+/* Fokusrahmen: überall sichtbar (Safari 13 kennt :focus-visible nicht), bei Mausklick in neueren Browsern ausgeblendet */
+:focus { outline: 3px solid var(--akzent); outline-offset: 2px; }
+:focus:not(:focus-visible) { outline: none; }
+.pult-fokus { outline: calc(4px * var(--bildschirm, 1)) solid var(--akzent) !important; outline-offset: 3px; box-shadow: 0 0 0 calc(7px * var(--bildschirm, 1)) rgba(27, 168, 181, .18); }
 .ic { width: 1.2em; height: 1.2em; flex: none; vertical-align: middle; }
 .versteckt { display: none !important; }
 .gedimmt { color: var(--text-3); }
@@ -91,10 +97,14 @@ img { max-width: 100%; }
 .zahl { font-variant-numeric: tabular-nums; }
 
 /* Scrollbalken dezent */
-::-webkit-scrollbar { width: 12px; height: 12px; }
-::-webkit-scrollbar-thumb { background: var(--linie-2); border-radius: 8px; border: 3px solid var(--grund); }
+::-webkit-scrollbar { width: calc(12px * var(--bildschirm, 1)); height: calc(12px * var(--bildschirm, 1)); }
+::-webkit-scrollbar-thumb { background: var(--linie-2); border-radius: calc(8px * var(--bildschirm, 1)); border: 3px solid var(--grund); }
 ::-webkit-scrollbar-track { background: transparent; }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition-duration: 1ms !important; animation-duration: 1ms !important; }
 }
+
+/* Unsichtbarer Bereich zum Vorladen der Vorschauen (core/library.js → HT.vorladen) */
+.vorlade-box { position: fixed; left: -10000px; top: 0; width: calc(400px * var(--bildschirm, 1)); height: calc(300px * var(--bildschirm, 1)); overflow: hidden; visibility: hidden; pointer-events: none; contain: strict; }
+.vorlade-box > .m-voll { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
