@@ -239,3 +239,11 @@ kbd { display: inline-block; min-width: 2rem; text-align: center; padding: .15re
 .lt-zeile.anker-rechts { border-right: 8px solid #E25C5C; }
 .lt-maske { color: transparent; text-shadow: none; background: repeating-linear-gradient(90deg, #dfe6ea 0 14px, transparent 14px 18px); border-radius: 6px; }
 @media (max-width: 760px) { .lt-zeile { font-size: 1.3rem; padding: .7rem .9rem; } .ek-artikel svg { height: 46px; } }
+.sv-banner { position: absolute; top: 14px; left: 50%; transform: translate(-50%, -8px); opacity: 0; transition: opacity .25s, transform .25s; z-index: 5; padding: .55rem 1.1rem; border-radius: 30px; background: rgba(20, 28, 34, .82); color: #fff; font-weight: 700; font-size: 1.1rem; white-space: nowrap; box-shadow: 0 6px 18px rgba(0, 0, 0, .2); pointer-events: none; max-width: 92%; overflow: hidden; text-overflow: ellipsis; }
+.sv-banner.an { opacity: 1; transform: translate(-50%, 0); }
+.sv-banner.gut { background: rgba(31, 138, 82, .92); }
+.sv-banner.schlecht { background: rgba(201, 52, 52, .94); }
+.sv-banner.warn { background: rgba(196, 128, 20, .94); }
+.sv-banner.info { background: rgba(21, 110, 140, .9); }
+.sv-knopf.gas { min-width: 90px; background: #e5f7ec; border-color: #b9e3c8; color: #1f7a48; font-size: 1.05rem; }
+@media (max-width: 760px) { .sv-banner { font-size: .9rem; top: 8px; } .sv-knopf { min-width: 52px; height: 54px; font-size: 1.2rem; } .sv-knopf.bremse { min-width: 96px; } .sv-knopf.gas { min-width: 66px; } }
