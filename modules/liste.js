@@ -3,7 +3,7 @@
 window.HT = window.HT || {};
 HT.MODUL_LISTE = [
   // Aufmerksamkeit
-  'reaktion', 'wahlreaktion', 'daueraufmerksamkeit', 'vigilanz', 'selektive-aufmerksamkeit', 'geteilte-aufmerksamkeit', 'hoeren', 'strassenverkehr', 'alarm-strasse', 'zahlenfeld', 'regel-reaktion',
+  'reaktion', 'wahlreaktion', 'daueraufmerksamkeit', 'vigilanz', 'selektive-aufmerksamkeit', 'geteilte-aufmerksamkeit', 'hoeren', 'strassenverkehr', 'fahrsimulator-3d', 'alarm-strasse', 'zahlenfeld', 'regel-reaktion',
   // Gedächtnis
   'arbeitsgedaechtnis', 'zahlenspanne', 'bilder-wiedererkennen', 'wortlisten', 'memory', 'wege-merken', 'alltagsgedaechtnis', 'einkaufen', 'geschichten', 'wort-bild-paare', 'personen-merken', 'spielkarten', 'szenen-beobachten', 'telefonnotiz',
   // Wahrnehmung & Neglect

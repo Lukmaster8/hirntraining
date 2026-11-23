@@ -418,3 +418,15 @@ html.leicht .pult-hinweis-training i { animation: none; }
 
 /* „Übung überspringen“ während der Probeaufgaben */
 .uebung-skip { position: absolute; right: 1rem; bottom: 1rem; z-index: 30; opacity: .92; }
+
+/* Fahrsimulator 3D */
+.f3d-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
+.f3d-status { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #dfe8ec; font-weight: 600; text-align: center; max-width: 80%; z-index: 3; }
+.f3d-status b { display: block; font-size: 1.3rem; margin-bottom: .4rem; } .f3d-status span { display: block; color: #9fb0ba; font-weight: 500; }
+.f3d-warn { position: absolute; top: 14%; left: 50%; transform: translate(-50%, 0); display: none; z-index: 4; background: rgba(178, 20, 24, .92); color: #fff; border: 2px solid rgba(255, 120, 120, .95); border-radius: 12px; padding: .7rem 1.4rem .7rem 3.6rem; box-shadow: 0 0 24px rgba(255, 40, 40, .5); }
+.f3d-warn.an { display: block; }
+.f3d-warn::before { content: '!'; position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-left: 1.1rem solid transparent; border-right: 1.1rem solid transparent; border-bottom: 1.9rem solid #ffd60a; color: #111; font-weight: 900; line-height: 2.6rem; text-indent: -.25rem; }
+.f3d-warn b { display: block; font-size: 1.35rem; } .f3d-warn span { display: block; font-size: .95rem; opacity: .95; }
+.f3d-hinweis { position: absolute; bottom: 6%; left: 50%; transform: translateX(-50%); z-index: 4; background: rgba(10, 14, 18, .72); color: #fff; padding: .55rem 1.1rem; border-radius: 10px; font-weight: 600; opacity: 0; transition: opacity .25s; pointer-events: none; }
+.f3d-hinweis.an { opacity: 1; }
+.f3d-fps { position: absolute; top: .6rem; left: .8rem; z-index: 4; color: #b8f5c8; font: 600 12px/1.3 Menlo, monospace; background: rgba(0, 0, 0, .45); padding: .2rem .5rem; border-radius: 6px; }

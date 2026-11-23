@@ -81,6 +81,13 @@ Das RehaCom-Pult meldet sich am Mac und am iPad (über USB-Adapter) als **normal
 
 Im Arbeitsplatz wählen die Pfeile Gruppe und Modul, OK startet das Training. Zifferntasten gehen an laufende Module. „Protokoll drucken“ gibt die Belegung aus.
 
+### Fahrsimulator 3D (Prototyp)
+Zusätzlich zum Modul „Straßenverkehr“ gibt es den **Fahrsimulator 3D**: Fahrt aus dem Cockpit eines echten 3D-Fahrzeugs (Golf GTI) durch eine Vorstadtstraße mit Häusern, Bäumen, Gehweg, Zebrastreifen und Ampel. Das Lenkrad dreht mit, das Kombi-Display des Autos zeigt live Tempo, Limit und Punkte, der Innenspiegel zeigt das Rückbild. Tempo 50 halten (+10/−5), Warnung bei zu schnell, Fußgänger und Ampel beachten.
+* Läuft nur in **Google Chrome** (WebGL 2). Safari 13 zeigt einen Hinweis; dort bitte „Straßenverkehr“ nehmen.
+* Grafikqualität (Parameter): Automatisch, Niedrig (iMac 2012), Mittel, Hoch; optional Leistungsanzeige (FPS).
+* Das Fahrzeugmodell ist **lizenzpflichtig (Sketchfab Standard)** und nur in der lokalen Fassung enthalten (`modules/fahrsimulator-3d/assets3d/golf.js`, nicht in GitHub). Neu erzeugen: `python3 tools/3d/golf_einbetten.py /Pfad/zur/volkswagen_golf_gti_2025.glb`. Lizenzen: `modules/fahrsimulator-3d/assets3d/LIZENZEN.md`.
+* Three.js neu bauen (nur Entwickler): `cd tools/3d && npm install --ignore-scripts && ./bauen.sh`. Plan und nächste Schritte: `docs/PLAN_3D_FAHRSIMULATOR.md`.
+
 ### iPhone, iPad und Online-Version (GitHub Pages)
 Hirntraining läuft auch auf iPhone und iPad als App mit eigenem Icon auf dem Home-Bildschirm. Dafür braucht es eine Internetadresse. GitHub Pages ist kostenlos:
 

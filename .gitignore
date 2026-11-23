@@ -3,3 +3,8 @@
 __pycache__/
 docs/PROMPT_*.md
 Prompt_*.md
+node_modules/
+tools/3d/package-lock.json
+# Lizenzpflichtiges 3D-Fahrzeug (Sketchfab Standard): nur lokal / privat, nie öffentlich
+modules/fahrsimulator-3d/assets3d/golf*.js
+modules/fahrsimulator-3d/assets3d/*.glb

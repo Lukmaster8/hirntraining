@@ -17,6 +17,9 @@ for t in TEILE:
             for f in fs:
                 if f.startswith('.'):
                     continue
+                # Lizenzpflichtiges 3D-Fahrzeug nur lokal: nicht in die Online-Fassung (GitHub Pages) aufnehmen
+                if 'fahrsimulator-3d/assets3d/' in os.path.join(wurzel, f).replace(os.sep, '/') and (f.startswith('golf') or f.endswith('.glb')):
+                    continue
                 liste.append(os.path.relpath(os.path.join(wurzel, f), BASIS).replace(os.sep, '/'))
     for d in sorted(liste):
         dateien.append(d)

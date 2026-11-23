@@ -1,0 +1,9 @@
+{
+  "name": "hirntraining-3d-werkzeug",
+  "private": true,
+  "description": "Nur Entwickler-Werkzeug: baut modules/fahrsimulator-3d/three-bundle.js",
+  "dependencies": {
+    "esbuild": "^0.24.0",
+    "three": "^0.170.0"
+  }
+}

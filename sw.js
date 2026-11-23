@@ -1,7 +1,7 @@
 /* Hirntraining – Offline-Speicher (Service Worker). Automatisch erzeugt von tools/offline_liste.py – nicht von Hand ändern.
  * Wirkt nur in der Online-Version (https, z. B. GitHub Pages): Nach dem ersten Öffnen läuft das Programm
  * auch ohne Internet. Die Patientendaten liegen davon unabhängig im Speicher des jeweiligen Geräts. */
-var VERSION = 'ht-661e1c91b3';
+var VERSION = 'ht-76a5375915';
 var DATEIEN = [
  "./",
  "index.html",
@@ -413,6 +413,9 @@ var DATEIEN = [
  "modules/daueraufmerksamkeit/module.js",
  "modules/denksport/module.js",
  "modules/einkaufen/module.js",
+ "modules/fahrsimulator-3d/assets3d/LIZENZEN.md",
+ "modules/fahrsimulator-3d/module.js",
+ "modules/fahrsimulator-3d/three-bundle.js",
  "modules/figur-grund/module.js",
  "modules/formen-unterscheiden/module.js",
  "modules/geschichten/module.js",
