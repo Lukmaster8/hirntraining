@@ -1,7 +1,7 @@
 /* Hirntraining – Offline-Speicher (Service Worker). Automatisch erzeugt von tools/offline_liste.py – nicht von Hand ändern.
  * Wirkt nur in der Online-Version (https, z. B. GitHub Pages): Nach dem ersten Öffnen läuft das Programm
  * auch ohne Internet. Die Patientendaten liegen davon unabhängig im Speicher des jeweiligen Geräts. */
-var VERSION = 'ht-7669bd3639';
+var VERSION = 'ht-661e1c91b3';
 var DATEIEN = [
  "./",
  "index.html",
@@ -67,6 +67,9 @@ var DATEIEN = [
  "assets/audio/strassenverkehr/abbiegen-links.mp3",
  "assets/audio/strassenverkehr/abbiegen-rechts.mp3",
  "assets/audio/strassenverkehr/anleitung-strassenverkehr.mp3",
+ "assets/audio/strassenverkehr/polizei-1.m4a",
+ "assets/audio/strassenverkehr/polizei-2.m4a",
+ "assets/audio/strassenverkehr/polizei-3.m4a",
  "assets/audio/szenen-beobachten/anleitung-szenen-beobachten.mp3",
  "assets/audio/tagesplanung/anleitung-tagesplanung.mp3",
  "assets/audio/telefonnotiz/anleitung-telefonnotiz.mp3",

@@ -3727,6 +3727,39 @@
    "gruppe": "optional",
    "status": "fehlt",
    "zeichen": 296
+  },
+  {
+   "id": "polizei-1",
+   "text": "Achtung, Polizei! Sie fahren zu schnell! Bitte halten Sie Ihr Fahrzeug an!",
+   "datei": "assets/audio/strassenverkehr/polizei-1.m4a",
+   "modul": "strassenverkehr",
+   "stelle": "Polizei-Durchsage (Megafon)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 74,
+   "stimme": "Paul (ElevenLabs v3, gerufen, Megafon-Effekt)"
+  },
+  {
+   "id": "polizei-2",
+   "text": "Bitte folgen Sie uns und halten Sie an!",
+   "datei": "assets/audio/strassenverkehr/polizei-2.m4a",
+   "modul": "strassenverkehr",
+   "stelle": "Polizei-Durchsage (Megafon)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 39,
+   "stimme": "Paul (ElevenLabs v3, gerufen, Megafon-Effekt)"
+  },
+  {
+   "id": "polizei-3",
+   "text": "Polizeikontrolle beendet. Bitte halten Sie sich an die Geschwindigkeit.",
+   "datei": "assets/audio/strassenverkehr/polizei-3.m4a",
+   "modul": "strassenverkehr",
+   "stelle": "Polizei-Durchsage (Megafon)",
+   "gruppe": "pflicht",
+   "status": "vorhanden",
+   "zeichen": 71,
+   "stimme": "Paul (ElevenLabs v3, gerufen, Megafon-Effekt)"
   }
  ]
 }
